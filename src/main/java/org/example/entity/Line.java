@@ -16,16 +16,16 @@ public class Line {
         this.rightPoint = edge.getRightPoint();
     }
 
-    public boolean is(Point c, CommonSupportLine commonSupportLine) {
+    public boolean is(Point point, CommonSupportLine commonSupportLine) {
         switch (commonSupportLine) {
             case UPPER -> {
-                return c.getY() > getEquationOfLine(c.getX());
+                return point.getY() > getEquationOfLine(point.getX());
             }
             case LOWER -> {
-                return c.getY() < getEquationOfLine(c.getX());
+                return point.getY() < getEquationOfLine(point.getX());
             }
             case ON -> {
-                return c.getY() == getEquationOfLine(c.getX());
+                return point.getY() == getEquationOfLine(point.getX());
             }
         }
 

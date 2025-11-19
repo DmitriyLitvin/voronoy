@@ -121,65 +121,36 @@ public class Main extends Application {
     }
 
     private Line getCommonSupport(List<Point> leftConvexPolygon, List<Point> rightConvexPolygon, CommonSupportLine commonSupportLine) {
-        Point maxXPoint = leftConvexPolygon.stream().max(Comparator.comparingDouble(Point::getX)).orElse(null);
+        Point maxXpoint = leftConvexPolygon.stream().max(Comparator.comparingDouble(Point::getX)).orElse(null);
         Point minXPoint = rightConvexPolygon.stream().min(Comparator.comparingDouble(Point::getX)).orElse(null);
-        Line line = new Line(maxXPoint, minXPoint);
+        Line line = new Line(maxXpoint, minXPoint);
 
-        leftConvexPolygon.removeIf(l -> l.equals(maxXPoint));
-        rightConvexPolygon.removeIf(l -> l.equals(minXPoint));
-        Point leftPoint = leftConvexPolygon.get(0);
-        Point rightPoint = rightConvexPolygon.get(0);
-        int i = 0;
-        int j = 0;
-        while (i < leftConvexPolygon.size() || j < rightConvexPolygon.size()) {
-            if (line.is(leftPoint, commonSupportLine) && i < leftConvexPolygon.size()) {
+        Iterator<Point> leftConvexPolygonIterator = leftConvexPolygon.stream().filter(p -> !p.equals(maxXpoint)).iterator();
+        Iterator<Point> rightConvexPolygonIterator = rightConvexPolygon.stream().filter(p -> !p.equals(minXPoint)).iterator();
+
+        Point leftPoint = maxXpoint;
+        Point rightPoint = minXPoint;
+        while (leftConvexPolygonIterator.hasNext() || rightConvexPolygonIterator.hasNext()) {
+            if (leftConvexPolygonIterator.hasNext()) {
+                leftPoint = leftConvexPolygonIterator.next();
+            }
+            if (rightConvexPolygonIterator.hasNext()) {
+                rightPoint = rightConvexPolygonIterator.next();
+            }
+
+            if (line.is(leftPoint, commonSupportLine)) {
                 line.setLeftPoint(leftPoint);
-                leftPoint = leftConvexPolygon.get(i);
-                i++;
-            } else {
-                int counter = j;
-                while (counter < rightConvexPolygon.size()) {
-                    Point currentPoint = rightConvexPolygon.get(j);
-                    if (new Line(leftPoint, currentPoint).is(leftPoint, commonSupportLine)) {
-                        line.setRightPoint(currentPoint);
-                        j = counter;
-                        break;
-                    }
-                    counter++;
+                if (line.is(rightPoint, commonSupportLine)) {
+                    line.setRightPoint(rightPoint);
                 }
-                i++;
-                if (counter == rightConvexPolygon.size() && i < leftConvexPolygon.size()) {
-                    leftPoint = leftConvexPolygon.get(i);
-                }
-            }
 
-            if (line.is(rightPoint, commonSupportLine) && j < rightConvexPolygon.size()) {
+            } else if (line.is(rightPoint, commonSupportLine)) {
                 line.setRightPoint(rightPoint);
-                rightPoint = rightConvexPolygon.get(j);
-                j++;
-            } else {
-                int counter = i;
-                while (counter < leftConvexPolygon.size()) {
-                    Point currentPoint = leftConvexPolygon.get(i);
-                    if (new Line(currentPoint, rightPoint).is(rightPoint, commonSupportLine)) {
-                        line.setLeftPoint(currentPoint);
-                        i = counter;
-                        break;
-                    }
-                    counter++;
-                }
-                j++;
-                if (counter == leftConvexPolygon.size() && j < rightConvexPolygon.size()) {
-                    rightPoint = rightConvexPolygon.get(j);
+
+                if (line.is(leftPoint, commonSupportLine)) {
+                    line.setLeftPoint(leftPoint);
                 }
             }
-        }
-
-        if (line.is(leftPoint, commonSupportLine)) {
-            line.setLeftPoint(leftPoint);
-        }
-        if (line.is(rightPoint, commonSupportLine)) {
-            line.setRightPoint(rightPoint);
         }
 
         return line;
@@ -230,6 +201,7 @@ public class Main extends Application {
 
         Line upperCommonSupport = getCommonSupport(new ArrayList<>(leftPolygon), new ArrayList<>(rightPolygon), UPPER);
         Line lowerCommonSupport = getCommonSupport(new ArrayList<>(leftPolygon), new ArrayList<>(rightPolygon), LOWER);
+
 
         Point prevPoint = null;
         Edge leftEdge = null;
@@ -463,6 +435,7 @@ public class Main extends Application {
         Map<Point, Cell> diagram = new HashMap<>();
         diagram.putAll(leftDiagram);
         diagram.putAll(rightDiagram);
+
         return diagram;
     }
 
