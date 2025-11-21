@@ -11,21 +11,23 @@ public class Line {
     private Point leftPoint;
     private Point rightPoint;
 
+    public Line(Line line) {
+        this.leftPoint = line.getLeftPoint();
+        this.rightPoint = line.getRightPoint();
+    }
+
     public Line(Edge edge) {
         this.leftPoint = edge.getLeftPoint();
         this.rightPoint = edge.getRightPoint();
     }
 
-    public boolean is(Point point, CommonSupportLine commonSupportLine) {
-        switch (commonSupportLine) {
+    public boolean is(Point point, CommonSupportType commonSupportType) {
+        switch (commonSupportType) {
             case UPPER -> {
                 return point.getY() > getEquationOfLine(point.getX());
             }
             case LOWER -> {
                 return point.getY() < getEquationOfLine(point.getX());
-            }
-            case ON -> {
-                return point.getY() == getEquationOfLine(point.getX());
             }
         }
 

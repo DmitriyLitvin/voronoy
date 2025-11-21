@@ -14,8 +14,8 @@ import org.example.entity.*;
 import java.util.*;
 
 import static java.lang.Math.*;
-import static org.example.entity.CommonSupportLine.LOWER;
-import static org.example.entity.CommonSupportLine.UPPER;
+import static org.example.entity.CommonSupportType.LOWER;
+import static org.example.entity.CommonSupportType.UPPER;
 
 
 public class Main extends Application {
@@ -120,35 +120,37 @@ public class Main extends Application {
         return new ArrayList<>(convexHull);
     }
 
-    private Line getCommonSupport(List<Point> leftConvexPolygon, List<Point> rightConvexPolygon, CommonSupportLine commonSupportLine) {
+    private Line getCommonSupport(List<Point> leftConvexPolygon, List<Point> rightConvexPolygon, CommonSupportType commonSupportType) {
         Point maxXpoint = leftConvexPolygon.stream().max(Comparator.comparingDouble(Point::getX)).orElse(null);
         Point minXPoint = rightConvexPolygon.stream().min(Comparator.comparingDouble(Point::getX)).orElse(null);
         Line line = new Line(maxXpoint, minXPoint);
 
-        Iterator<Point> leftConvexPolygonIterator = leftConvexPolygon.stream().filter(p -> !p.equals(maxXpoint)).iterator();
-        Iterator<Point> rightConvexPolygonIterator = rightConvexPolygon.stream().filter(p -> !p.equals(minXPoint)).iterator();
+        for (int i = 0; i < 2; i++) {
+            Point leftPoint = maxXpoint;
+            Point rightPoint = minXPoint;
 
-        Point leftPoint = maxXpoint;
-        Point rightPoint = minXPoint;
-        while (leftConvexPolygonIterator.hasNext() || rightConvexPolygonIterator.hasNext()) {
-            if (leftConvexPolygonIterator.hasNext()) {
-                leftPoint = leftConvexPolygonIterator.next();
-            }
-            if (rightConvexPolygonIterator.hasNext()) {
-                rightPoint = rightConvexPolygonIterator.next();
-            }
-
-            if (line.is(leftPoint, commonSupportLine)) {
-                line.setLeftPoint(leftPoint);
-                if (line.is(rightPoint, commonSupportLine)) {
-                    line.setRightPoint(rightPoint);
+            Iterator<Point> leftConvexPolygonIterator = leftConvexPolygon.stream().filter(p -> !p.equals(maxXpoint)).iterator();
+            Iterator<Point> rightConvexPolygonIterator = rightConvexPolygon.stream().filter(p -> !p.equals(minXPoint)).iterator();
+            while (leftConvexPolygonIterator.hasNext() || rightConvexPolygonIterator.hasNext()) {
+                if (leftConvexPolygonIterator.hasNext()) {
+                    leftPoint = leftConvexPolygonIterator.next();
+                }
+                if (rightConvexPolygonIterator.hasNext()) {
+                    rightPoint = rightConvexPolygonIterator.next();
                 }
 
-            } else if (line.is(rightPoint, commonSupportLine)) {
-                line.setRightPoint(rightPoint);
-
-                if (line.is(leftPoint, commonSupportLine)) {
+                if (line.is(leftPoint, commonSupportType)) {
                     line.setLeftPoint(leftPoint);
+                    if (line.is(rightPoint, commonSupportType)) {
+                        line.setRightPoint(rightPoint);
+                    }
+
+                } else if (line.is(rightPoint, commonSupportType)) {
+                    line.setRightPoint(rightPoint);
+
+                    if (line.is(leftPoint, commonSupportType)) {
+                        line.setLeftPoint(leftPoint);
+                    }
                 }
             }
         }
@@ -200,7 +202,21 @@ public class Main extends Application {
         List<Point> rightPolygon = buildConvexHull(new ArrayList<>(rightDiagram.keySet()));
 
         Line upperCommonSupport = getCommonSupport(new ArrayList<>(leftPolygon), new ArrayList<>(rightPolygon), UPPER);
+
+        if (leftDiagram.size() == 4) {
+            javafx.scene.shape.Line line = new javafx.scene.shape.Line(upperCommonSupport.getLeftPoint().getX(), upperCommonSupport.getLeftPoint().getY(), upperCommonSupport.getRightPoint().getX(), upperCommonSupport.getRightPoint().getY());
+            line.setStroke(Color.BLACK);
+            line.setStrokeWidth(1);
+            pane.getChildren().add(line);
+        }
+
         Line lowerCommonSupport = getCommonSupport(new ArrayList<>(leftPolygon), new ArrayList<>(rightPolygon), LOWER);
+        if (leftDiagram.size() == 4) {
+            javafx.scene.shape.Line line = new javafx.scene.shape.Line(lowerCommonSupport.getLeftPoint().getX(), lowerCommonSupport.getLeftPoint().getY(), lowerCommonSupport.getRightPoint().getX(), lowerCommonSupport.getRightPoint().getY());
+            line.setStroke(Color.BLACK);
+            line.setStrokeWidth(1);
+            pane.getChildren().add(line);
+        }
 
 
         Point prevPoint = null;
