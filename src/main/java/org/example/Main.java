@@ -53,6 +53,8 @@ public class Main extends Application {
         });
 
         button.setOnAction(e -> {
+
+
             drawVoronoyDiagram(points);
             points.clear();
         });
@@ -268,10 +270,11 @@ public class Main extends Application {
 
                 List<Edge> leftChain = disjunctiveChain.get(leftCell);
                 if (leftChain == null || leftChain.isEmpty()) {
+                    nextLeftEdge.setPrev(leftEdge);
                     disjunctiveChain.put(leftCell, new ArrayList<>(List.of(nextLeftEdge)));
                 } else {
                     Edge lastEdge = leftChain.get(leftChain.size() - 1);
-                    nextLeftEdge.setPrev(lastEdge);
+                    nextLeftEdge.setPrev(leftEdge);
                     lastEdge.setNext(nextLeftEdge);
                     leftChain.add(nextLeftEdge);
                 }
@@ -331,10 +334,11 @@ public class Main extends Application {
 
                 List<Edge> rightChain = disjunctiveChain.get(rightCell);
                 if (rightChain == null || rightChain.isEmpty()) {
+                    nextRightEdge.setPrev(rightEdge);
                     disjunctiveChain.put(rightCell, new ArrayList<>(List.of(nextRightEdge)));
                 } else {
                     Edge lastEdge = rightChain.get(rightChain.size() - 1);
-                    nextRightEdge.setPrev(lastEdge);
+                    nextRightEdge.setPrev(rightEdge);
                     lastEdge.setNext(nextRightEdge);
                     rightChain.add(nextRightEdge);
                 }
@@ -412,22 +416,22 @@ public class Main extends Application {
                     firstRightEdge.setPrev(firstEdge);
                 }
             } else {
+                System.out.println("111111111111111111111111111111111111");
                 if (!firstEdge.isInfiniteLeftEnd() && firstLeftEdge != null) {
                     firstEdge.setPrev(firstLeftEdge);
                     firstLeftEdge.setNext(firstEdge);
-                }
-                if (!firstEdge.isInfiniteRightEnd() && firstRightEdge != null) {
+                } else if (!firstEdge.isInfiniteRightEnd() && firstRightEdge != null) {
                     firstEdge.setPrev(firstRightEdge);
                     firstRightEdge.setNext(firstEdge);
                 }
+                System.out.println("111111111111111111111111111111111111");
             }
 
             if (chain.size() >= 2) {
                 if (!lastEdge.isInfiniteLeftEnd() && lastLeftEdge != null) {
                     lastEdge.setNext(lastLeftEdge);
                     lastLeftEdge.setPrev(lastEdge);
-                }
-                if (!lastEdge.isInfiniteRightEnd() && lastRightEdge != null) {
+                } else if (!lastEdge.isInfiniteRightEnd() && lastRightEdge != null) {
                     lastEdge.setNext(lastRightEdge);
                     lastRightEdge.setPrev(lastEdge);
                 }
@@ -443,6 +447,7 @@ public class Main extends Application {
 
     public void drawVoronoyDiagram(List<Point> polygon) {
         List<Cell> voronoyCells = buildVoronoyDiagram(polygon.stream().sorted(Comparator.comparingDouble(Point::getX).thenComparing(Point::getY)).toList()).values().stream().toList();
+        System.out.println("---------------------------------------------------------------------------------");
         for (Cell voronoyCell : voronoyCells) {
             Edge edge = voronoyCell.getBoundary();
             Edge nextEdge = voronoyCell.getBoundary();
@@ -451,7 +456,7 @@ public class Main extends Application {
                 line.setStroke(Color.BLUE);
                 line.setStrokeWidth(1);
                 pane.getChildren().add(line);
-                System.out.println(new Line(edge) + " " + new Line(nextEdge));
+                //System.out.println(new Line(edge) + " " + new Line(nextEdge));
                 nextEdge = nextEdge.getNext();
             } while (nextEdge != null && !Objects.equals(new Line(edge), new Line(nextEdge)));
 
@@ -461,10 +466,12 @@ public class Main extends Application {
                 line.setStroke(Color.BLUE);
                 line.setStrokeWidth(1);
                 pane.getChildren().add(line);
-                System.out.println(new Line(edge) + " " + new Line(prevEdge));
+                //System.out.println(new Line(edge) + " " + new Line(prevEdge));
                 prevEdge = prevEdge.getPrev();
             } while (prevEdge != null && !Objects.equals(new Line(edge), new Line(prevEdge)));
         }
+
+        System.out.println("44444444444444444444444444444444444444444444444444");
     }
 
     private Edge getClosestEdge(Cell cell, Line middlePerpendicular, Edge excludedEdge) {
