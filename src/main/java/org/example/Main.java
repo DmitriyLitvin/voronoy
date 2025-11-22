@@ -204,6 +204,7 @@ public class Main extends Application {
         Line upperCommonSupport = getCommonSupport(new ArrayList<>(leftPolygon), new ArrayList<>(rightPolygon), UPPER);
         Line lowerCommonSupport = getCommonSupport(new ArrayList<>(leftPolygon), new ArrayList<>(rightPolygon), LOWER);
 
+
         Point prevPoint = null;
         Edge leftEdge = null;
         Edge rightEdge = null;
@@ -285,7 +286,7 @@ public class Main extends Application {
                 } else {
                     Edge lastEdge = rightChain.get(rightChain.size() - 1);
                     nextRightEdge.setPrev(lastEdge);
-                    lastEdge.setPrev(nextRightEdge);
+                    lastEdge.setNext(nextRightEdge);
                     rightChain.add(nextRightEdge);
                 }
 
