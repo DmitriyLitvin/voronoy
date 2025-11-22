@@ -416,7 +416,6 @@ public class Main extends Application {
                     firstRightEdge.setPrev(firstEdge);
                 }
             } else {
-                System.out.println("111111111111111111111111111111111111");
                 if (!firstEdge.isInfiniteLeftEnd() && firstLeftEdge != null) {
                     firstEdge.setPrev(firstLeftEdge);
                     firstLeftEdge.setNext(firstEdge);
@@ -424,7 +423,6 @@ public class Main extends Application {
                     firstEdge.setPrev(firstRightEdge);
                     firstRightEdge.setNext(firstEdge);
                 }
-                System.out.println("111111111111111111111111111111111111");
             }
 
             if (chain.size() >= 2) {
@@ -447,7 +445,7 @@ public class Main extends Application {
 
     public void drawVoronoyDiagram(List<Point> polygon) {
         List<Cell> voronoyCells = buildVoronoyDiagram(polygon.stream().sorted(Comparator.comparingDouble(Point::getX).thenComparing(Point::getY)).toList()).values().stream().toList();
-        System.out.println("---------------------------------------------------------------------------------");
+        System.out.println("Started drawing");
         for (Cell voronoyCell : voronoyCells) {
             Edge edge = voronoyCell.getBoundary();
             Edge nextEdge = voronoyCell.getBoundary();
@@ -471,7 +469,7 @@ public class Main extends Application {
             } while (prevEdge != null && !Objects.equals(new Line(edge), new Line(prevEdge)));
         }
 
-        System.out.println("44444444444444444444444444444444444444444444444444");
+        System.out.println("Ended drawing");
     }
 
     private Edge getClosestEdge(Cell cell, Line middlePerpendicular, Edge excludedEdge) {
