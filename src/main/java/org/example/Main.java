@@ -202,22 +202,7 @@ public class Main extends Application {
         List<Point> rightPolygon = buildConvexHull(new ArrayList<>(rightDiagram.keySet()));
 
         Line upperCommonSupport = getCommonSupport(new ArrayList<>(leftPolygon), new ArrayList<>(rightPolygon), UPPER);
-
-        if (leftDiagram.size() == 4) {
-            javafx.scene.shape.Line line = new javafx.scene.shape.Line(upperCommonSupport.getLeftPoint().getX(), upperCommonSupport.getLeftPoint().getY(), upperCommonSupport.getRightPoint().getX(), upperCommonSupport.getRightPoint().getY());
-            line.setStroke(Color.BLACK);
-            line.setStrokeWidth(1);
-            pane.getChildren().add(line);
-        }
-
         Line lowerCommonSupport = getCommonSupport(new ArrayList<>(leftPolygon), new ArrayList<>(rightPolygon), LOWER);
-        if (leftDiagram.size() == 4) {
-            javafx.scene.shape.Line line = new javafx.scene.shape.Line(lowerCommonSupport.getLeftPoint().getX(), lowerCommonSupport.getLeftPoint().getY(), lowerCommonSupport.getRightPoint().getX(), lowerCommonSupport.getRightPoint().getY());
-            line.setStroke(Color.BLACK);
-            line.setStrokeWidth(1);
-            pane.getChildren().add(line);
-        }
-
 
         Point prevPoint = null;
         Edge leftEdge = null;
