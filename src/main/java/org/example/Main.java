@@ -203,8 +203,8 @@ public class Main extends Application {
         List<Point> leftPolygon = buildConvexHull(new ArrayList<>(leftDiagram.keySet()));
         List<Point> rightPolygon = buildConvexHull(new ArrayList<>(rightDiagram.keySet()));
 
-        Line upperCommonSupport = getCommonSupport(new ArrayList<>(leftPolygon), new ArrayList<>(rightPolygon), UPPER);
-        Line lowerCommonSupport = getCommonSupport(new ArrayList<>(leftPolygon), new ArrayList<>(rightPolygon), LOWER);
+        Line upperCommonSupport = getCommonSupport(leftPolygon, rightPolygon, UPPER);
+        Line lowerCommonSupport = getCommonSupport(leftPolygon, rightPolygon, LOWER);
 
 
         Point prevPoint = null;
