@@ -36,6 +36,7 @@ public class Main extends Application {
         borderPane.setBottom(button);
         pane.getChildren().add(button);
 
+
         Scene scene = new Scene(borderPane, width, height);
         scene.setOnMouseClicked((MouseEvent event) -> {
             double x = event.getX();
@@ -51,6 +52,26 @@ public class Main extends Application {
             // Вивід координат у консоль
             System.out.println("Клік: x=" + x + ", y=" + y);
         });
+
+
+//        points.add(new Point(520.0, 290.0));
+//        points.add(new Point(630.0, 193.0));
+//        points.add(new Point(714.0, 326.0));
+//        points.add(new Point(763.0, 565.0));
+//        points.add(new Point(670.0, 465.0));
+//        points.add(new Point(560.0, 664.0));
+//        points.add(new Point(667.0, 838.0));
+//        points.add(new Point(693.0, 730.0));
+
+        points.add(new Point(275.0, 508.0));
+        points.add(new Point(284.0, 650.0));
+        points.add(new Point(441.0, 585.0));
+        points.add(new Point(287.0, 534.0));
+        points.add(new Point(660.0, 840.0));
+        points.add(new Point(678.0, 936.0));
+        points.add(new Point(792.0, 900.0));
+        points.add(new Point(675.0, 870.0));
+
 
         button.setOnAction(e -> {
             drawVoronoyDiagram(points);
@@ -274,9 +295,9 @@ public class Main extends Application {
                     Edge lastEdge = leftChain.get(leftChain.size() - 1);
                     if (Objects.equals(lastEdge.getRightPoint(), nextLeftEdge.getLeftPoint())) {
                         nextLeftEdge.setPrev(lastEdge);
+                        nextLeftEdge.setNext(leftEdge);
                         lastEdge.setNext(nextLeftEdge);
                     }
-                    nextLeftEdge.setNext(leftEdge);
                     leftChain.add(nextLeftEdge);
                 }
 
@@ -343,9 +364,9 @@ public class Main extends Application {
                     Edge lastEdge = rightChain.get(rightChain.size() - 1);
                     if (Objects.equals(lastEdge.getRightPoint(), nextRightEdge.getLeftPoint())) {
                         nextRightEdge.setPrev(lastEdge);
+                        nextRightEdge.setNext(rightEdge);
                         lastEdge.setNext(nextRightEdge);
                     }
-                    nextRightEdge.setNext(rightEdge);
                     rightChain.add(nextRightEdge);
                 }
 
@@ -424,21 +445,11 @@ public class Main extends Application {
             for (int i = 0; i < chain.size() - 1; i++) {
                 Edge prevEdge = chain.get(i);
                 Edge nextEdge = chain.get(i + 1);
-                if (prevEdge.getNext() == null && nextEdge.getPrev() == null) {
-                    Edge connectedEdge;
-                    do {
-                        connectedEdge = cell.getConnectedEdge(prevEdge.getRightPoint());
-                        if (connectedEdge != null) {
-                            prevEdge.setNext(connectedEdge);
-                            connectedEdge.setPrev(prevEdge);
-                            prevEdge = connectedEdge;
-                        }
-                    } while (connectedEdge != null && !Objects.equals(connectedEdge.getRightPoint(), nextEdge.getLeftPoint()));
-
-                    if (connectedEdge != null) {
-                        connectedEdge.setNext(nextEdge);
-                        nextEdge.setPrev(connectedEdge);
-                    }
+                if (nextEdge.getPrev() == null) {
+                    Edge connectedEdge = prevEdge.getNext();
+                    connectedEdge.setPrev(prevEdge);
+                    connectedEdge.setNext(nextEdge);
+                    nextEdge.setPrev(connectedEdge);
                 }
             }
 
@@ -448,11 +459,18 @@ public class Main extends Application {
             }
         });
 
+
+
         Map<Point, Cell> diagram = new HashMap<>();
         diagram.putAll(leftDiagram);
         diagram.putAll(rightDiagram);
 
         return diagram;
+    }
+
+    private boolean isEdgesEqual(Edge a, Edge b) {
+        return Objects.equals(a.getLeftPoint(), b.getRightPoint()) || Objects.equals(a.getRightPoint(), b.getLeftPoint()) || Objects.equals(a.getLeftPoint(), b.getLeftPoint()) || Objects.equals(a.getRightPoint(), b.getRightPoint());
+
     }
 
     public void drawVoronoyDiagram(List<Point> polygon) {
