@@ -9,6 +9,7 @@ import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.stage.Stage;
+import lombok.extern.slf4j.Slf4j;
 import org.example.entity.*;
 
 import java.util.*;
@@ -17,7 +18,7 @@ import static java.lang.Math.*;
 import static org.example.entity.CommonSupportType.LOWER;
 import static org.example.entity.CommonSupportType.UPPER;
 
-
+@Slf4j
 public class Main extends Application {
     private final List<Point> points = new LinkedList<>();
 
@@ -151,7 +152,7 @@ public class Main extends Application {
         Point minXPoint = rightConvexPolygon.stream().min(Comparator.comparingDouble(Point::getX)).orElse(null);
         Line line = new Line(maxXpoint, minXPoint);
 
-        for (int i = 0; i < 2; i++) {
+        for (int i = 0; i < 5; i++) {
             Point leftPoint = maxXpoint;
             Point rightPoint = minXPoint;
 
@@ -225,7 +226,6 @@ public class Main extends Application {
         Line upperCommonSupport = getCommonSupport(leftPolygon, rightPolygon, UPPER);
         Line lowerCommonSupport = getCommonSupport(leftPolygon, rightPolygon, LOWER);
 
-
         Point prevPoint = null;
         Edge leftEdge = null;
         Edge rightEdge = null;
@@ -266,6 +266,7 @@ public class Main extends Application {
                         leftTwinEdge = leftEdge.getTwin();
                         eraseEdges(leftTwinEdge, leftTwinEdge.getRightPoint());
                         leftTwinEdge.setRightPoint(leftPoint);
+                        leftTwinEdge.setInfiniteRightEnd(false);
                     } else if (PointUtils.getLength(leftEdge.getLeftPoint(), leftPoint) < PointUtils.getLength(leftEdge.getRightPoint(), leftPoint)) {
                         eraseEdges(leftEdge, leftEdge.getLeftPoint());
                         leftEdge.setLeftPoint(leftPoint);
@@ -274,6 +275,7 @@ public class Main extends Application {
                         leftTwinEdge = leftEdge.getTwin();
                         eraseEdges(leftTwinEdge, leftTwinEdge.getLeftPoint());
                         leftTwinEdge.setLeftPoint(leftPoint);
+                        leftTwinEdge.setInfiniteLeftEnd(false);
                     }
                 } else if (isOnTheSameSide(middlePerpendicular, leftCell.getCenter(), leftLine.getLeftPoint())) {
                     eraseEdges(leftEdge, leftEdge.getRightPoint());
@@ -283,6 +285,7 @@ public class Main extends Application {
                     leftTwinEdge = leftEdge.getTwin();
                     eraseEdges(leftTwinEdge, leftTwinEdge.getRightPoint());
                     leftTwinEdge.setRightPoint(leftPoint);
+                    leftTwinEdge.setInfiniteRightEnd(false);
                 } else if (isOnTheSameSide(middlePerpendicular, leftCell.getCenter(), leftLine.getRightPoint())) {
                     eraseEdges(leftEdge, leftEdge.getLeftPoint());
                     leftEdge.setLeftPoint(leftPoint);
@@ -291,6 +294,7 @@ public class Main extends Application {
                     leftTwinEdge = leftEdge.getTwin();
                     eraseEdges(leftTwinEdge, leftTwinEdge.getLeftPoint());
                     leftTwinEdge.setLeftPoint(leftPoint);
+                    leftTwinEdge.setInfiniteLeftEnd(false);
                 }
 
                 Edge nextLeftEdge = new Edge((prevPoint == null ? middlePerpendicular.getRightPoint() : prevPoint), leftPoint, leftCell);
@@ -345,6 +349,7 @@ public class Main extends Application {
                         rightTwinEdge = rightEdge.getTwin();
                         eraseEdges(rightTwinEdge, rightTwinEdge.getRightPoint());
                         rightTwinEdge.setRightPoint(rightPoint);
+                        rightTwinEdge.setInfiniteRightEnd(false);
                     } else if (PointUtils.getLength(rightEdge.getLeftPoint(), rightPoint) < PointUtils.getLength(rightEdge.getRightPoint(), rightPoint)) {
                         eraseEdges(rightEdge, rightEdge.getLeftPoint());
                         rightEdge.setLeftPoint(rightPoint);
@@ -353,6 +358,7 @@ public class Main extends Application {
                         rightTwinEdge = rightEdge.getTwin();
                         eraseEdges(rightTwinEdge, rightTwinEdge.getLeftPoint());
                         rightTwinEdge.setLeftPoint(rightPoint);
+                        rightTwinEdge.setInfiniteLeftEnd(false);
                     }
                 } else if (isOnTheSameSide(middlePerpendicular, rightCell.getCenter(), rightLine.getLeftPoint())) {
                     eraseEdges(rightEdge, rightEdge.getRightPoint());
@@ -362,6 +368,7 @@ public class Main extends Application {
                     rightTwinEdge = rightEdge.getTwin();
                     eraseEdges(rightTwinEdge, rightTwinEdge.getRightPoint());
                     rightTwinEdge.setRightPoint(rightPoint);
+                    rightTwinEdge.setInfiniteRightEnd(false);
                 } else if (isOnTheSameSide(middlePerpendicular, rightCell.getCenter(), rightLine.getRightPoint())) {
                     eraseEdges(rightEdge, rightEdge.getLeftPoint());
                     rightEdge.setLeftPoint(rightPoint);
@@ -370,6 +377,7 @@ public class Main extends Application {
                     rightTwinEdge = rightEdge.getTwin();
                     eraseEdges(rightTwinEdge, rightTwinEdge.getLeftPoint());
                     rightTwinEdge.setLeftPoint(rightPoint);
+                    rightTwinEdge.setInfiniteLeftEnd(false);
                 }
 
                 Edge nextRightEdge = new Edge((prevPoint == null ? middlePerpendicular.getRightPoint() : prevPoint), rightPoint, rightCell);
@@ -411,8 +419,6 @@ public class Main extends Application {
                 nextRightEdge.setTwin(nextLeftEdge);
                 prevPoint = rightPoint;
                 leftEdge = null;
-            } else {
-               // System.out.println("we can't find the edge");
             }
         }
 
@@ -493,20 +499,22 @@ public class Main extends Application {
         Edge nextEdge = edge.getNext();
         if (nextEdge != null && (Objects.equals(point, nextEdge.getRightPoint()) || Objects.equals(point, nextEdge.getLeftPoint()))) {
             edge.setNext(null);
+            nextEdge.setPrev(null);
         }
 
         Edge prevEdge = edge.getPrev();
         if (prevEdge != null && (Objects.equals(point, prevEdge.getRightPoint()) || Objects.equals(point, prevEdge.getLeftPoint()))) {
             edge.setPrev(null);
+            prevEdge.setNext(null);
         }
     }
 
     private boolean isConnected(Edge a, Edge b) {
         return Objects.equals(a.getLeftPoint(), b.getRightPoint()) || Objects.equals(a.getRightPoint(), b.getLeftPoint()) || Objects.equals(a.getLeftPoint(), b.getLeftPoint()) || Objects.equals(a.getRightPoint(), b.getRightPoint());
-
     }
 
     public void drawVoronoyDiagram(List<Point> polygon) {
+        log.info("Start drawing ");
         buildVoronoyDiagram(polygon.stream().sorted(Comparator.comparingDouble(Point::getX).thenComparing(Point::getY)).toList())
                 .values()
                 .forEach(voronoyCell -> {
@@ -517,7 +525,6 @@ public class Main extends Application {
                         line.setStroke(Color.BLUE);
                         line.setStrokeWidth(1);
                         pane.getChildren().add(line);
-                        //System.out.println(new Line(edge) + " " + new Line(nextEdge));
                         nextEdge = nextEdge.getNext();
                     } while (nextEdge != null && !Objects.equals(new Line(edge), new Line(nextEdge)));
 
@@ -527,11 +534,11 @@ public class Main extends Application {
                         line.setStroke(Color.BLUE);
                         line.setStrokeWidth(1);
                         pane.getChildren().add(line);
-                        //System.out.println(new Line(edge) + " " + new Line(prevEdge));
                         prevEdge = prevEdge.getPrev();
                     } while (prevEdge != null && !Objects.equals(new Line(edge), new Line(prevEdge)));
                 });
 
+        log.info("End drawing");
     }
 
     private Edge getClosestEdge(Cell cell, Line middlePerpendicular, Edge excludedEdge) {
@@ -669,10 +676,10 @@ public class Main extends Application {
         } else if (deltaXb == 0) {
             return new Point(a2.getX(), a.getEquationOfLine(a2.getX()));
         } else {
-            double fracA = deltaYa / deltaXa;
-            double fracB = deltaYb / deltaXb;
+            double frackA = deltaYa / deltaXa;
+            double frackB = deltaYb / deltaXb;
 
-            double c = a2.getY() - a1.getY() + a1.getX() * fracA - a2.getX() * fracB;
+            double c = a2.getY() - a1.getY() + a1.getX() * frackA - a2.getX() * frackB;
 
             if (deltaYa * deltaXb - deltaYb * deltaXa == 0) {
                 if (c == 0) {
@@ -681,7 +688,7 @@ public class Main extends Application {
 
                 return null;
             }
-            double x = c / (fracA - fracB);
+            double x = c / (frackA - frackB);
 
             return new Point(x, a.getEquationOfLine(x));
         }
