@@ -1,18 +1,23 @@
 package org.example;
 
 import javafx.application.Application;
+import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.stage.Stage;
 import lombok.extern.slf4j.Slf4j;
 import org.example.entity.*;
+import org.example.entity.Point;
 
 import java.util.*;
+import java.util.List;
 
 import static java.lang.Math.*;
 import static org.example.entity.CommonSupportType.LOWER;
@@ -24,6 +29,7 @@ public class Main extends Application {
 
     private final int width = 1500;
     private final int height = 1000;
+
     private final Pane pane = new Pane();
     private final BorderPane borderPane = new BorderPane();
 
@@ -75,7 +81,10 @@ public class Main extends Application {
 
         points.forEach(p -> {
             Circle circle = new Circle(p.getX(), p.getY(), 3, Color.RED);
-            borderPane.getChildren().add(circle);
+            Label label = new Label(+circle.getCenterX() + ", " + circle.getCenterY());
+
+            label.relocate(circle.getCenterX() + 1, circle.getCenterY() + 1);
+            pane.getChildren().addAll(label, circle);
         });
 
 
@@ -89,6 +98,7 @@ public class Main extends Application {
         stage.setTitle("Voronoy");
         stage.show();
     }
+
 
     private List<Point> buildConvexHull(List<Point> points) {
         if (points.size() <= 2) {
@@ -234,6 +244,7 @@ public class Main extends Application {
         while (!Objects.equals(upperCommonSupport, lowerCommonSupport)) {
             middlePerpendicular = getMiddlePerpendicular(upperCommonSupport);
 
+
             double leftDistance = 0;
             Point leftPoint = null;
             Cell leftCell = leftDiagram.get(upperCommonSupport.getLeftPoint());
@@ -262,44 +273,60 @@ public class Main extends Application {
                         eraseEdges(leftEdge, leftEdge.getRightPoint());
                         leftEdge.setRightPoint(leftPoint);
                         leftEdge.setInfiniteRightEnd(false);
+                        leftCell.setBoundary(leftEdge);
 
                         leftTwinEdge = leftEdge.getTwin();
                         eraseEdges(leftTwinEdge, leftTwinEdge.getRightPoint());
                         leftTwinEdge.setRightPoint(leftPoint);
                         leftTwinEdge.setInfiniteRightEnd(false);
+                        leftTwinEdge.getCell().setBoundary(leftTwinEdge);
                     } else if (PointUtils.getLength(leftEdge.getLeftPoint(), leftPoint) < PointUtils.getLength(leftEdge.getRightPoint(), leftPoint)) {
                         eraseEdges(leftEdge, leftEdge.getLeftPoint());
                         leftEdge.setLeftPoint(leftPoint);
                         leftEdge.setInfiniteLeftEnd(false);
+                        leftCell.setBoundary(leftEdge);
 
                         leftTwinEdge = leftEdge.getTwin();
                         eraseEdges(leftTwinEdge, leftTwinEdge.getLeftPoint());
                         leftTwinEdge.setLeftPoint(leftPoint);
                         leftTwinEdge.setInfiniteLeftEnd(false);
+                        leftTwinEdge.getCell().setBoundary(leftTwinEdge);
                     }
                 } else if (isOnTheSameSide(middlePerpendicular, leftCell.getCenter(), leftLine.getLeftPoint())) {
                     eraseEdges(leftEdge, leftEdge.getRightPoint());
                     leftEdge.setRightPoint(leftPoint);
                     leftEdge.setInfiniteRightEnd(false);
+                    leftCell.setBoundary(leftEdge);
 
                     leftTwinEdge = leftEdge.getTwin();
                     eraseEdges(leftTwinEdge, leftTwinEdge.getRightPoint());
                     leftTwinEdge.setRightPoint(leftPoint);
                     leftTwinEdge.setInfiniteRightEnd(false);
+                    leftTwinEdge.getCell().setBoundary(leftTwinEdge);
                 } else if (isOnTheSameSide(middlePerpendicular, leftCell.getCenter(), leftLine.getRightPoint())) {
                     eraseEdges(leftEdge, leftEdge.getLeftPoint());
                     leftEdge.setLeftPoint(leftPoint);
                     leftEdge.setInfiniteLeftEnd(false);
+                    leftCell.setBoundary(leftEdge);
 
                     leftTwinEdge = leftEdge.getTwin();
                     eraseEdges(leftTwinEdge, leftTwinEdge.getLeftPoint());
                     leftTwinEdge.setLeftPoint(leftPoint);
                     leftTwinEdge.setInfiniteLeftEnd(false);
+                    leftTwinEdge.getCell().setBoundary(leftTwinEdge);
                 }
 
                 Edge nextLeftEdge = new Edge((prevPoint == null ? middlePerpendicular.getRightPoint() : prevPoint), leftPoint, leftCell);
                 nextLeftEdge.setInfiniteLeftEnd(prevPoint == null);
                 nextLeftEdge.setInfiniteRightEnd(false);
+
+                if (leftDiagram.size() == 4) {
+                    javafx.scene.shape.Line line = new javafx.scene.shape.Line(nextLeftEdge.getLeftPoint().getX(), nextLeftEdge.getLeftPoint().getY(), nextLeftEdge.getRightPoint().getX(), nextLeftEdge.getRightPoint().getY());
+                    line.setStroke(Color.BLACK);
+                    line.setStrokeWidth(5);
+                    pane.getChildren().add(line);
+
+                }
 
                 List<Edge> leftChain = disjunctiveChain.get(leftCell);
                 if (leftChain == null || leftChain.isEmpty()) {
@@ -345,44 +372,59 @@ public class Main extends Application {
                         eraseEdges(rightEdge, rightEdge.getRightPoint());
                         rightEdge.setRightPoint(rightPoint);
                         rightEdge.setInfiniteRightEnd(false);
+                        rightCell.setBoundary(rightEdge);
 
                         rightTwinEdge = rightEdge.getTwin();
                         eraseEdges(rightTwinEdge, rightTwinEdge.getRightPoint());
                         rightTwinEdge.setRightPoint(rightPoint);
                         rightTwinEdge.setInfiniteRightEnd(false);
+                        rightTwinEdge.getCell().setBoundary(rightTwinEdge);
                     } else if (PointUtils.getLength(rightEdge.getLeftPoint(), rightPoint) < PointUtils.getLength(rightEdge.getRightPoint(), rightPoint)) {
                         eraseEdges(rightEdge, rightEdge.getLeftPoint());
                         rightEdge.setLeftPoint(rightPoint);
                         rightEdge.setInfiniteLeftEnd(false);
+                        rightCell.setBoundary(rightEdge);
 
                         rightTwinEdge = rightEdge.getTwin();
                         eraseEdges(rightTwinEdge, rightTwinEdge.getLeftPoint());
                         rightTwinEdge.setLeftPoint(rightPoint);
                         rightTwinEdge.setInfiniteLeftEnd(false);
+                        rightTwinEdge.getCell().setBoundary(rightTwinEdge);
                     }
                 } else if (isOnTheSameSide(middlePerpendicular, rightCell.getCenter(), rightLine.getLeftPoint())) {
                     eraseEdges(rightEdge, rightEdge.getRightPoint());
                     rightEdge.setRightPoint(rightPoint);
                     rightEdge.setInfiniteRightEnd(false);
+                    rightCell.setBoundary(rightEdge);
 
                     rightTwinEdge = rightEdge.getTwin();
                     eraseEdges(rightTwinEdge, rightTwinEdge.getRightPoint());
                     rightTwinEdge.setRightPoint(rightPoint);
                     rightTwinEdge.setInfiniteRightEnd(false);
+                    rightTwinEdge.getCell().setBoundary(rightTwinEdge);
                 } else if (isOnTheSameSide(middlePerpendicular, rightCell.getCenter(), rightLine.getRightPoint())) {
                     eraseEdges(rightEdge, rightEdge.getLeftPoint());
                     rightEdge.setLeftPoint(rightPoint);
                     rightEdge.setInfiniteLeftEnd(false);
+                    rightCell.setBoundary(rightEdge);
 
                     rightTwinEdge = rightEdge.getTwin();
                     eraseEdges(rightTwinEdge, rightTwinEdge.getLeftPoint());
                     rightTwinEdge.setLeftPoint(rightPoint);
                     rightTwinEdge.setInfiniteLeftEnd(false);
+                    rightTwinEdge.getCell().setBoundary(rightTwinEdge);
                 }
 
                 Edge nextRightEdge = new Edge((prevPoint == null ? middlePerpendicular.getRightPoint() : prevPoint), rightPoint, rightCell);
                 nextRightEdge.setInfiniteLeftEnd(prevPoint == null);
                 nextRightEdge.setInfiniteRightEnd(false);
+
+                if (leftDiagram.size() == 4) {
+                    javafx.scene.shape.Line line = new javafx.scene.shape.Line(nextRightEdge.getLeftPoint().getX(), nextRightEdge.getLeftPoint().getY(), nextRightEdge.getRightPoint().getX(), nextRightEdge.getRightPoint().getY());
+                    line.setStroke(Color.BLACK);
+                    line.setStrokeWidth(5);
+                    pane.getChildren().add(line);
+                }
 
                 List<Edge> rightChain = disjunctiveChain.get(rightCell);
                 if (rightChain == null || rightChain.isEmpty()) {
@@ -492,6 +534,7 @@ public class Main extends Application {
         Map<Point, Cell> diagram = new HashMap<>();
         diagram.putAll(leftDiagram);
         diagram.putAll(rightDiagram);
+
         return diagram;
     }
 
@@ -515,6 +558,8 @@ public class Main extends Application {
 
     public void drawVoronoyDiagram(List<Point> polygon) {
         log.info("Start drawing ");
+
+        //       buildVoronoyDiagram(polygon.stream().sorted(Comparator.comparingDouble(Point::getX).thenComparing(Point::getY)).toList());
         buildVoronoyDiagram(polygon.stream().sorted(Comparator.comparingDouble(Point::getX).thenComparing(Point::getY)).toList())
                 .values()
                 .forEach(voronoyCell -> {
