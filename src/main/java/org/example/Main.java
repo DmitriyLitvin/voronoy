@@ -1,13 +1,11 @@
 package org.example;
 
 import javafx.application.Application;
-import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
@@ -240,10 +238,10 @@ public class Main extends Application {
         Edge leftEdge = null;
         Edge rightEdge = null;
         Line middlePerpendicular;
+        Edge currentEdge = null;
         Map<Cell, List<Edge>> disjunctiveChain = new HashMap<>();
         while (!Objects.equals(upperCommonSupport, lowerCommonSupport)) {
             middlePerpendicular = getMiddlePerpendicular(upperCommonSupport);
-
 
             double leftDistance = 0;
             Point leftPoint = null;
@@ -263,6 +261,21 @@ public class Main extends Application {
                 rightPoint = intersectionOfLines(middlePerpendicular, new Line(rightEdge));
                 assert rightPoint != null;
                 rightDistance = PointUtils.getLength(rightPoint, prevPoint == null ? middlePerpendicular.getRightPoint() : prevPoint);
+            }
+
+            if (leftPoint == null && rightPoint == null && currentEdge != null) {
+                Point centerPoint = currentEdge.getTwin().getCell().getCenter();
+                leftCell = leftDiagram.get(centerPoint);
+                if (leftCell != null) {
+                    leftPoint = intersectionOfLines(middlePerpendicular, new Line(getClosestEdge(leftCell, middlePerpendicular, null)));
+                    assert leftPoint != null;
+                    leftDistance = PointUtils.getLength(leftPoint, prevPoint);
+                } else {
+                    rightCell = rightDiagram.get(centerPoint);
+                    rightPoint = intersectionOfLines(middlePerpendicular, new Line(getClosestEdge(rightCell, middlePerpendicular, null)));
+                    assert rightPoint != null;
+                    rightDistance = PointUtils.getLength(rightPoint, prevPoint);
+                }
             }
 
             if ((leftEdge != null && rightEdge == null) || (leftEdge != null && leftDistance < rightDistance)) {
@@ -363,7 +376,7 @@ public class Main extends Application {
                 nextLeftEdge.setTwin(nextRightEdge);
                 prevPoint = leftPoint;
                 rightEdge = null;
-
+                currentEdge = leftEdge;
             } else if ((leftEdge == null && rightEdge != null) || (rightEdge != null && leftDistance >= rightDistance)) {
                 Edge rightTwinEdge = null;
                 Line rightLine = new Line(rightEdge);
@@ -461,6 +474,7 @@ public class Main extends Application {
                 nextRightEdge.setTwin(nextLeftEdge);
                 prevPoint = rightPoint;
                 leftEdge = null;
+                currentEdge = rightEdge;
             }
         }
 
