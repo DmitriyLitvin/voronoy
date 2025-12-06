@@ -11,11 +11,6 @@ public class Line {
     private Point leftPoint;
     private Point rightPoint;
 
-    public Line(Line line) {
-        this.leftPoint = line.getLeftPoint();
-        this.rightPoint = line.getRightPoint();
-    }
-
     public Line(Edge edge) {
         this.leftPoint = edge.getLeftPoint();
         this.rightPoint = edge.getRightPoint();
