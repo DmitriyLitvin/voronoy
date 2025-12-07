@@ -239,8 +239,7 @@ public class Main extends Application {
         Edge leftEdge = null;
         Edge rightEdge = null;
         Line middlePerpendicular;
-        Edge leftExcludedEdge = null;
-        Edge rightExcludedEdge = null;
+        Map<Point, Edge> excludedEdges = new HashMap<>();
         Map<Cell, List<Edge>> disjunctiveChain = new HashMap<>();
         int k = 0;
         while (!Objects.equals(upperCommonSupport, lowerCommonSupport)) {
@@ -252,50 +251,50 @@ public class Main extends Application {
 
             double leftDistance = 0;
             Point leftPoint = null;
-            Cell leftCell = leftDiagram.get(upperCommonSupport.getLeftPoint());
+            Point leftPointOfCommonSupport = upperCommonSupport.getLeftPoint();
+            Cell leftCell = leftDiagram.get(leftPointOfCommonSupport);
+            Edge leftExcludedEdge = getClosestEdge(excludedEdges.get(leftPointOfCommonSupport), middlePerpendicular, leftEdge);
             leftEdge = getClosestEdge(leftCell.getBoundary(), middlePerpendicular, leftEdge);
+
             if (leftEdge != null) {
                 leftPoint = intersectionOfLines(middlePerpendicular, new Line(leftEdge));
                 assert leftPoint != null;
                 leftDistance = PointUtils.getLength(leftPoint, prevPoint == null ? middlePerpendicular.getRightPoint() : prevPoint);
             }
-
-            leftExcludedEdge = getClosestEdge(leftExcludedEdge, middlePerpendicular, leftEdge);
             if (leftExcludedEdge != null) {
                 Point leftDeletedEdgeIntersectionPoint = intersectionOfLines(middlePerpendicular, new Line(leftExcludedEdge));
-                assert leftDeletedEdgeIntersectionPoint != null;
-                double leftDeletedIntersectionDistance = PointUtils.getLength(leftDeletedEdgeIntersectionPoint, prevPoint);
-
-                if (leftDeletedIntersectionDistance < leftDistance || leftEdge == null) {
-                    leftDistance = leftDeletedIntersectionDistance;
-                    leftPoint = leftDeletedEdgeIntersectionPoint;
-                    leftEdge = leftExcludedEdge;
+                if (leftDeletedEdgeIntersectionPoint != null) {
+                    double leftDeletedIntersectionDistance = PointUtils.getLength(leftDeletedEdgeIntersectionPoint, prevPoint == null ? middlePerpendicular.getRightPoint() : prevPoint);
+                    if (leftDeletedIntersectionDistance < leftDistance || leftEdge == null) {
+                        leftDistance = leftDeletedIntersectionDistance;
+                        leftPoint = leftDeletedEdgeIntersectionPoint;
+                        leftEdge = leftExcludedEdge;
+                    }
                 }
-                leftExcludedEdge = null;
             }
 
             double rightDistance = 0;
             Point rightPoint = null;
-            Cell rightCell = rightDiagram.get(upperCommonSupport.getRightPoint());
+            Point rightPointOfCommonSupport = upperCommonSupport.getRightPoint();
+            Cell rightCell = rightDiagram.get(rightPointOfCommonSupport);
+            Edge rightExcludedEdge = getClosestEdge(excludedEdges.get(rightPointOfCommonSupport), middlePerpendicular, rightEdge);
             rightEdge = getClosestEdge(rightCell.getBoundary(), middlePerpendicular, rightEdge);
+
             if (rightEdge != null) {
                 rightPoint = intersectionOfLines(middlePerpendicular, new Line(rightEdge));
                 assert rightPoint != null;
                 rightDistance = PointUtils.getLength(rightPoint, prevPoint == null ? middlePerpendicular.getRightPoint() : prevPoint);
             }
-
-            rightExcludedEdge = getClosestEdge(rightExcludedEdge, middlePerpendicular, rightEdge);
             if (rightExcludedEdge != null) {
                 Point rightDeletedEdgeIntersectionPoint = intersectionOfLines(middlePerpendicular, new Line(rightExcludedEdge));
-                assert rightDeletedEdgeIntersectionPoint != null;
-                double rightDeletedIntersectionDistance = PointUtils.getLength(rightDeletedEdgeIntersectionPoint, prevPoint);
-
-                if (rightDeletedIntersectionDistance < rightDistance || rightEdge == null) {
-                    rightDistance = rightDeletedIntersectionDistance;
-                    rightPoint = rightDeletedEdgeIntersectionPoint;
-                    rightEdge = rightExcludedEdge;
+                if (rightDeletedEdgeIntersectionPoint != null) {
+                    double rightDeletedIntersectionDistance = PointUtils.getLength(rightDeletedEdgeIntersectionPoint, prevPoint == null ? middlePerpendicular.getRightPoint() : prevPoint);
+                    if (rightDeletedIntersectionDistance < rightDistance || rightEdge == null) {
+                        rightDistance = rightDeletedIntersectionDistance;
+                        rightPoint = rightDeletedEdgeIntersectionPoint;
+                        rightEdge = rightExcludedEdge;
+                    }
                 }
-                rightExcludedEdge = null;
             }
 
             if ((leftEdge != null && rightEdge == null) || (leftEdge != null && leftDistance < rightDistance)) {
@@ -346,19 +345,19 @@ public class Main extends Application {
                 }
                 assert leftTwinEdge != null;
                 Cell leftTwinCell = leftTwinEdge.getCell();
-                leftExcludedEdge = leftTwinCell.getBoundary();
+                excludedEdges.put(leftTwinCell.getCenter(), leftTwinCell.getBoundary());
                 leftTwinCell.setBoundary(leftTwinEdge);
 
                 Edge nextLeftEdge = new Edge((prevPoint == null ? middlePerpendicular.getRightPoint() : prevPoint), leftPoint, leftCell);
                 nextLeftEdge.setInfiniteLeftEnd(prevPoint == null);
                 nextLeftEdge.setInfiniteRightEnd(false);
 
-                if (leftDiagram.size() == 4) {
-                    javafx.scene.shape.Line line = new javafx.scene.shape.Line(nextLeftEdge.getLeftPoint().getX(), nextLeftEdge.getLeftPoint().getY(), nextLeftEdge.getRightPoint().getX(), nextLeftEdge.getRightPoint().getY());
-                    line.setStroke(Color.BLACK);
-                    line.setStrokeWidth(5);
-                    pane.getChildren().add(line);
-                }
+//                if (leftDiagram.size() == 4) {
+//                    javafx.scene.shape.Line line = new javafx.scene.shape.Line(nextLeftEdge.getLeftPoint().getX(), nextLeftEdge.getLeftPoint().getY(), nextLeftEdge.getRightPoint().getX(), nextLeftEdge.getRightPoint().getY());
+//                    line.setStroke(Color.BLACK);
+//                    line.setStrokeWidth(5);
+//                    pane.getChildren().add(line);
+//                }
 
                 List<Edge> leftChain = disjunctiveChain.get(leftCell);
                 if (leftChain == null || leftChain.isEmpty()) {
@@ -390,7 +389,7 @@ public class Main extends Application {
                     rightChain.add(nextRightEdge);
                 }
 
-                upperCommonSupport.setLeftPoint(leftTwinEdge.getCell().getCenter());
+                upperCommonSupport.setLeftPoint(leftTwinCell.getCenter());
                 nextLeftEdge.setTwin(nextRightEdge);
                 prevPoint = leftPoint;
                 rightEdge = null;
@@ -442,19 +441,19 @@ public class Main extends Application {
                 }
                 assert rightTwinEdge != null;
                 Cell rightTwinCell = rightTwinEdge.getCell();
-                rightExcludedEdge = rightTwinCell.getBoundary();
+                excludedEdges.put(rightTwinCell.getCenter(), rightTwinCell.getBoundary());
                 rightTwinCell.setBoundary(rightTwinEdge);
 
                 Edge nextRightEdge = new Edge((prevPoint == null ? middlePerpendicular.getRightPoint() : prevPoint), rightPoint, rightCell);
                 nextRightEdge.setInfiniteLeftEnd(prevPoint == null);
                 nextRightEdge.setInfiniteRightEnd(false);
 
-                if (leftDiagram.size() == 4) {
-                    javafx.scene.shape.Line line = new javafx.scene.shape.Line(nextRightEdge.getLeftPoint().getX(), nextRightEdge.getLeftPoint().getY(), nextRightEdge.getRightPoint().getX(), nextRightEdge.getRightPoint().getY());
-                    line.setStroke(Color.BLACK);
-                    line.setStrokeWidth(5);
-                    pane.getChildren().add(line);
-                }
+//                if (leftDiagram.size() == 4) {
+//                    javafx.scene.shape.Line line = new javafx.scene.shape.Line(nextRightEdge.getLeftPoint().getX(), nextRightEdge.getLeftPoint().getY(), nextRightEdge.getRightPoint().getX(), nextRightEdge.getRightPoint().getY());
+//                    line.setStroke(Color.BLACK);
+//                    line.setStrokeWidth(5);
+//                    pane.getChildren().add(line);
+//                }
 
                 List<Edge> rightChain = disjunctiveChain.get(rightCell);
                 if (rightChain == null || rightChain.isEmpty()) {
@@ -486,7 +485,7 @@ public class Main extends Application {
                     leftChain.add(nextLeftEdge);
                 }
 
-                upperCommonSupport.setRightPoint(rightTwinEdge.getCell().getCenter());
+                upperCommonSupport.setRightPoint(rightTwinCell.getCenter());
                 nextRightEdge.setTwin(nextLeftEdge);
                 prevPoint = rightPoint;
                 leftEdge = null;
