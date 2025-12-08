@@ -599,8 +599,6 @@ public class Main extends Application {
 
     public void drawVoronoyDiagram(List<Point> polygon) {
         log.info("Start drawing ");
-
-        //       buildVoronoyDiagram(polygon.stream().sorted(Comparator.comparingDouble(Point::getX).thenComparing(Point::getY)).toList());
         buildVoronoyDiagram(polygon.stream().sorted(Comparator.comparingDouble(Point::getX).thenComparing(Point::getY)).toList())
                 .values()
                 .forEach(voronoyCell -> {
