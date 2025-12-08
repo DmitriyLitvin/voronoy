@@ -303,56 +303,60 @@ public class Main extends Application {
                 Line leftLine = new Line(leftEdge);
                 if (isOnTheSameSide(middlePerpendicular, leftCell.getCenter(), leftLine.getLeftPoint()) && isOnTheSameSide(middlePerpendicular, leftCell.getCenter(), leftLine.getRightPoint())) {
                     if (PointUtils.getLength(leftEdge.getLeftPoint(), leftPoint) > PointUtils.getLength(leftEdge.getRightPoint(), leftPoint)) {
-                        eraseEdges(leftEdge, leftEdge.getRightPoint());
+                        getEraseEdge(leftEdge, leftEdge.getRightPoint());
                         leftEdge.setRightPoint(leftPoint);
                         leftEdge.setInfiniteRightEnd(false);
                         leftCell.setBoundary(leftEdge);
 
                         leftTwinEdge = leftEdge.getTwin();
                         Cell leftTwinCell = leftTwinEdge.getCell();
-                        excludedEdges.put(leftTwinCell.getCenter(), leftTwinCell.getBoundary());
-
-                        eraseEdges(leftTwinEdge, leftTwinEdge.getRightPoint());
+                        Edge erasedEdge = getEraseEdge(leftTwinEdge, leftTwinEdge.getRightPoint());
+                        if (erasedEdge != null) {
+                            excludedEdges.put(leftTwinCell.getCenter(), erasedEdge);
+                        }
                         leftTwinEdge.setRightPoint(leftPoint);
                         leftTwinEdge.setInfiniteRightEnd(false);
                     } else if (PointUtils.getLength(leftEdge.getLeftPoint(), leftPoint) < PointUtils.getLength(leftEdge.getRightPoint(), leftPoint)) {
-                        eraseEdges(leftEdge, leftEdge.getLeftPoint());
+                        getEraseEdge(leftEdge, leftEdge.getLeftPoint());
                         leftEdge.setLeftPoint(leftPoint);
                         leftEdge.setInfiniteLeftEnd(false);
                         leftCell.setBoundary(leftEdge);
 
                         leftTwinEdge = leftEdge.getTwin();
                         Cell leftTwinCell = leftTwinEdge.getCell();
-                        excludedEdges.put(leftTwinCell.getCenter(), leftTwinCell.getBoundary());
-
-                        eraseEdges(leftTwinEdge, leftTwinEdge.getLeftPoint());
+                        Edge erasedEdge = getEraseEdge(leftTwinEdge, leftTwinEdge.getLeftPoint());
+                        if (erasedEdge != null) {
+                            excludedEdges.put(leftTwinCell.getCenter(), erasedEdge);
+                        }
                         leftTwinEdge.setLeftPoint(leftPoint);
                         leftTwinEdge.setInfiniteLeftEnd(false);
                     }
                 } else if (isOnTheSameSide(middlePerpendicular, leftCell.getCenter(), leftLine.getLeftPoint())) {
-                    eraseEdges(leftEdge, leftEdge.getRightPoint());
+                    getEraseEdge(leftEdge, leftEdge.getRightPoint());
                     leftEdge.setRightPoint(leftPoint);
                     leftEdge.setInfiniteRightEnd(false);
                     leftCell.setBoundary(leftEdge);
 
                     leftTwinEdge = leftEdge.getTwin();
                     Cell leftTwinCell = leftTwinEdge.getCell();
-                    excludedEdges.put(leftTwinCell.getCenter(), leftTwinCell.getBoundary());
-
-                    eraseEdges(leftTwinEdge, leftTwinEdge.getRightPoint());
+                    Edge erasedEdge = getEraseEdge(leftTwinEdge, leftTwinEdge.getRightPoint());
+                    if (erasedEdge != null) {
+                        excludedEdges.put(leftTwinCell.getCenter(), erasedEdge);
+                    }
                     leftTwinEdge.setRightPoint(leftPoint);
                     leftTwinEdge.setInfiniteRightEnd(false);
                 } else if (isOnTheSameSide(middlePerpendicular, leftCell.getCenter(), leftLine.getRightPoint())) {
-                    eraseEdges(leftEdge, leftEdge.getLeftPoint());
+                    getEraseEdge(leftEdge, leftEdge.getLeftPoint());
                     leftEdge.setLeftPoint(leftPoint);
                     leftEdge.setInfiniteLeftEnd(false);
                     leftCell.setBoundary(leftEdge);
 
                     leftTwinEdge = leftEdge.getTwin();
                     Cell leftTwinCell = leftTwinEdge.getCell();
-                    excludedEdges.put(leftTwinCell.getCenter(), leftTwinCell.getBoundary());
-
-                    eraseEdges(leftTwinEdge, leftTwinEdge.getLeftPoint());
+                    Edge erasedEdge = getEraseEdge(leftTwinEdge, leftTwinEdge.getLeftPoint());
+                    if (erasedEdge != null) {
+                        excludedEdges.put(leftTwinCell.getCenter(), erasedEdge);
+                    }
                     leftTwinEdge.setLeftPoint(leftPoint);
                     leftTwinEdge.setInfiniteLeftEnd(false);
                 }
@@ -409,56 +413,60 @@ public class Main extends Application {
                 Line rightLine = new Line(rightEdge);
                 if (isOnTheSameSide(middlePerpendicular, rightCell.getCenter(), rightLine.getLeftPoint()) && isOnTheSameSide(middlePerpendicular, rightCell.getCenter(), rightLine.getRightPoint())) {
                     if (PointUtils.getLength(rightEdge.getLeftPoint(), rightPoint) > PointUtils.getLength(rightEdge.getRightPoint(), rightPoint)) {
-                        eraseEdges(rightEdge, rightEdge.getRightPoint());
+                        getEraseEdge(rightEdge, rightEdge.getRightPoint());
                         rightEdge.setRightPoint(rightPoint);
                         rightEdge.setInfiniteRightEnd(false);
                         rightCell.setBoundary(rightEdge);
 
                         rightTwinEdge = rightEdge.getTwin();
                         Cell rightTwinCell = rightTwinEdge.getCell();
-                        excludedEdges.put(rightTwinCell.getCenter(), rightTwinCell.getBoundary());
-
-                        eraseEdges(rightTwinEdge, rightTwinEdge.getRightPoint());
+                        Edge erasedEdge = getEraseEdge(rightTwinEdge, rightTwinEdge.getRightPoint());
+                        if (erasedEdge != null) {
+                            excludedEdges.put(rightTwinCell.getCenter(), erasedEdge);
+                        }
                         rightTwinEdge.setRightPoint(rightPoint);
                         rightTwinEdge.setInfiniteRightEnd(false);
                     } else if (PointUtils.getLength(rightEdge.getLeftPoint(), rightPoint) < PointUtils.getLength(rightEdge.getRightPoint(), rightPoint)) {
-                        eraseEdges(rightEdge, rightEdge.getLeftPoint());
+                        getEraseEdge(rightEdge, rightEdge.getLeftPoint());
                         rightEdge.setLeftPoint(rightPoint);
                         rightEdge.setInfiniteLeftEnd(false);
                         rightCell.setBoundary(rightEdge);
 
                         rightTwinEdge = rightEdge.getTwin();
                         Cell rightTwinCell = rightTwinEdge.getCell();
-                        excludedEdges.put(rightTwinCell.getCenter(), rightTwinCell.getBoundary());
-
-                        eraseEdges(rightTwinEdge, rightTwinEdge.getLeftPoint());
+                        Edge erasedEdge = getEraseEdge(rightTwinEdge, rightTwinEdge.getLeftPoint());
+                        if (erasedEdge != null) {
+                            excludedEdges.put(rightTwinCell.getCenter(), erasedEdge);
+                        }
                         rightTwinEdge.setLeftPoint(rightPoint);
                         rightTwinEdge.setInfiniteLeftEnd(false);
                     }
                 } else if (isOnTheSameSide(middlePerpendicular, rightCell.getCenter(), rightLine.getLeftPoint())) {
-                    eraseEdges(rightEdge, rightEdge.getRightPoint());
+                    getEraseEdge(rightEdge, rightEdge.getRightPoint());
                     rightEdge.setRightPoint(rightPoint);
                     rightEdge.setInfiniteRightEnd(false);
                     rightCell.setBoundary(rightEdge);
 
                     rightTwinEdge = rightEdge.getTwin();
                     Cell rightTwinCell = rightTwinEdge.getCell();
-                    excludedEdges.put(rightTwinCell.getCenter(), rightTwinCell.getBoundary());
-
-                    eraseEdges(rightTwinEdge, rightTwinEdge.getRightPoint());
+                    Edge erasedEdge = getEraseEdge(rightTwinEdge, rightTwinEdge.getRightPoint());
+                    if (erasedEdge != null) {
+                        excludedEdges.put(rightTwinCell.getCenter(), erasedEdge);
+                    }
                     rightTwinEdge.setRightPoint(rightPoint);
                     rightTwinEdge.setInfiniteRightEnd(false);
                 } else if (isOnTheSameSide(middlePerpendicular, rightCell.getCenter(), rightLine.getRightPoint())) {
-                    eraseEdges(rightEdge, rightEdge.getLeftPoint());
+                    getEraseEdge(rightEdge, rightEdge.getLeftPoint());
                     rightEdge.setLeftPoint(rightPoint);
                     rightEdge.setInfiniteLeftEnd(false);
                     rightCell.setBoundary(rightEdge);
 
                     rightTwinEdge = rightEdge.getTwin();
                     Cell rightTwinCell = rightTwinEdge.getCell();
-                    excludedEdges.put(rightTwinCell.getCenter(), rightTwinCell.getBoundary());
-
-                    eraseEdges(rightTwinEdge, rightTwinEdge.getLeftPoint());
+                    Edge erasedEdge = getEraseEdge(rightTwinEdge, rightTwinEdge.getLeftPoint());
+                    if (erasedEdge != null) {
+                        excludedEdges.put(rightTwinCell.getCenter(), erasedEdge);
+                    }
                     rightTwinEdge.setLeftPoint(rightPoint);
                     rightTwinEdge.setInfiniteLeftEnd(false);
                 }
@@ -585,18 +593,24 @@ public class Main extends Application {
         return diagram;
     }
 
-    private void eraseEdges(Edge edge, Point point) {
+    private Edge getEraseEdge(Edge edge, Point point) {
         Edge nextEdge = edge.getNext();
         if (nextEdge != null && (Objects.equals(point, nextEdge.getRightPoint()) || Objects.equals(point, nextEdge.getLeftPoint()))) {
             edge.setNext(null);
             nextEdge.setPrev(null);
+
+            return nextEdge;
         }
 
         Edge prevEdge = edge.getPrev();
         if (prevEdge != null && (Objects.equals(point, prevEdge.getRightPoint()) || Objects.equals(point, prevEdge.getLeftPoint()))) {
             edge.setPrev(null);
             prevEdge.setNext(null);
+
+            return prevEdge;
         }
+
+        return null;
     }
 
     private boolean isConnected(Edge a, Edge b) {
