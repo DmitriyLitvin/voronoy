@@ -242,13 +242,8 @@ public class Main extends Application {
         Line middlePerpendicular;
         Map<Point, Edge> excludedEdges = new HashMap<>();
         Map<Cell, List<Edge>> disjunctiveChain = new HashMap<>();
-        int k = 0;
         while (!Objects.equals(upperCommonSupport, lowerCommonSupport)) {
             middlePerpendicular = getMiddlePerpendicular(upperCommonSupport);
-            if (k > 15) {
-                break;
-            }
-            k++;
 
             double leftDistance = 0;
             Point leftPoint = null;
@@ -367,13 +362,6 @@ public class Main extends Application {
                 nextLeftEdge.setInfiniteLeftEnd(prevPoint == null);
                 nextLeftEdge.setInfiniteRightEnd(false);
 
-                if (leftDiagram.size() == 4) {
-                    javafx.scene.shape.Line line = new javafx.scene.shape.Line(nextLeftEdge.getLeftPoint().getX(), nextLeftEdge.getLeftPoint().getY(), nextLeftEdge.getRightPoint().getX(), nextLeftEdge.getRightPoint().getY());
-                    line.setStroke(Color.BLACK);
-                    line.setStrokeWidth(5);
-                    pane.getChildren().add(line);
-                }
-
                 List<Edge> leftChain = disjunctiveChain.get(leftCell);
                 if (leftChain == null || leftChain.isEmpty()) {
                     nextLeftEdge.setNext(leftEdge);
@@ -476,13 +464,6 @@ public class Main extends Application {
                 Edge nextRightEdge = new Edge((prevPoint == null ? middlePerpendicular.getRightPoint() : prevPoint), rightPoint, rightCell);
                 nextRightEdge.setInfiniteLeftEnd(prevPoint == null);
                 nextRightEdge.setInfiniteRightEnd(false);
-
-                if (leftDiagram.size() == 4) {
-                    javafx.scene.shape.Line line = new javafx.scene.shape.Line(nextRightEdge.getLeftPoint().getX(), nextRightEdge.getLeftPoint().getY(), nextRightEdge.getRightPoint().getX(), nextRightEdge.getRightPoint().getY());
-                    line.setStroke(Color.BLACK);
-                    line.setStrokeWidth(5);
-                    pane.getChildren().add(line);
-                }
 
                 List<Edge> rightChain = disjunctiveChain.get(rightCell);
                 if (rightChain == null || rightChain.isEmpty()) {
