@@ -198,7 +198,6 @@ public class Main extends Application {
         if (polygon.size() == 1) {
             Map<Point, Cell> diagram = new HashMap<>();
             Point center = polygon.get(0);
-
             diagram.put(center, new Cell(center, null));
 
             return diagram;
