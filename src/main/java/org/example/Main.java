@@ -13,6 +13,7 @@ import javafx.stage.Stage;
 import lombok.extern.slf4j.Slf4j;
 import org.example.entity.*;
 import org.example.entity.Point;
+import org.example.utils.PointUtils;
 
 import java.util.*;
 import java.util.List;
@@ -308,6 +309,9 @@ public class Main extends Application {
                         leftCell.setBoundary(leftEdge);
 
                         leftTwinEdge = leftEdge.getTwin();
+                        Cell leftTwinCell = leftTwinEdge.getCell();
+                        excludedEdges.put(leftTwinCell.getCenter(), leftTwinCell.getBoundary());
+
                         eraseEdges(leftTwinEdge, leftTwinEdge.getRightPoint());
                         leftTwinEdge.setRightPoint(leftPoint);
                         leftTwinEdge.setInfiniteRightEnd(false);
@@ -318,6 +322,9 @@ public class Main extends Application {
                         leftCell.setBoundary(leftEdge);
 
                         leftTwinEdge = leftEdge.getTwin();
+                        Cell leftTwinCell = leftTwinEdge.getCell();
+                        excludedEdges.put(leftTwinCell.getCenter(), leftTwinCell.getBoundary());
+
                         eraseEdges(leftTwinEdge, leftTwinEdge.getLeftPoint());
                         leftTwinEdge.setLeftPoint(leftPoint);
                         leftTwinEdge.setInfiniteLeftEnd(false);
@@ -329,6 +336,9 @@ public class Main extends Application {
                     leftCell.setBoundary(leftEdge);
 
                     leftTwinEdge = leftEdge.getTwin();
+                    Cell leftTwinCell = leftTwinEdge.getCell();
+                    excludedEdges.put(leftTwinCell.getCenter(), leftTwinCell.getBoundary());
+
                     eraseEdges(leftTwinEdge, leftTwinEdge.getRightPoint());
                     leftTwinEdge.setRightPoint(leftPoint);
                     leftTwinEdge.setInfiniteRightEnd(false);
@@ -339,25 +349,26 @@ public class Main extends Application {
                     leftCell.setBoundary(leftEdge);
 
                     leftTwinEdge = leftEdge.getTwin();
+                    Cell leftTwinCell = leftTwinEdge.getCell();
+                    excludedEdges.put(leftTwinCell.getCenter(), leftTwinCell.getBoundary());
+
                     eraseEdges(leftTwinEdge, leftTwinEdge.getLeftPoint());
                     leftTwinEdge.setLeftPoint(leftPoint);
                     leftTwinEdge.setInfiniteLeftEnd(false);
                 }
                 assert leftTwinEdge != null;
-                Cell leftTwinCell = leftTwinEdge.getCell();
-                excludedEdges.put(leftTwinCell.getCenter(), leftTwinCell.getBoundary());
-                leftTwinCell.setBoundary(leftTwinEdge);
+                leftTwinEdge.getCell().setBoundary(leftTwinEdge);
 
                 Edge nextLeftEdge = new Edge((prevPoint == null ? middlePerpendicular.getRightPoint() : prevPoint), leftPoint, leftCell);
                 nextLeftEdge.setInfiniteLeftEnd(prevPoint == null);
                 nextLeftEdge.setInfiniteRightEnd(false);
 
-//                if (leftDiagram.size() == 4) {
-//                    javafx.scene.shape.Line line = new javafx.scene.shape.Line(nextLeftEdge.getLeftPoint().getX(), nextLeftEdge.getLeftPoint().getY(), nextLeftEdge.getRightPoint().getX(), nextLeftEdge.getRightPoint().getY());
-//                    line.setStroke(Color.BLACK);
-//                    line.setStrokeWidth(5);
-//                    pane.getChildren().add(line);
-//                }
+                if (leftDiagram.size() == 4) {
+                    javafx.scene.shape.Line line = new javafx.scene.shape.Line(nextLeftEdge.getLeftPoint().getX(), nextLeftEdge.getLeftPoint().getY(), nextLeftEdge.getRightPoint().getX(), nextLeftEdge.getRightPoint().getY());
+                    line.setStroke(Color.BLACK);
+                    line.setStrokeWidth(5);
+                    pane.getChildren().add(line);
+                }
 
                 List<Edge> leftChain = disjunctiveChain.get(leftCell);
                 if (leftChain == null || leftChain.isEmpty()) {
@@ -389,7 +400,7 @@ public class Main extends Application {
                     rightChain.add(nextRightEdge);
                 }
 
-                upperCommonSupport.setLeftPoint(leftTwinCell.getCenter());
+                upperCommonSupport.setLeftPoint(leftTwinEdge.getCell().getCenter());
                 nextLeftEdge.setTwin(nextRightEdge);
                 prevPoint = leftPoint;
                 rightEdge = null;
@@ -404,6 +415,9 @@ public class Main extends Application {
                         rightCell.setBoundary(rightEdge);
 
                         rightTwinEdge = rightEdge.getTwin();
+                        Cell rightTwinCell = rightTwinEdge.getCell();
+                        excludedEdges.put(rightTwinCell.getCenter(), rightTwinCell.getBoundary());
+
                         eraseEdges(rightTwinEdge, rightTwinEdge.getRightPoint());
                         rightTwinEdge.setRightPoint(rightPoint);
                         rightTwinEdge.setInfiniteRightEnd(false);
@@ -414,6 +428,9 @@ public class Main extends Application {
                         rightCell.setBoundary(rightEdge);
 
                         rightTwinEdge = rightEdge.getTwin();
+                        Cell rightTwinCell = rightTwinEdge.getCell();
+                        excludedEdges.put(rightTwinCell.getCenter(), rightTwinCell.getBoundary());
+
                         eraseEdges(rightTwinEdge, rightTwinEdge.getLeftPoint());
                         rightTwinEdge.setLeftPoint(rightPoint);
                         rightTwinEdge.setInfiniteLeftEnd(false);
@@ -425,6 +442,9 @@ public class Main extends Application {
                     rightCell.setBoundary(rightEdge);
 
                     rightTwinEdge = rightEdge.getTwin();
+                    Cell rightTwinCell = rightTwinEdge.getCell();
+                    excludedEdges.put(rightTwinCell.getCenter(), rightTwinCell.getBoundary());
+
                     eraseEdges(rightTwinEdge, rightTwinEdge.getRightPoint());
                     rightTwinEdge.setRightPoint(rightPoint);
                     rightTwinEdge.setInfiniteRightEnd(false);
@@ -435,25 +455,26 @@ public class Main extends Application {
                     rightCell.setBoundary(rightEdge);
 
                     rightTwinEdge = rightEdge.getTwin();
+                    Cell rightTwinCell = rightTwinEdge.getCell();
+                    excludedEdges.put(rightTwinCell.getCenter(), rightTwinCell.getBoundary());
+
                     eraseEdges(rightTwinEdge, rightTwinEdge.getLeftPoint());
                     rightTwinEdge.setLeftPoint(rightPoint);
                     rightTwinEdge.setInfiniteLeftEnd(false);
                 }
                 assert rightTwinEdge != null;
-                Cell rightTwinCell = rightTwinEdge.getCell();
-                excludedEdges.put(rightTwinCell.getCenter(), rightTwinCell.getBoundary());
-                rightTwinCell.setBoundary(rightTwinEdge);
+                rightTwinEdge.getCell().setBoundary(rightTwinEdge);
 
                 Edge nextRightEdge = new Edge((prevPoint == null ? middlePerpendicular.getRightPoint() : prevPoint), rightPoint, rightCell);
                 nextRightEdge.setInfiniteLeftEnd(prevPoint == null);
                 nextRightEdge.setInfiniteRightEnd(false);
 
-//                if (leftDiagram.size() == 4) {
-//                    javafx.scene.shape.Line line = new javafx.scene.shape.Line(nextRightEdge.getLeftPoint().getX(), nextRightEdge.getLeftPoint().getY(), nextRightEdge.getRightPoint().getX(), nextRightEdge.getRightPoint().getY());
-//                    line.setStroke(Color.BLACK);
-//                    line.setStrokeWidth(5);
-//                    pane.getChildren().add(line);
-//                }
+                if (leftDiagram.size() == 4) {
+                    javafx.scene.shape.Line line = new javafx.scene.shape.Line(nextRightEdge.getLeftPoint().getX(), nextRightEdge.getLeftPoint().getY(), nextRightEdge.getRightPoint().getX(), nextRightEdge.getRightPoint().getY());
+                    line.setStroke(Color.BLACK);
+                    line.setStrokeWidth(5);
+                    pane.getChildren().add(line);
+                }
 
                 List<Edge> rightChain = disjunctiveChain.get(rightCell);
                 if (rightChain == null || rightChain.isEmpty()) {
@@ -485,7 +506,7 @@ public class Main extends Application {
                     leftChain.add(nextLeftEdge);
                 }
 
-                upperCommonSupport.setRightPoint(rightTwinCell.getCenter());
+                upperCommonSupport.setRightPoint(rightTwinEdge.getCell().getCenter());
                 nextRightEdge.setTwin(nextLeftEdge);
                 prevPoint = rightPoint;
                 leftEdge = null;

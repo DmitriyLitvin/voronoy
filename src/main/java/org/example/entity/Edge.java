@@ -2,10 +2,13 @@ package org.example.entity;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.example.utils.DeepCopyHelper;
 
 @Getter
 @Setter
+@NoArgsConstructor
 @AllArgsConstructor
 public class Edge {
     private Point leftPoint;
@@ -16,6 +19,12 @@ public class Edge {
     private Cell cell;
     private boolean isInfiniteLeftEnd = true;
     private boolean isInfiniteRightEnd = true;
+
+    private static DeepCopyHelper<Edge> helper = new DeepCopyHelper<>();
+
+    public Edge deepCopy() {
+        return helper.copy(this);
+    }
 
     public Edge(Point leftPoint, Point rightPoint, Cell cell) {
         this.leftPoint = leftPoint;

@@ -1,14 +1,13 @@
 package org.example.entity;
 
-import lombok.AllArgsConstructor;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
+import org.example.utils.PointUtils;
 
 import java.util.Objects;
 
 @Getter
 @Setter
+@NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(exclude = "boundary")
 public class Cell {

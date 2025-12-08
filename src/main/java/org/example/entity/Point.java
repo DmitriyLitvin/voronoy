@@ -4,8 +4,9 @@ import lombok.*;
 
 @Getter
 @Setter
-@EqualsAndHashCode
 @ToString
+@NoArgsConstructor
+@EqualsAndHashCode
 public class Point {
     private double x;
     private double y;
