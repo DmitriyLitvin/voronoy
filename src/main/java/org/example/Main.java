@@ -208,7 +208,6 @@ public class Main extends Application {
 
             Line middlePerpendicular = getMiddlePerpendicular(new Line(leftCenter, rightCenter));
             Edge leftEdge = new Edge(middlePerpendicular.getLeftPoint(), middlePerpendicular.getRightPoint());
-
             Edge rightEdge = new Edge(middlePerpendicular.getLeftPoint(), middlePerpendicular.getRightPoint());
 
             leftEdge.setTwin(rightEdge);
