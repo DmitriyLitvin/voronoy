@@ -3,7 +3,6 @@ package org.example;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
-import javafx.scene.control.Label;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
@@ -59,39 +58,10 @@ public class Main extends Application {
             System.out.println("Клік: x=" + x + ", y=" + y);
         });
 
-
-        points.add(new Point(520.0, 290.0));
-        points.add(new Point(630.0, 193.0));
-        points.add(new Point(714.0, 326.0));
-        points.add(new Point(763.0, 565.0));
-        points.add(new Point(670.0, 465.0));
-        points.add(new Point(560.0, 664.0));
-        points.add(new Point(667.0, 838.0));
-        points.add(new Point(693.0, 730.0));
-
-//        points.add(new Point(275.0, 508.0));
-//        points.add(new Point(284.0, 650.0));
-//        points.add(new Point(441.0, 585.0));
-//        points.add(new Point(287.0, 534.0));
-//        points.add(new Point(660.0, 840.0));
-//        points.add(new Point(678.0, 936.0));
-//        points.add(new Point(792.0, 900.0));
-//        points.add(new Point(675.0, 870.0));
-
-        points.forEach(p -> {
-            Circle circle = new Circle(p.getX(), p.getY(), 3, Color.RED);
-            Label label = new Label(+circle.getCenterX() + ", " + circle.getCenterY());
-
-            label.relocate(circle.getCenterX() + 1, circle.getCenterY() + 1);
-            pane.getChildren().addAll(label, circle);
-        });
-
-
         button.setOnAction(e -> {
             drawVoronoyDiagram(points);
             points.clear();
         });
-
 
         stage.setScene(scene);
         stage.setTitle("Voronoy");
