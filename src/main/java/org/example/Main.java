@@ -131,7 +131,7 @@ public class Main extends Application {
         Point minXPoint = rightConvexPolygon.stream().min(Comparator.comparingDouble(Point::getX)).orElse(null);
         Line line = new Line(maxXpoint, minXPoint);
 
-        for (int i = 0; i < 5; i++) {
+        for (int i = 0; i < 2; i++) {
             Point leftPoint = maxXpoint;
             Point rightPoint = minXPoint;
 
