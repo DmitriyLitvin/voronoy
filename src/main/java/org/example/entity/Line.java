@@ -20,10 +20,10 @@ public class Line {
     public boolean is(Point point, CommonSupportType commonSupportType) {
         switch (commonSupportType) {
             case UPPER -> {
-                return point.getY() > getEquationOfLine(point.getX());
+                return point.getY() >= getEquationOfLine(point.getX());
             }
             case LOWER -> {
-                return point.getY() < getEquationOfLine(point.getX());
+                return point.getY() <= getEquationOfLine(point.getX());
             }
         }
 
