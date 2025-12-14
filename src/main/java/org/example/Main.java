@@ -63,14 +63,14 @@ public class Main extends Application {
 //        points.add(new Point(383.0, 859.0));
 
 
-        points.add(new Point(638.0, 324.0));
-        points.add(new Point(711.0, 216.0));
-        points.add(new Point(720.0, 252.0));
-        points.add(new Point(692.0, 270.0));
-        points.add(new Point(725.0, 376.0));
-        points.add(new Point(673.0, 456.0));
-        points.add(new Point(506.0, 632.0));
-        points.add(new Point(778.0, 773.0));
+//        points.add(new Point(638.0, 324.0));
+//        points.add(new Point(711.0, 216.0));
+//        points.add(new Point(720.0, 252.0));
+//        points.add(new Point(692.0, 270.0));
+//        points.add(new Point(725.0, 376.0));
+//        points.add(new Point(673.0, 456.0));
+//        points.add(new Point(506.0, 632.0));
+//        points.add(new Point(778.0, 773.0));
 
 
         points.forEach(p -> {
@@ -249,14 +249,14 @@ public class Main extends Application {
         Line middlePerpendicular;
         Map<Point, Edge> excludedEdges = new HashMap<>();
         Map<Cell, List<Edge>> disjunctiveChain = new HashMap<>();
-        int k = 0;
+        //int k = 0;
         while (!Objects.equals(upperCommonSupport, lowerCommonSupport)) {
             System.out.println("Upper common support is updated");
             middlePerpendicular = getMiddlePerpendicular(upperCommonSupport);
-            if (k > 15) {
-                break;
-            }
-            k++;
+//            if (k > 15) {
+//                break;
+//            }
+//            k++;
 
             double leftDistance = 0;
             Point leftPoint = null;
@@ -699,7 +699,8 @@ public class Main extends Application {
             } else if (Objects.equals(prevEdge.getRightPoint(), currentPoint)) {
                 nextPoint = prevEdge.getLeftPoint();
             }
-        } else if (nextEdge != null) {
+        }
+        if (nextEdge != null) {
             if (Objects.equals(nextEdge.getLeftPoint(), currentPoint)) {
                 nextPoint = nextEdge.getRightPoint();
             } else if (Objects.equals(nextEdge.getRightPoint(), currentPoint)) {
