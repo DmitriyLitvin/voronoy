@@ -31,7 +31,7 @@ public class Line {
     }
 
     public double getEquationOfLine(double x) {
-        return ((rightPoint.getY() - this.leftPoint.getY()) * (x - this.leftPoint.getX())) / (rightPoint.getX() - this.leftPoint.getX()) + this.leftPoint.getY();
+        return ((rightPoint.getY() - leftPoint.getY()) * (x - leftPoint.getX())) / (rightPoint.getX() - leftPoint.getX()) + leftPoint.getY();
     }
 
 

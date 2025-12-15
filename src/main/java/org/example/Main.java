@@ -43,25 +43,14 @@ public class Main extends Application {
         borderPane.setBottom(button);
         pane.getChildren().add(button);
 
-//        points.add(new Point(637.0, 152.0));
-//        points.add(new Point(625.0, 229.0));
-//        points.add(new Point(795.0, 391.0));
-//        points.add(new Point(707.0, 478.0));
-//        points.add(new Point(547.0, 272.0));
-//        points.add(new Point(614.0, 381.0));
-//        points.add(new Point(472.0, 677.0));
-//        points.add(new Point(144.0, 806.0));
-
-
-//        points.add(new Point(642.0, 386.0));
-//        points.add(new Point(691.0, 237.0));
-//        points.add(new Point(684.0, 313.0));
+        points.add(new Point(383.0, 859.0));
+        points.add(new Point(642.0, 386.0));
+        points.add(new Point(691.0, 237.0));
+        points.add(new Point(684.0, 313.0));
 //        points.add(new Point(822.0, 395.0));
 //        points.add(new Point(733.0, 361.0));
 //        points.add(new Point(759.0, 576.0));
 //        points.add(new Point(714.0, 506.0));
-//        points.add(new Point(383.0, 859.0));
-
 
 //        points.add(new Point(638.0, 324.0));
 //        points.add(new Point(711.0, 216.0));
@@ -109,9 +98,9 @@ public class Main extends Application {
     }
 
 
-    private List<Point> buildConvexHull(List<Point> points) {
+    private Set<Point> buildConvexHull(List<Point> points) {
         if (points.size() <= 2) {
-            return points;
+            return new HashSet<>(points);
         }
 
         Point point = points.stream().min((p1, p2) -> {
@@ -163,20 +152,20 @@ public class Main extends Application {
             convexHull.push(p);
         });
 
-        return new ArrayList<>(convexHull);
+        return new HashSet<>(convexHull);
     }
 
-    private Line getCommonSupport(List<Point> leftConvexPolygon, List<Point> rightConvexPolygon, CommonSupportType commonSupportType) {
-        Point maxXpoint = leftConvexPolygon.stream().max(Comparator.comparingDouble(Point::getX)).orElse(null);
-        Point minXPoint = rightConvexPolygon.stream().min(Comparator.comparingDouble(Point::getX)).orElse(null);
+    private Line getCommonSupport(Set<Point> leftPolygon, Set<Point> rightPolygon, CommonSupportType commonSupportType) {
+        Point maxXpoint = leftPolygon.stream().max(Comparator.comparingDouble(Point::getX)).orElse(null);
+        Point minXPoint = rightPolygon.stream().min(Comparator.comparingDouble(Point::getX)).orElse(null);
         Line line = new Line(maxXpoint, minXPoint);
 
         for (int i = 0; i < 2; i++) {
             Point leftPoint = maxXpoint;
             Point rightPoint = minXPoint;
 
-            Iterator<Point> leftConvexPolygonIterator = leftConvexPolygon.stream().filter(p -> !p.equals(maxXpoint)).iterator();
-            Iterator<Point> rightConvexPolygonIterator = rightConvexPolygon.stream().filter(p -> !p.equals(minXPoint)).iterator();
+            Iterator<Point> leftConvexPolygonIterator = leftPolygon.stream().filter(p -> !p.equals(maxXpoint)).iterator();
+            Iterator<Point> rightConvexPolygonIterator = rightPolygon.stream().filter(p -> !p.equals(minXPoint)).iterator();
             while (leftConvexPolygonIterator.hasNext() || rightConvexPolygonIterator.hasNext()) {
                 if (leftConvexPolygonIterator.hasNext()) {
                     leftPoint = leftConvexPolygonIterator.next();
@@ -193,11 +182,36 @@ public class Main extends Application {
 
                 } else if (line.is(rightPoint, commonSupportType)) {
                     line.setRightPoint(rightPoint);
-
                     if (line.is(leftPoint, commonSupportType)) {
                         line.setLeftPoint(leftPoint);
                     }
                 }
+            }
+        }
+
+        while (true) {
+            Map<Point, Double> leftDistances = new HashMap<>();
+            Map<Point, Double> rightDistances = new HashMap<>();
+
+            Point midPoint = line.getMidPoint();
+            leftPolygon.forEach(p -> leftDistances.put(p, PointUtils.getLength(midPoint, p)));
+            rightPolygon.forEach(p -> rightDistances.put(p, PointUtils.getLength(midPoint, p)));
+
+            Optional<Map.Entry<Point, Double>> leftDistanceEntryOptional = leftDistances.entrySet().stream().min(Comparator.comparingDouble(Map.Entry::getValue));
+            Optional<Map.Entry<Point, Double>> rightDistanceEntryOptional = rightDistances.entrySet().stream().min(Comparator.comparingDouble(Map.Entry::getValue));
+
+            if (leftDistanceEntryOptional.isPresent() && rightDistanceEntryOptional.isPresent()) {
+                Map.Entry<Point, Double> leftDistanceEntry = leftDistanceEntryOptional.get();
+                Map.Entry<Point, Double> rightDistanceEntry = rightDistanceEntryOptional.get();
+                if (rightDistanceEntry.getValue() - leftDistanceEntry.getValue() < 0) {
+                    line.setRightPoint(rightDistanceEntry.getKey());
+                } else if (rightDistanceEntry.getValue() - leftDistanceEntry.getValue() > 0) {
+                    line.setLeftPoint(leftDistanceEntry.getKey());
+                } else {
+                    break;
+                }
+            } else {
+                break;
             }
         }
 
@@ -238,8 +252,8 @@ public class Main extends Application {
     }
 
     private Map<Point, Cell> joinDiagrams(Map<Point, Cell> leftDiagram, Map<Point, Cell> rightDiagram) {
-        List<Point> leftPolygon = buildConvexHull(new ArrayList<>(leftDiagram.keySet()));
-        List<Point> rightPolygon = buildConvexHull(new ArrayList<>(rightDiagram.keySet()));
+        Set<Point> leftPolygon = buildConvexHull(new ArrayList<>(leftDiagram.keySet()));
+        Set<Point> rightPolygon = buildConvexHull(new ArrayList<>(rightDiagram.keySet()));
 
         Line upperCommonSupport = getCommonSupport(leftPolygon, rightPolygon, UPPER);
         Line lowerCommonSupport = getCommonSupport(leftPolygon, rightPolygon, LOWER);
@@ -249,14 +263,14 @@ public class Main extends Application {
         Line middlePerpendicular;
         Map<Point, Edge> excludedEdges = new HashMap<>();
         Map<Cell, List<Edge>> disjunctiveChain = new HashMap<>();
-        //int k = 0;
+        int k = 0;
         while (!Objects.equals(upperCommonSupport, lowerCommonSupport)) {
             System.out.println("Upper common support is updated");
             middlePerpendicular = getMiddlePerpendicular(upperCommonSupport);
-//            if (k > 15) {
-//                break;
-//            }
-//            k++;
+            if (k > 10) {
+                break;
+            }
+            k++;
 
             double leftDistance = 0;
             Point leftPoint = null;
@@ -606,28 +620,28 @@ public class Main extends Application {
         diagram.putAll(leftDiagram);
         diagram.putAll(rightDiagram);
 
-//        if (diagram.size() == 4) {
-//            diagram.values().forEach(voronoyCell -> {
-//                Edge edge = voronoyCell.getBoundary();
-//                Edge nextEdge = voronoyCell.getBoundary();
-//                do {
-//                    javafx.scene.shape.Line line = new javafx.scene.shape.Line(nextEdge.getLeftPoint().getX(), nextEdge.getLeftPoint().getY(), nextEdge.getRightPoint().getX(), nextEdge.getRightPoint().getY());
-//                    line.setStroke(Color.BLUE);
-//                    line.setStrokeWidth(1);
-//                    pane.getChildren().add(line);
-//                    nextEdge = nextEdge.getNext();
-//                } while (nextEdge != null && !Objects.equals(new Line(edge), new Line(nextEdge)));
-//
-//                Edge prevEdge = voronoyCell.getBoundary();
-//                do {
-//                    javafx.scene.shape.Line line = new javafx.scene.shape.Line(prevEdge.getLeftPoint().getX(), prevEdge.getLeftPoint().getY(), prevEdge.getRightPoint().getX(), prevEdge.getRightPoint().getY());
-//                    line.setStroke(Color.BLUE);
-//                    line.setStrokeWidth(1);
-//                    pane.getChildren().add(line);
-//                    prevEdge = prevEdge.getPrev();
-//                } while (prevEdge != null && !Objects.equals(new Line(edge), new Line(prevEdge)));
-//            });
-//        }
+        if (diagram.size() == 4) {
+            diagram.values().forEach(voronoyCell -> {
+                Edge edge = voronoyCell.getBoundary();
+                Edge nextEdge = voronoyCell.getBoundary();
+                do {
+                    javafx.scene.shape.Line line = new javafx.scene.shape.Line(nextEdge.getLeftPoint().getX(), nextEdge.getLeftPoint().getY(), nextEdge.getRightPoint().getX(), nextEdge.getRightPoint().getY());
+                    line.setStroke(Color.BLUE);
+                    line.setStrokeWidth(1);
+                    pane.getChildren().add(line);
+                    nextEdge = nextEdge.getNext();
+                } while (nextEdge != null && !Objects.equals(new Line(edge), new Line(nextEdge)));
+
+                Edge prevEdge = voronoyCell.getBoundary();
+                do {
+                    javafx.scene.shape.Line line = new javafx.scene.shape.Line(prevEdge.getLeftPoint().getX(), prevEdge.getLeftPoint().getY(), prevEdge.getRightPoint().getX(), prevEdge.getRightPoint().getY());
+                    line.setStroke(Color.BLUE);
+                    line.setStrokeWidth(1);
+                    pane.getChildren().add(line);
+                    prevEdge = prevEdge.getPrev();
+                } while (prevEdge != null && !Objects.equals(new Line(edge), new Line(prevEdge)));
+            });
+        }
 
         return diagram;
     }
@@ -658,29 +672,29 @@ public class Main extends Application {
 
     public void drawVoronoyDiagram(List<Point> polygon) {
         log.info("Start drawing ");
-        //       buildVoronoyDiagram(polygon.stream().sorted(Comparator.comparingDouble(Point::getX).thenComparing(Point::getY)).toList());
-        buildVoronoyDiagram(polygon.stream().sorted(Comparator.comparingDouble(Point::getX).thenComparing(Point::getY)).toList())
-                .values()
-                .forEach(voronoyCell -> {
-                    Edge edge = voronoyCell.getBoundary();
-                    Edge nextEdge = voronoyCell.getBoundary();
-                    do {
-                        javafx.scene.shape.Line line = new javafx.scene.shape.Line(nextEdge.getLeftPoint().getX(), nextEdge.getLeftPoint().getY(), nextEdge.getRightPoint().getX(), nextEdge.getRightPoint().getY());
-                        line.setStroke(Color.BLUE);
-                        line.setStrokeWidth(1);
-                        pane.getChildren().add(line);
-                        nextEdge = nextEdge.getNext();
-                    } while (nextEdge != null && !Objects.equals(new Line(edge), new Line(nextEdge)));
-
-                    Edge prevEdge = voronoyCell.getBoundary();
-                    do {
-                        javafx.scene.shape.Line line = new javafx.scene.shape.Line(prevEdge.getLeftPoint().getX(), prevEdge.getLeftPoint().getY(), prevEdge.getRightPoint().getX(), prevEdge.getRightPoint().getY());
-                        line.setStroke(Color.BLUE);
-                        line.setStrokeWidth(1);
-                        pane.getChildren().add(line);
-                        prevEdge = prevEdge.getPrev();
-                    } while (prevEdge != null && !Objects.equals(new Line(edge), new Line(prevEdge)));
-                });
+        buildVoronoyDiagram(polygon.stream().sorted(Comparator.comparingDouble(Point::getX).thenComparing(Point::getY)).toList());
+//        buildVoronoyDiagram(polygon.stream().sorted(Comparator.comparingDouble(Point::getX).thenComparing(Point::getY)).toList())
+//                .values()
+//                .forEach(voronoyCell -> {
+//                    Edge edge = voronoyCell.getBoundary();
+//                    Edge nextEdge = voronoyCell.getBoundary();
+//                    do {
+//                        javafx.scene.shape.Line line = new javafx.scene.shape.Line(nextEdge.getLeftPoint().getX(), nextEdge.getLeftPoint().getY(), nextEdge.getRightPoint().getX(), nextEdge.getRightPoint().getY());
+//                        line.setStroke(Color.BLUE);
+//                        line.setStrokeWidth(1);
+//                        pane.getChildren().add(line);
+//                        nextEdge = nextEdge.getNext();
+//                    } while (nextEdge != null && !Objects.equals(new Line(edge), new Line(nextEdge)));
+//
+//                    Edge prevEdge = voronoyCell.getBoundary();
+//                    do {
+//                        javafx.scene.shape.Line line = new javafx.scene.shape.Line(prevEdge.getLeftPoint().getX(), prevEdge.getLeftPoint().getY(), prevEdge.getRightPoint().getX(), prevEdge.getRightPoint().getY());
+//                        line.setStroke(Color.BLUE);
+//                        line.setStrokeWidth(1);
+//                        pane.getChildren().add(line);
+//                        prevEdge = prevEdge.getPrev();
+//                    } while (prevEdge != null && !Objects.equals(new Line(edge), new Line(prevEdge)));
+//                });
         log.info("End drawing");
     }
 
@@ -887,6 +901,7 @@ public class Main extends Application {
             return new Point(x, a.getEquationOfLine(x));
         }
     }
+
 
     public static void main(String[] args) {
         launch(args);
