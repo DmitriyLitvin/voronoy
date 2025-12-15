@@ -43,23 +43,23 @@ public class Main extends Application {
         borderPane.setBottom(button);
         pane.getChildren().add(button);
 
-        points.add(new Point(383.0, 859.0));
-        points.add(new Point(642.0, 386.0));
-        points.add(new Point(691.0, 237.0));
-        points.add(new Point(684.0, 313.0));
+//        points.add(new Point(383.0, 859.0));
+//        points.add(new Point(642.0, 386.0));
+//        points.add(new Point(691.0, 237.0));
+//        points.add(new Point(684.0, 313.0));
 //        points.add(new Point(822.0, 395.0));
 //        points.add(new Point(733.0, 361.0));
 //        points.add(new Point(759.0, 576.0));
 //        points.add(new Point(714.0, 506.0));
 
-//        points.add(new Point(638.0, 324.0));
-//        points.add(new Point(711.0, 216.0));
-//        points.add(new Point(720.0, 252.0));
-//        points.add(new Point(692.0, 270.0));
-//        points.add(new Point(725.0, 376.0));
-//        points.add(new Point(673.0, 456.0));
-//        points.add(new Point(506.0, 632.0));
-//        points.add(new Point(778.0, 773.0));
+        points.add(new Point(638.0, 324.0));
+        points.add(new Point(711.0, 216.0));
+        points.add(new Point(720.0, 252.0));
+        points.add(new Point(692.0, 270.0));
+        points.add(new Point(725.0, 376.0));
+        points.add(new Point(673.0, 456.0));
+        points.add(new Point(506.0, 632.0));
+        points.add(new Point(778.0, 773.0));
 
 
         points.forEach(p -> {
@@ -223,7 +223,6 @@ public class Main extends Application {
             Map<Point, Cell> diagram = new HashMap<>();
             Point center = polygon.get(0);
             diagram.put(center, new Cell(center, null));
-
             return diagram;
         } else if (polygon.size() == 2) {
             Map<Point, Cell> diagram = new HashMap<>();
@@ -258,27 +257,32 @@ public class Main extends Application {
         Line upperCommonSupport = getCommonSupport(leftPolygon, rightPolygon, UPPER);
         Line lowerCommonSupport = getCommonSupport(leftPolygon, rightPolygon, LOWER);
 
+        if (leftDiagram.size() == 4) {
+            javafx.scene.shape.Line line = new javafx.scene.shape.Line(lowerCommonSupport.getLeftPoint().getX(), lowerCommonSupport.getLeftPoint().getY(), lowerCommonSupport.getRightPoint().getX(), lowerCommonSupport.getRightPoint().getY());
+            line.setStroke(Color.RED);
+            line.setStrokeWidth(5);
+            pane.getChildren().add(line);
+        }
+
         Point currentPoint = null;
         Edge currentEdge = null;
         Line middlePerpendicular;
         Map<Point, Edge> excludedEdges = new HashMap<>();
         Map<Cell, List<Edge>> disjunctiveChain = new HashMap<>();
-        int k = 0;
-        while (!Objects.equals(upperCommonSupport, lowerCommonSupport)) {
-            System.out.println("Upper common support is updated");
-            middlePerpendicular = getMiddlePerpendicular(upperCommonSupport);
-            if (k > 10) {
+        /*we need to know if the upper and lower common support are the same line from the beginning. If yes we don't need to break the loop, although we need to iterate throughout the cells till we can't intersect any of them using middle perpendiculars.*/
+        boolean isCommonSupportLinesEqual = Objects.equals(upperCommonSupport, lowerCommonSupport);
+        while (true) {
+            if (!isCommonSupportLinesEqual && Objects.equals(upperCommonSupport, lowerCommonSupport)) {
                 break;
             }
-            k++;
 
+            middlePerpendicular = getMiddlePerpendicular(upperCommonSupport);
             double leftDistance = 0;
             Point leftPoint = null;
             Point leftPointOfCommonSupport = upperCommonSupport.getLeftPoint();
             Cell leftCell = leftDiagram.get(leftPointOfCommonSupport);
             Edge leftExcludedEdge = getClosestEdge(excludedEdges.get(leftPointOfCommonSupport), middlePerpendicular, currentEdge, currentPoint);
             Edge leftEdge = getClosestEdge(leftCell.getBoundary(), middlePerpendicular, currentEdge, currentPoint);
-
             if (leftEdge != null) {
                 leftPoint = intersectionOfLines(middlePerpendicular, new Line(leftEdge));
                 assert leftPoint != null;
@@ -302,7 +306,6 @@ public class Main extends Application {
             Cell rightCell = rightDiagram.get(rightPointOfCommonSupport);
             Edge rightExcludedEdge = getClosestEdge(excludedEdges.get(rightPointOfCommonSupport), middlePerpendicular, currentEdge, currentPoint);
             Edge rightEdge = getClosestEdge(rightCell.getBoundary(), middlePerpendicular, currentEdge, currentPoint);
-
             if (rightEdge != null) {
                 rightPoint = intersectionOfLines(middlePerpendicular, new Line(rightEdge));
                 assert rightPoint != null;
@@ -320,7 +323,9 @@ public class Main extends Application {
                 }
             }
 
-            if ((leftEdge != null && rightEdge == null) || (leftEdge != null && leftDistance < rightDistance)) {
+            if (rightEdge == null && leftEdge == null) {
+                break;
+            } else if ((leftEdge != null && rightEdge == null) || (leftEdge != null && leftDistance < rightDistance)) {
                 Edge leftTwinEdge = null;
                 Line leftLine = new Line(leftEdge);
                 if (isOnTheSameSide(middlePerpendicular, leftCell.getCenter(), leftLine.getLeftPoint()) && isOnTheSameSide(middlePerpendicular, leftCell.getCenter(), leftLine.getRightPoint())) {
@@ -431,7 +436,7 @@ public class Main extends Application {
                 nextLeftEdge.setTwin(nextRightEdge);
                 currentPoint = leftPoint;
                 currentEdge = leftEdge;
-            } else if ((leftEdge == null && rightEdge != null) || (rightEdge != null && leftDistance >= rightDistance)) {
+            } else if (leftEdge == null || leftDistance >= rightDistance) {
                 Edge rightTwinEdge = null;
                 Line rightLine = new Line(rightEdge);
                 if (isOnTheSameSide(middlePerpendicular, rightCell.getCenter(), rightLine.getLeftPoint()) && isOnTheSameSide(middlePerpendicular, rightCell.getCenter(), rightLine.getRightPoint())) {
@@ -620,29 +625,6 @@ public class Main extends Application {
         diagram.putAll(leftDiagram);
         diagram.putAll(rightDiagram);
 
-        if (diagram.size() == 4) {
-            diagram.values().forEach(voronoyCell -> {
-                Edge edge = voronoyCell.getBoundary();
-                Edge nextEdge = voronoyCell.getBoundary();
-                do {
-                    javafx.scene.shape.Line line = new javafx.scene.shape.Line(nextEdge.getLeftPoint().getX(), nextEdge.getLeftPoint().getY(), nextEdge.getRightPoint().getX(), nextEdge.getRightPoint().getY());
-                    line.setStroke(Color.BLUE);
-                    line.setStrokeWidth(1);
-                    pane.getChildren().add(line);
-                    nextEdge = nextEdge.getNext();
-                } while (nextEdge != null && !Objects.equals(new Line(edge), new Line(nextEdge)));
-
-                Edge prevEdge = voronoyCell.getBoundary();
-                do {
-                    javafx.scene.shape.Line line = new javafx.scene.shape.Line(prevEdge.getLeftPoint().getX(), prevEdge.getLeftPoint().getY(), prevEdge.getRightPoint().getX(), prevEdge.getRightPoint().getY());
-                    line.setStroke(Color.BLUE);
-                    line.setStrokeWidth(1);
-                    pane.getChildren().add(line);
-                    prevEdge = prevEdge.getPrev();
-                } while (prevEdge != null && !Objects.equals(new Line(edge), new Line(prevEdge)));
-            });
-        }
-
         return diagram;
     }
 
@@ -672,29 +654,29 @@ public class Main extends Application {
 
     public void drawVoronoyDiagram(List<Point> polygon) {
         log.info("Start drawing ");
-        buildVoronoyDiagram(polygon.stream().sorted(Comparator.comparingDouble(Point::getX).thenComparing(Point::getY)).toList());
-//        buildVoronoyDiagram(polygon.stream().sorted(Comparator.comparingDouble(Point::getX).thenComparing(Point::getY)).toList())
-//                .values()
-//                .forEach(voronoyCell -> {
-//                    Edge edge = voronoyCell.getBoundary();
-//                    Edge nextEdge = voronoyCell.getBoundary();
-//                    do {
-//                        javafx.scene.shape.Line line = new javafx.scene.shape.Line(nextEdge.getLeftPoint().getX(), nextEdge.getLeftPoint().getY(), nextEdge.getRightPoint().getX(), nextEdge.getRightPoint().getY());
-//                        line.setStroke(Color.BLUE);
-//                        line.setStrokeWidth(1);
-//                        pane.getChildren().add(line);
-//                        nextEdge = nextEdge.getNext();
-//                    } while (nextEdge != null && !Objects.equals(new Line(edge), new Line(nextEdge)));
-//
-//                    Edge prevEdge = voronoyCell.getBoundary();
-//                    do {
-//                        javafx.scene.shape.Line line = new javafx.scene.shape.Line(prevEdge.getLeftPoint().getX(), prevEdge.getLeftPoint().getY(), prevEdge.getRightPoint().getX(), prevEdge.getRightPoint().getY());
-//                        line.setStroke(Color.BLUE);
-//                        line.setStrokeWidth(1);
-//                        pane.getChildren().add(line);
-//                        prevEdge = prevEdge.getPrev();
-//                    } while (prevEdge != null && !Objects.equals(new Line(edge), new Line(prevEdge)));
-//                });
+        //       buildVoronoyDiagram(polygon.stream().sorted(Comparator.comparingDouble(Point::getX).thenComparing(Point::getY)).toList());
+        buildVoronoyDiagram(polygon.stream().sorted(Comparator.comparingDouble(Point::getX).thenComparing(Point::getY)).toList())
+                .values()
+                .forEach(voronoyCell -> {
+                    Edge edge = voronoyCell.getBoundary();
+                    Edge nextEdge = voronoyCell.getBoundary();
+                    do {
+                        javafx.scene.shape.Line line = new javafx.scene.shape.Line(nextEdge.getLeftPoint().getX(), nextEdge.getLeftPoint().getY(), nextEdge.getRightPoint().getX(), nextEdge.getRightPoint().getY());
+                        line.setStroke(Color.BLUE);
+                        line.setStrokeWidth(1);
+                        pane.getChildren().add(line);
+                        nextEdge = nextEdge.getNext();
+                    } while (nextEdge != null && !Objects.equals(new Line(edge), new Line(nextEdge)));
+
+                    Edge prevEdge = voronoyCell.getBoundary();
+                    do {
+                        javafx.scene.shape.Line line = new javafx.scene.shape.Line(prevEdge.getLeftPoint().getX(), prevEdge.getLeftPoint().getY(), prevEdge.getRightPoint().getX(), prevEdge.getRightPoint().getY());
+                        line.setStroke(Color.BLUE);
+                        line.setStrokeWidth(1);
+                        pane.getChildren().add(line);
+                        prevEdge = prevEdge.getPrev();
+                    } while (prevEdge != null && !Objects.equals(new Line(edge), new Line(prevEdge)));
+                });
         log.info("End drawing");
     }
 
