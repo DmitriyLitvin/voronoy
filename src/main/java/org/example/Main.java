@@ -17,6 +17,7 @@ import org.example.utils.PointUtils;
 
 import java.util.*;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static java.lang.Math.*;
 import static org.example.entity.CommonSupportType.LOWER;
@@ -52,13 +53,13 @@ public class Main extends Application {
 //        points.add(new Point(759.0, 576.0));
 //        points.add(new Point(714.0, 506.0));
 
-        points.add(new Point(638.0, 324.0));
-        points.add(new Point(711.0, 216.0));
-        points.add(new Point(720.0, 252.0));
-        points.add(new Point(692.0, 270.0));
-        points.add(new Point(725.0, 376.0));
         points.add(new Point(673.0, 456.0));
         points.add(new Point(506.0, 632.0));
+        points.add(new Point(638.0, 324.0));
+        points.add(new Point(692.0, 270.0));
+        points.add(new Point(711.0, 216.0));
+        points.add(new Point(720.0, 252.0));
+        points.add(new Point(725.0, 376.0));
         points.add(new Point(778.0, 773.0));
 
 
@@ -189,32 +190,6 @@ public class Main extends Application {
             }
         }
 
-        while (true) {
-            Map<Point, Double> leftDistances = new HashMap<>();
-            Map<Point, Double> rightDistances = new HashMap<>();
-
-            Point midPoint = line.getMidPoint();
-            leftPolygon.forEach(p -> leftDistances.put(p, PointUtils.getLength(midPoint, p)));
-            rightPolygon.forEach(p -> rightDistances.put(p, PointUtils.getLength(midPoint, p)));
-
-            Optional<Map.Entry<Point, Double>> leftDistanceEntryOptional = leftDistances.entrySet().stream().min(Comparator.comparingDouble(Map.Entry::getValue));
-            Optional<Map.Entry<Point, Double>> rightDistanceEntryOptional = rightDistances.entrySet().stream().min(Comparator.comparingDouble(Map.Entry::getValue));
-
-            if (leftDistanceEntryOptional.isPresent() && rightDistanceEntryOptional.isPresent()) {
-                Map.Entry<Point, Double> leftDistanceEntry = leftDistanceEntryOptional.get();
-                Map.Entry<Point, Double> rightDistanceEntry = rightDistanceEntryOptional.get();
-                if (rightDistanceEntry.getValue() - leftDistanceEntry.getValue() < 0) {
-                    line.setRightPoint(rightDistanceEntry.getKey());
-                } else if (rightDistanceEntry.getValue() - leftDistanceEntry.getValue() > 0) {
-                    line.setLeftPoint(leftDistanceEntry.getKey());
-                } else {
-                    break;
-                }
-            } else {
-                break;
-            }
-        }
-
         return line;
     }
 
@@ -250,6 +225,91 @@ public class Main extends Application {
         return joinDiagrams(buildVoronoyDiagram(polygon.subList(0, polygon.size() / 2)), buildVoronoyDiagram(polygon.subList(polygon.size() / 2, polygon.size())));
     }
 
+    private Set<Point> getIncidentCellCenters(Cell cell, Set<Point> polygon) {
+        Set<Point> incidentCellCenters = new HashSet<>();
+        incidentCellCenters.add(cell.getCenter());
+
+        Edge edge = cell.getBoundary();
+        Edge nextEdge = cell.getBoundary();
+        do {
+            incidentCellCenters.add(nextEdge.getTwin().getCell().getCenter());
+            nextEdge = nextEdge.getNext();
+        } while (nextEdge != null && !Objects.equals(new Line(edge), new Line(nextEdge)));
+
+        Edge prevEdge = cell.getBoundary();
+        do {
+            incidentCellCenters.add(prevEdge.getTwin().getCell().getCenter());
+            prevEdge = prevEdge.getPrev();
+        } while (prevEdge != null && !Objects.equals(new Line(edge), new Line(prevEdge)));
+
+        return incidentCellCenters.stream().filter(polygon::contains).collect(Collectors.toSet());
+    }
+
+    private Line dominanceCheck(Line supportLine, Cell leftCell, Cell rightCell, Set<Point> leftPolygon, Set<Point> rightPolygon) {
+        List<Point> leftIncidentCellCenters = new ArrayList<>(getIncidentCellCenters(leftCell, leftPolygon));
+        List<Point> rightIncidentCellCenters = new ArrayList<>(getIncidentCellCenters(rightCell, rightPolygon));
+
+        Line currentSupportLine = new Line(supportLine.getLeftPoint(), supportLine.getRightPoint());
+        Point currentLeftPoint = currentSupportLine.getLeftPoint();
+        Point currentRightPoint = currentSupportLine.getRightPoint();
+        int leftCounter = 0;
+        int rightCounter = 0;
+        while (leftCounter < leftIncidentCellCenters.size() || rightCounter < rightIncidentCellCenters.size()) {
+            Point directionPoint = new Point((currentRightPoint.getY() - currentLeftPoint.getY()), -(currentRightPoint.getX() - currentLeftPoint.getX()));
+
+            Circle circle = new Circle(directionPoint.getX(), directionPoint.getY(), 3, Color.BROWN);
+            borderPane.getChildren().add(circle);
+
+            Map<Point, Double> leftDistances = new HashMap<>();
+            Map<Point, Double> rightDistances = new HashMap<>();
+
+            Point midPoint = new Line(currentLeftPoint, currentRightPoint).getMidPoint();
+            leftIncidentCellCenters.forEach(p -> leftDistances.put(p, PointUtils.getLength(midPoint, p)));
+            rightIncidentCellCenters.forEach(p -> rightDistances.put(p, PointUtils.getLength(midPoint, p)));
+
+            Optional<Map.Entry<Point, Double>> leftDistanceEntryOptional = leftDistances.entrySet().stream().min(Comparator.comparingDouble(Map.Entry::getValue));
+            Optional<Map.Entry<Point, Double>> rightDistanceEntryOptional = rightDistances.entrySet().stream().min(Comparator.comparingDouble(Map.Entry::getValue));
+            if (leftDistanceEntryOptional.isEmpty() || rightDistanceEntryOptional.isEmpty()) {
+                break;
+            }
+
+            Map.Entry<Point, Double> leftDistanceEntry = leftDistanceEntryOptional.get();
+            Map.Entry<Point, Double> rightDistanceEntry = rightDistanceEntryOptional.get();
+
+            if (rightDistanceEntry.getValue() - leftDistanceEntry.getValue() > 0) {
+                Point leftPoint = leftDistanceEntry.getKey();
+                Point rightPoint = currentSupportLine.getRightPoint();
+                if (PointUtils.dotProduct(new Point(leftPoint.getX() - rightPoint.getX(), leftPoint.getY() - rightPoint.getY()), directionPoint) > 0) {
+                    currentLeftPoint = leftPoint;
+                    currentSupportLine.setLeftPoint(leftPoint);
+                } else if (leftCounter < leftIncidentCellCenters.size()) {
+                    currentLeftPoint = leftIncidentCellCenters.get(leftCounter);
+                    leftCounter++;
+                } else if (rightCounter < rightIncidentCellCenters.size()) {
+                    currentRightPoint = rightIncidentCellCenters.get(rightCounter);
+                    rightCounter++;
+                }
+            } else if (rightDistanceEntry.getValue() - leftDistanceEntry.getValue() < 0) {
+                Point leftPoint = currentSupportLine.getLeftPoint();
+                Point rightPoint = rightDistanceEntry.getKey();
+                if (PointUtils.dotProduct(new Point(  rightPoint.getX() - leftPoint.getX(), rightPoint.getY() - leftPoint.getY()), directionPoint) > 0) {
+                    currentRightPoint = rightPoint;
+                    currentSupportLine.setRightPoint(rightPoint);
+                } else if (rightCounter < rightIncidentCellCenters.size()) {
+                    currentRightPoint = rightIncidentCellCenters.get(rightCounter);
+                    rightCounter++;
+                } else if (leftCounter < leftIncidentCellCenters.size()) {
+                    currentLeftPoint = leftIncidentCellCenters.get(leftCounter);
+                    leftCounter++;
+                }
+            } else {
+                break;
+            }
+        }
+
+        return currentSupportLine;
+    }
+
     private Map<Point, Cell> joinDiagrams(Map<Point, Cell> leftDiagram, Map<Point, Cell> rightDiagram) {
         Set<Point> leftPolygon = buildConvexHull(new ArrayList<>(leftDiagram.keySet()));
         Set<Point> rightPolygon = buildConvexHull(new ArrayList<>(rightDiagram.keySet()));
@@ -257,30 +317,23 @@ public class Main extends Application {
         Line upperCommonSupport = getCommonSupport(leftPolygon, rightPolygon, UPPER);
         Line lowerCommonSupport = getCommonSupport(leftPolygon, rightPolygon, LOWER);
 
-        if (leftDiagram.size() == 4) {
-            javafx.scene.shape.Line line = new javafx.scene.shape.Line(lowerCommonSupport.getLeftPoint().getX(), lowerCommonSupport.getLeftPoint().getY(), lowerCommonSupport.getRightPoint().getX(), lowerCommonSupport.getRightPoint().getY());
-            line.setStroke(Color.RED);
-            line.setStrokeWidth(5);
-            pane.getChildren().add(line);
-        }
-
         Point currentPoint = null;
         Edge currentEdge = null;
         Line middlePerpendicular;
         Map<Point, Edge> excludedEdges = new HashMap<>();
         Map<Cell, List<Edge>> disjunctiveChain = new HashMap<>();
-        /*we need to know if the upper and lower common support are the same line from the beginning. If yes we don't need to break the loop, although we need to iterate throughout the cells till we can't intersect any of them using middle perpendiculars.*/
-        boolean isCommonSupportLinesEqual = Objects.equals(upperCommonSupport, lowerCommonSupport);
-        while (true) {
-            if (!isCommonSupportLinesEqual && Objects.equals(upperCommonSupport, lowerCommonSupport)) {
-                break;
-            }
-
-            middlePerpendicular = getMiddlePerpendicular(upperCommonSupport);
-            double leftDistance = 0;
-            Point leftPoint = null;
+        while (!Objects.equals(upperCommonSupport, lowerCommonSupport)) {
             Point leftPointOfCommonSupport = upperCommonSupport.getLeftPoint();
             Cell leftCell = leftDiagram.get(leftPointOfCommonSupport);
+
+            Point rightPointOfCommonSupport = upperCommonSupport.getRightPoint();
+            Cell rightCell = rightDiagram.get(rightPointOfCommonSupport);
+            upperCommonSupport = dominanceCheck(upperCommonSupport, leftCell, rightCell, leftPolygon, rightPolygon);
+
+            middlePerpendicular = getMiddlePerpendicular(upperCommonSupport);
+
+            double leftDistance = 0;
+            Point leftPoint = null;
             Edge leftExcludedEdge = getClosestEdge(excludedEdges.get(leftPointOfCommonSupport), middlePerpendicular, currentEdge, currentPoint);
             Edge leftEdge = getClosestEdge(leftCell.getBoundary(), middlePerpendicular, currentEdge, currentPoint);
             if (leftEdge != null) {
@@ -302,8 +355,6 @@ public class Main extends Application {
 
             double rightDistance = 0;
             Point rightPoint = null;
-            Point rightPointOfCommonSupport = upperCommonSupport.getRightPoint();
-            Cell rightCell = rightDiagram.get(rightPointOfCommonSupport);
             Edge rightExcludedEdge = getClosestEdge(excludedEdges.get(rightPointOfCommonSupport), middlePerpendicular, currentEdge, currentPoint);
             Edge rightEdge = getClosestEdge(rightCell.getBoundary(), middlePerpendicular, currentEdge, currentPoint);
             if (rightEdge != null) {
@@ -609,9 +660,11 @@ public class Main extends Application {
                 Edge nextEdge = chain.get(i + 1);
                 if (nextEdge.getPrev() == null) {
                     Edge connectedEdge = prevEdge.getNext();
-                    connectedEdge.setPrev(prevEdge);
-                    connectedEdge.setNext(nextEdge);
-                    nextEdge.setPrev(connectedEdge);
+                    if (connectedEdge != null) {
+                        connectedEdge.setPrev(prevEdge);
+                        connectedEdge.setNext(nextEdge);
+                        nextEdge.setPrev(connectedEdge);
+                    }
                 }
             }
 
@@ -654,7 +707,6 @@ public class Main extends Application {
 
     public void drawVoronoyDiagram(List<Point> polygon) {
         log.info("Start drawing ");
-        //       buildVoronoyDiagram(polygon.stream().sorted(Comparator.comparingDouble(Point::getX).thenComparing(Point::getY)).toList());
         buildVoronoyDiagram(polygon.stream().sorted(Comparator.comparingDouble(Point::getX).thenComparing(Point::getY)).toList())
                 .values()
                 .forEach(voronoyCell -> {
