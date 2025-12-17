@@ -257,9 +257,6 @@ public class Main extends Application {
         while (leftCounter < leftIncidentCellCenters.size() || rightCounter < rightIncidentCellCenters.size()) {
             Point directionPoint = new Point((currentRightPoint.getY() - currentLeftPoint.getY()), -(currentRightPoint.getX() - currentLeftPoint.getX()));
 
-            Circle circle = new Circle(directionPoint.getX(), directionPoint.getY(), 3, Color.BROWN);
-            borderPane.getChildren().add(circle);
-
             Map<Point, Double> leftDistances = new HashMap<>();
             Map<Point, Double> rightDistances = new HashMap<>();
 
