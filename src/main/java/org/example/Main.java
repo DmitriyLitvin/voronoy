@@ -294,7 +294,7 @@ public class Main extends Application {
 
 
         Map<Point, Double> leftDistances = leftIntersectedPoints.stream()
-                .map(l -> Objects.requireNonNull(leftIncidentCellCenters.stream().map(lc -> new AbstractMap.SimpleEntry<>(lc, Math.pow(PointUtils.getLength(lc, l), 2))).min(Comparator.comparingDouble(AbstractMap.SimpleEntry::getValue))))
+                .map(l -> Objects.requireNonNull(leftIncidentCellCenters.stream().map(lc -> new AbstractMap.SimpleEntry<>(lc, PointUtils.getSumOfSquares(lc, l))).min(Comparator.comparingDouble(AbstractMap.SimpleEntry::getValue))))
                 .flatMap(Optional::stream)
                 .collect(Collectors.toMap(
                         Map.Entry::getKey,
@@ -302,7 +302,7 @@ public class Main extends Application {
                 ));
 
         Map<Point, Double> rightDistances = rightIntersectedPoints.stream()
-                .map(r -> Objects.requireNonNull(rightIncidentCellCenters.stream().map(rc -> new AbstractMap.SimpleEntry<>(rc, Math.pow(PointUtils.getLength(rc, r), 2))).min(Comparator.comparingDouble(AbstractMap.SimpleEntry::getValue))))
+                .map(r -> Objects.requireNonNull(rightIncidentCellCenters.stream().map(rc -> new AbstractMap.SimpleEntry<>(rc, PointUtils.getSumOfSquares(rc, r))).min(Comparator.comparingDouble(AbstractMap.SimpleEntry::getValue))))
                 .flatMap(Optional::stream)
                 .collect(Collectors.toMap(
                         Map.Entry::getKey,
