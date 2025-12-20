@@ -292,7 +292,6 @@ public class Main extends Application {
                 })
                 .toList();
 
-
         Map<Point, Double> leftDistances = leftIntersectedPoints.stream()
                 .map(l -> Objects.requireNonNull(leftIncidentCellCenters.stream().map(lc -> new AbstractMap.SimpleEntry<>(lc, PointUtils.getSumOfSquares(lc, l))).min(Comparator.comparingDouble(AbstractMap.SimpleEntry::getValue))))
                 .flatMap(Optional::stream)
