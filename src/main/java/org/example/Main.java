@@ -258,16 +258,17 @@ public class Main extends Application {
         Line middlePerpendicular = getMiddlePerpendicular(supportLine);
 
         if (prevPoint == null) {
-            prevPoint = middlePerpendicular.getMidPoint();
+            prevPoint = middlePerpendicular.getRightPoint();
         }
 
         AtomicReference<Point> prevPointAtomic = new AtomicReference<>(prevPoint);
 
         List<Point> leftIntersectedPoints = leftIncidentCellCenters.stream()
+                .filter(l -> !Objects.equals(l, supportLine.getLeftPoint()))
                 .map(l -> getMiddlePerpendicular(new Line(leftPoint, l)))
                 .map(l -> intersectionOfLines(middlePerpendicular, l))
                 .filter(Objects::nonNull)
-                //.filter(l -> PointUtils.getSumOfSquares(leftPoint, l) == PointUtils.getSumOfSquares(rightPoint, l))
+ //               .filter(l -> PointUtils.getSumOfSquares(leftPoint, l) == PointUtils.getSumOfSquares(rightPoint, l))
                 .filter(l -> {
                     Point point = prevPointAtomic.get();
                     return PointUtils.dotProduct(new Point(l.getX() - point.getX(), l.getY() - point.getY()), directionPoint) > 0;
@@ -277,26 +278,26 @@ public class Main extends Application {
         List<PointDto> leftPointDTOs = new ArrayList<>();
         for (Point leftIntersectedPoint : leftIntersectedPoints) {
             leftIncidentCellCenters.stream()
-                    .map(lc -> new AbstractMap.SimpleEntry<>(lc, PointUtils.getSumOfSquares(lc, leftIntersectedPoint))).min(Comparator.comparingDouble(AbstractMap.SimpleEntry::getValue))
+                    .map(lc -> new AbstractMap.SimpleEntry<>(lc, PointUtils.getLength(lc, leftIntersectedPoint))).min(Comparator.comparingDouble(AbstractMap.SimpleEntry::getValue))
                     .ifPresent(p -> leftPointDTOs.add(new PointDto(leftIntersectedPoint, p.getKey(), p.getValue())));
         }
 
         List<Point> rightIntersectedPoints = rightIncidentCellCenters.stream()
+                .filter(l -> !Objects.equals(l, supportLine.getRightPoint()))
                 .map(r -> getMiddlePerpendicular(new Line(rightPoint, r)))
                 .map(r -> intersectionOfLines(middlePerpendicular, r))
                 .filter(Objects::nonNull)
-                //.filter(r -> PointUtils.getSumOfSquares(leftPoint, r) == PointUtils.getSumOfSquares(rightPoint, r))
+   //             .filter(r -> PointUtils.getSumOfSquares(leftPoint, r) == PointUtils.getSumOfSquares(rightPoint, r))
                 .filter(r -> {
                     Point point = prevPointAtomic.get();
                     return PointUtils.dotProduct(new Point(r.getX() - point.getX(), r.getY() - point.getY()), directionPoint) > 0;
                 })
                 .toList();
 
-
         List<PointDto> rightPointDTOs = new ArrayList<>();
         for (Point rightIntersectedPoint : rightIntersectedPoints) {
             rightIncidentCellCenters.stream()
-                    .map(rc -> new AbstractMap.SimpleEntry<>(rc, PointUtils.getSumOfSquares(rc, rightIntersectedPoint))).min(Comparator.comparingDouble(AbstractMap.SimpleEntry::getValue))
+                    .map(rc -> new AbstractMap.SimpleEntry<>(rc, PointUtils.getLength(rc, rightIntersectedPoint))).min(Comparator.comparingDouble(AbstractMap.SimpleEntry::getValue))
                     .ifPresent(p -> rightPointDTOs.add(new PointDto(rightIntersectedPoint, p.getKey(), p.getValue())));
         }
 
