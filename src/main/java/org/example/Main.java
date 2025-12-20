@@ -11,6 +11,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.stage.Stage;
 import lombok.extern.slf4j.Slf4j;
+import org.example.dto.PointDto;
 import org.example.entity.*;
 import org.example.entity.Point;
 import org.example.utils.PointUtils;
@@ -66,7 +67,7 @@ public class Main extends Application {
 
         points.forEach(p -> {
             Circle circle = new Circle(p.getX(), p.getY(), 3, Color.RED);
-            Label label = new Label(+circle.getCenterX() + ", " + circle.getCenterY());
+            Label label = new Label(circle.getCenterX() + ", " + circle.getCenterY());
 
             label.relocate(circle.getCenterX() + 1, circle.getCenterY() + 1);
             pane.getChildren().addAll(label, circle);
@@ -249,7 +250,7 @@ public class Main extends Application {
     private Line dominanceCheck(Line supportLine, Cell leftCell, Cell rightCell, Set<Point> leftPolygon, Set<Point> rightPolygon, Point prevPoint) {
         Point leftPoint = supportLine.getLeftPoint();
         Point rightPoint = supportLine.getRightPoint();
-        Point directionPoint = new Point((rightPoint.getY() - leftPoint.getY()), -(rightPoint.getX() - leftPoint.getX()));
+        Point directionPoint = new Point(rightPoint.getY() - leftPoint.getY(), -(rightPoint.getX() - leftPoint.getX()));
 
         Set<Point> leftIncidentCellCenters = getIncidentCellCenters(leftCell, leftPolygon);
         Set<Point> rightIncidentCellCenters = getIncidentCellCenters(rightCell, rightPolygon);
@@ -257,15 +258,7 @@ public class Main extends Application {
         Line middlePerpendicular = getMiddlePerpendicular(supportLine);
 
         if (prevPoint == null) {
-            Point midPoint = middlePerpendicular.getMidPoint();
-            Point mitLeftPoint = middlePerpendicular.getLeftPoint();
-            Point mitRightPoint = middlePerpendicular.getRightPoint();
-            double dotProduct = PointUtils.dotProduct(new Point(mitLeftPoint.getX() - midPoint.getX(), mitLeftPoint.getY() - midPoint.getY()), directionPoint);
-            if (dotProduct < 0) {
-                prevPoint = mitLeftPoint;
-            } else {
-                prevPoint = mitRightPoint;
-            }
+            prevPoint = middlePerpendicular.getMidPoint();
         }
 
         AtomicReference<Point> prevPointAtomic = new AtomicReference<>(prevPoint);
@@ -274,50 +267,49 @@ public class Main extends Application {
                 .map(l -> getMiddlePerpendicular(new Line(leftPoint, l)))
                 .map(l -> intersectionOfLines(middlePerpendicular, l))
                 .filter(Objects::nonNull)
-                .filter(l -> PointUtils.getSumOfSquares(leftPoint, l) == PointUtils.getSumOfSquares(rightPoint, l))
+                //.filter(l -> PointUtils.getSumOfSquares(leftPoint, l) == PointUtils.getSumOfSquares(rightPoint, l))
                 .filter(l -> {
                     Point point = prevPointAtomic.get();
                     return PointUtils.dotProduct(new Point(l.getX() - point.getX(), l.getY() - point.getY()), directionPoint) > 0;
                 })
                 .toList();
 
+        List<PointDto> leftPointDTOs = new ArrayList<>();
+        for (Point leftIntersectedPoint : leftIntersectedPoints) {
+            leftIncidentCellCenters.stream()
+                    .map(lc -> new AbstractMap.SimpleEntry<>(lc, PointUtils.getSumOfSquares(lc, leftIntersectedPoint))).min(Comparator.comparingDouble(AbstractMap.SimpleEntry::getValue))
+                    .ifPresent(p -> leftPointDTOs.add(new PointDto(leftIntersectedPoint, p.getKey(), p.getValue())));
+        }
+
         List<Point> rightIntersectedPoints = rightIncidentCellCenters.stream()
                 .map(r -> getMiddlePerpendicular(new Line(rightPoint, r)))
                 .map(r -> intersectionOfLines(middlePerpendicular, r))
                 .filter(Objects::nonNull)
-                .filter(r -> PointUtils.getSumOfSquares(leftPoint, r) == PointUtils.getSumOfSquares(rightPoint, r))
+                //.filter(r -> PointUtils.getSumOfSquares(leftPoint, r) == PointUtils.getSumOfSquares(rightPoint, r))
                 .filter(r -> {
                     Point point = prevPointAtomic.get();
                     return PointUtils.dotProduct(new Point(r.getX() - point.getX(), r.getY() - point.getY()), directionPoint) > 0;
                 })
                 .toList();
 
-        Map<Point, Double> leftDistances = leftIntersectedPoints.stream()
-                .map(l -> Objects.requireNonNull(leftIncidentCellCenters.stream().map(lc -> new AbstractMap.SimpleEntry<>(lc, PointUtils.getSumOfSquares(lc, l))).min(Comparator.comparingDouble(AbstractMap.SimpleEntry::getValue))))
-                .flatMap(Optional::stream)
-                .collect(Collectors.toMap(
-                        Map.Entry::getKey,
-                        Map.Entry::getValue
-                ));
 
-        Map<Point, Double> rightDistances = rightIntersectedPoints.stream()
-                .map(r -> Objects.requireNonNull(rightIncidentCellCenters.stream().map(rc -> new AbstractMap.SimpleEntry<>(rc, PointUtils.getSumOfSquares(rc, r))).min(Comparator.comparingDouble(AbstractMap.SimpleEntry::getValue))))
-                .flatMap(Optional::stream)
-                .collect(Collectors.toMap(
-                        Map.Entry::getKey,
-                        Map.Entry::getValue
-                ));
+        List<PointDto> rightPointDTOs = new ArrayList<>();
+        for (Point rightIntersectedPoint : rightIntersectedPoints) {
+            rightIncidentCellCenters.stream()
+                    .map(rc -> new AbstractMap.SimpleEntry<>(rc, PointUtils.getSumOfSquares(rc, rightIntersectedPoint))).min(Comparator.comparingDouble(AbstractMap.SimpleEntry::getValue))
+                    .ifPresent(p -> rightPointDTOs.add(new PointDto(rightIntersectedPoint, p.getKey(), p.getValue())));
+        }
 
-        List<Line> upperSupportCandidates = new ArrayList<>();
-        for (Map.Entry<Point, Double> leftEntry : leftDistances.entrySet()) {
-            for (Map.Entry<Point, Double> rigtEntry : rightDistances.entrySet()) {
-                if (Objects.equals(leftEntry.getValue(), rigtEntry.getValue())) {
-                    upperSupportCandidates.add(new Line(leftEntry.getKey(), rigtEntry.getKey()));
+        List<Line> supportLines = new ArrayList<>();
+        for (PointDto leftPointDTO : leftPointDTOs) {
+            for (PointDto rightPointDTO : rightPointDTOs) {
+                if (Objects.equals(leftPointDTO.getDistance(), rightPointDTO.getDistance())) {
+                    supportLines.add(new Line(leftPointDTO.getCellCenterPoint(), rightPointDTO.getCellCenterPoint()));
                 }
             }
         }
 
-        return upperSupportCandidates.stream().findFirst().orElse(supportLine);
+        return supportLines.stream().findFirst().orElse(supportLine);
     }
 
     private Map<Point, Cell> joinDiagrams(Map<Point, Cell> leftDiagram, Map<Point, Cell> rightDiagram) {
