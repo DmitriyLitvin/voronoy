@@ -274,7 +274,7 @@ public class Main extends Application {
                 .map(l -> getMiddlePerpendicular(new Line(leftPoint, l)))
                 .map(l -> intersectionOfLines(middlePerpendicular, l))
                 .filter(Objects::nonNull)
-                .filter(l -> Math.pow(PointUtils.getLength(leftPoint, l), 2) == Math.pow(PointUtils.getLength(rightPoint, l), 2))
+                .filter(l -> PointUtils.getSumOfSquares(leftPoint, l) == PointUtils.getSumOfSquares(rightPoint, l))
                 .filter(l -> {
                     Point point = prevPointAtomic.get();
                     return PointUtils.dotProduct(new Point(l.getX() - point.getX(), l.getY() - point.getY()), directionPoint) > 0;
@@ -285,7 +285,7 @@ public class Main extends Application {
                 .map(r -> getMiddlePerpendicular(new Line(rightPoint, r)))
                 .map(r -> intersectionOfLines(middlePerpendicular, r))
                 .filter(Objects::nonNull)
-                .filter(r -> Math.pow(PointUtils.getLength(leftPoint, r), 2) == Math.pow(PointUtils.getLength(rightPoint, r), 2))
+                .filter(r -> PointUtils.getSumOfSquares(leftPoint, r) == PointUtils.getSumOfSquares(rightPoint, r))
                 .filter(r -> {
                     Point point = prevPointAtomic.get();
                     return PointUtils.dotProduct(new Point(r.getX() - point.getX(), r.getY() - point.getY()), directionPoint) > 0;
