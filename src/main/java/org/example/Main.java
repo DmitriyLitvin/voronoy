@@ -318,8 +318,7 @@ public class Main extends Application {
             }
         }
 
-
-        return null;
+        return upperSupportCandidates.stream().findFirst().orElse(supportLine);
     }
 
     private Map<Point, Cell> joinDiagrams(Map<Point, Cell> leftDiagram, Map<Point, Cell> rightDiagram) {
