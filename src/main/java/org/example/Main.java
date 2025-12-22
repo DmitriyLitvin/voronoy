@@ -11,14 +11,12 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.stage.Stage;
 import lombok.extern.slf4j.Slf4j;
-import org.example.dto.PointDto;
 import org.example.entity.*;
 import org.example.entity.Point;
 import org.example.utils.PointUtils;
 
 import java.util.*;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 import static java.lang.Math.*;
@@ -46,10 +44,10 @@ public class Main extends Application {
         borderPane.setBottom(button);
         pane.getChildren().add(button);
 
-        points.add(new Point(383.0, 859.0));
-        points.add(new Point(642.0, 386.0));
-        points.add(new Point(691.0, 237.0));
-        points.add(new Point(684.0, 313.0));
+//        points.add(new Point(383.0, 859.0));
+//        points.add(new Point(642.0, 386.0));
+//        points.add(new Point(691.0, 237.0));
+//        points.add(new Point(684.0, 313.0));
         points.add(new Point(822.0, 395.0));
         points.add(new Point(733.0, 361.0));
         points.add(new Point(759.0, 576.0));
@@ -67,7 +65,7 @@ public class Main extends Application {
 
         points.forEach(p -> {
             Circle circle = new Circle(p.getX(), p.getY(), 3, Color.RED);
-            Label label = new Label(circle.getCenterX() + ", " + circle.getCenterY());
+            Label label = new Label(+circle.getCenterX() + ", " + circle.getCenterY());
 
             label.relocate(circle.getCenterX() + 1, circle.getCenterY() + 1);
             pane.getChildren().addAll(label, circle);
@@ -247,71 +245,106 @@ public class Main extends Application {
         return incidentCellCenters.stream().filter(polygon::contains).collect(Collectors.toSet());
     }
 
-    private Line dominanceCheck(Line supportLine, Cell leftCell, Cell rightCell, Set<Point> leftPolygon, Set<Point> rightPolygon, Point prevPoint) {
-        Point leftPoint = supportLine.getLeftPoint();
-        Point rightPoint = supportLine.getRightPoint();
-        Point directionPoint = new Point(rightPoint.getY() - leftPoint.getY(), -(rightPoint.getX() - leftPoint.getX()));
+    private Line dominanceCheck(Line supportLine, Cell leftCell, Cell rightCell, Set<Point> leftPolygon, Set<Point> rightPolygon) {
+//        List<Point> leftIncidentCellCenters = new ArrayList<>(getIncidentCellCenters(leftCell, leftPolygon));
+//        List<Point> rightIncidentCellCenters = new ArrayList<>(getIncidentCellCenters(rightCell, rightPolygon));
+//
+//        Point currentLeftPoint = supportLine.getLeftPoint();
+//        Point currentRightPoint = supportLine.getRightPoint();
+//        Point directionPoint = new Point((currentRightPoint.getY() - currentLeftPoint.getY()), -(currentRightPoint.getX() - currentLeftPoint.getX()));
+//
+//        List<Line> supportLines = new ArrayList<>();
+//
+//        int leftCounter = 0;
+//        Line prevSupportLine = null;
+//        Line currentSupportLine = supportLine.deepCopy();
+//        while (leftCounter < leftIncidentCellCenters.size()) {
+//            log.info("dominance check");
+//            Map<Point, Double> leftDistances = new HashMap<>();
+//            Map<Point, Double> rightDistances = new HashMap<>();
+//
+//            Point midPoint = currentSupportLine.getMidPoint();
+//            leftIncidentCellCenters.forEach(p -> leftDistances.put(p, PointUtils.getLength(midPoint, p)));
+//            rightIncidentCellCenters.forEach(p -> rightDistances.put(p, PointUtils.getLength(midPoint, p)));
+//
+//            Optional<Map.Entry<Point, Double>> leftDistanceEntryOptional = leftDistances.entrySet().stream().min(Comparator.comparingDouble(Map.Entry::getValue));
+//            Optional<Map.Entry<Point, Double>> rightDistanceEntryOptional = rightDistances.entrySet().stream().min(Comparator.comparingDouble(Map.Entry::getValue));
+//
+//            if (leftDistanceEntryOptional.isEmpty() || rightDistanceEntryOptional.isEmpty()) {
+//                break;
+//            }
+//
+//            Map.Entry<Point, Double> leftDistanceEntry = leftDistanceEntryOptional.get();
+//            Map.Entry<Point, Double> rightDistanceEntry = rightDistanceEntryOptional.get();
+//            Point leftPoint = leftDistanceEntry.getKey();
+//            Point rightPoint = currentSupportLine.getRightPoint();
+//
+//            boolean isPointUpper = PointUtils.dotProduct(new Point(leftPoint.getX() - rightPoint.getX(), leftPoint.getY() - rightPoint.getY()), directionPoint) > 0;
+//            if (leftDistanceEntry.getValue() - rightDistanceEntry.getValue() == 0 && isPointUpper) {
+//                supportLines.add(currentSupportLine);
+//                break;
+//            }
+//            if (isPointUpper) {
+//                currentSupportLine.setLeftPoint(leftPoint);
+//            } else {
+//                currentSupportLine.setLeftPoint(leftIncidentCellCenters.get(leftCounter));
+//                leftCounter++;
+//            }
+//
+//            if (Objects.equals(prevSupportLine, currentSupportLine)) {
+//                break;
+//            }
+//            prevSupportLine = currentSupportLine.deepCopy();
+//        }
+//
+//        int rightCounter = 0;
+//        prevSupportLine = null;
+//        currentSupportLine = supportLine.deepCopy();
+//        while (rightCounter < rightIncidentCellCenters.size()) {
+//            log.info("dominance check");
+//            Map<Point, Double> leftDistances = new HashMap<>();
+//            Map<Point, Double> rightDistances = new HashMap<>();
+//
+//            Point midPoint = currentSupportLine.getMidPoint();
+//
+//            leftIncidentCellCenters.forEach(p -> leftDistances.put(p, PointUtils.getLength(midPoint, p)));
+//            rightIncidentCellCenters.forEach(p -> rightDistances.put(p, PointUtils.getLength(midPoint, p)));
+//
+//            Optional<Map.Entry<Point, Double>> leftDistanceEntryOptional = leftDistances.entrySet().stream().min(Comparator.comparingDouble(Map.Entry::getValue));
+//            Optional<Map.Entry<Point, Double>> rightDistanceEntryOptional = rightDistances.entrySet().stream().min(Comparator.comparingDouble(Map.Entry::getValue));
+//
+//            if (leftDistanceEntryOptional.isEmpty() || rightDistanceEntryOptional.isEmpty()) {
+//                break;
+//            }
+//
+//            Map.Entry<Point, Double> leftDistanceEntry = leftDistanceEntryOptional.get();
+//            Map.Entry<Point, Double> rightDistanceEntry = rightDistanceEntryOptional.get();
+//            Point leftPoint = currentSupportLine.getLeftPoint();
+//            Point rightPoint = rightDistanceEntry.getKey();
+//
+//            boolean isPointUpper = PointUtils.dotProduct(new Point(rightPoint.getX() - leftPoint.getX(), rightPoint.getY() - leftPoint.getY()), directionPoint) > 0;
+//            if (leftDistanceEntry.getValue() - rightDistanceEntry.getValue() == 0 && isPointUpper) {
+//                supportLines.add(currentSupportLine);
+//                break;
+//            }
+//            if (isPointUpper) {
+//                currentSupportLine.setRightPoint(rightPoint);
+//            } else {
+//                currentSupportLine.setRightPoint(rightIncidentCellCenters.get(rightCounter));
+//                rightCounter++;
+//            }
+//
+//            if (Objects.equals(prevSupportLine, currentSupportLine)) {
+//                break;
+//            }
+//            prevSupportLine = currentSupportLine.deepCopy();
+//        }
+//
+//        return supportLines.stream().findFirst().orElse(supportLine);
 
-        Set<Point> leftIncidentCellCenters = getIncidentCellCenters(leftCell, leftPolygon);
-        Set<Point> rightIncidentCellCenters = getIncidentCellCenters(rightCell, rightPolygon);
-
-        Line middlePerpendicular = getMiddlePerpendicular(supportLine);
-
-        if (prevPoint == null) {
-            prevPoint = middlePerpendicular.getRightPoint();
-        }
-
-        AtomicReference<Point> prevPointAtomic = new AtomicReference<>(prevPoint);
-
-        List<Point> leftIntersectedPoints = leftIncidentCellCenters.stream()
-                .filter(l -> !Objects.equals(l, supportLine.getLeftPoint()))
-                .map(l -> getMiddlePerpendicular(new Line(leftPoint, l)))
-                .map(l -> intersectionOfLines(middlePerpendicular, l))
-                .filter(Objects::nonNull)
- //               .filter(l -> PointUtils.getSumOfSquares(leftPoint, l) == PointUtils.getSumOfSquares(rightPoint, l))
-                .filter(l -> {
-                    Point point = prevPointAtomic.get();
-                    return PointUtils.dotProduct(new Point(l.getX() - point.getX(), l.getY() - point.getY()), directionPoint) > 0;
-                })
-                .toList();
-
-        List<PointDto> leftPointDTOs = new ArrayList<>();
-        for (Point leftIntersectedPoint : leftIntersectedPoints) {
-            leftIncidentCellCenters.stream()
-                    .map(lc -> new AbstractMap.SimpleEntry<>(lc, PointUtils.getLength(lc, leftIntersectedPoint))).min(Comparator.comparingDouble(AbstractMap.SimpleEntry::getValue))
-                    .ifPresent(p -> leftPointDTOs.add(new PointDto(leftIntersectedPoint, p.getKey(), p.getValue())));
-        }
-
-        List<Point> rightIntersectedPoints = rightIncidentCellCenters.stream()
-                .filter(l -> !Objects.equals(l, supportLine.getRightPoint()))
-                .map(r -> getMiddlePerpendicular(new Line(rightPoint, r)))
-                .map(r -> intersectionOfLines(middlePerpendicular, r))
-                .filter(Objects::nonNull)
-   //             .filter(r -> PointUtils.getSumOfSquares(leftPoint, r) == PointUtils.getSumOfSquares(rightPoint, r))
-                .filter(r -> {
-                    Point point = prevPointAtomic.get();
-                    return PointUtils.dotProduct(new Point(r.getX() - point.getX(), r.getY() - point.getY()), directionPoint) > 0;
-                })
-                .toList();
-
-        List<PointDto> rightPointDTOs = new ArrayList<>();
-        for (Point rightIntersectedPoint : rightIntersectedPoints) {
-            rightIncidentCellCenters.stream()
-                    .map(rc -> new AbstractMap.SimpleEntry<>(rc, PointUtils.getLength(rc, rightIntersectedPoint))).min(Comparator.comparingDouble(AbstractMap.SimpleEntry::getValue))
-                    .ifPresent(p -> rightPointDTOs.add(new PointDto(rightIntersectedPoint, p.getKey(), p.getValue())));
-        }
-
-        List<Line> supportLines = new ArrayList<>();
-        for (PointDto leftPointDTO : leftPointDTOs) {
-            for (PointDto rightPointDTO : rightPointDTOs) {
-                if (Objects.equals(leftPointDTO.getDistance(), rightPointDTO.getDistance())) {
-                    supportLines.add(new Line(leftPointDTO.getCellCenterPoint(), rightPointDTO.getCellCenterPoint()));
-                }
-            }
-        }
-
-        return supportLines.stream().findFirst().orElse(supportLine);
+        return supportLine;
     }
+
 
     private Map<Point, Cell> joinDiagrams(Map<Point, Cell> leftDiagram, Map<Point, Cell> rightDiagram) {
         Set<Point> leftPolygon = buildConvexHull(new ArrayList<>(leftDiagram.keySet()));
@@ -325,20 +358,23 @@ public class Main extends Application {
         Line middlePerpendicular;
         Map<Point, Edge> excludedEdges = new HashMap<>();
         Map<Cell, List<Edge>> disjunctiveChain = new HashMap<>();
+
+
         while (!Objects.equals(upperCommonSupport, lowerCommonSupport)) {
             Point leftPointOfCommonSupport = upperCommonSupport.getLeftPoint();
             Cell leftCell = leftDiagram.get(leftPointOfCommonSupport);
 
             Point rightPointOfCommonSupport = upperCommonSupport.getRightPoint();
             Cell rightCell = rightDiagram.get(rightPointOfCommonSupport);
-            upperCommonSupport = dominanceCheck(upperCommonSupport, leftCell, rightCell, leftPolygon, rightPolygon, currentPoint);
 
-            if (leftDiagram.size() == 4) {
-                javafx.scene.shape.Line line = new javafx.scene.shape.Line(upperCommonSupport.getLeftPoint().getX(), upperCommonSupport.getLeftPoint().getY(), upperCommonSupport.getRightPoint().getX(), upperCommonSupport.getRightPoint().getY());
-                line.setStroke(Color.LIME);
-                line.setStrokeWidth(5);
-                pane.getChildren().add(line);
-            }
+
+            upperCommonSupport = dominanceCheck(upperCommonSupport, leftCell, rightCell, leftPolygon, rightPolygon);
+
+
+            leftPointOfCommonSupport = upperCommonSupport.getLeftPoint();
+            leftCell = leftDiagram.get(leftPointOfCommonSupport);
+            rightPointOfCommonSupport = upperCommonSupport.getRightPoint();
+            rightCell = rightDiagram.get(rightPointOfCommonSupport);
 
             middlePerpendicular = getMiddlePerpendicular(upperCommonSupport);
 
@@ -719,6 +755,7 @@ public class Main extends Application {
         log.info("Start drawing ");
         buildVoronoyDiagram(polygon.stream().sorted(Comparator.comparingDouble(Point::getX).thenComparing(Point::getY)).toList())
                 .values()
+                .stream()
                 .forEach(voronoyCell -> {
                     Edge edge = voronoyCell.getBoundary();
                     Edge nextEdge = voronoyCell.getBoundary();

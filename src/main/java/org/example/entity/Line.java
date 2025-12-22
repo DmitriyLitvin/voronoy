@@ -1,6 +1,7 @@
 package org.example.entity;
 
 import lombok.*;
+import org.example.utils.DeepCopyHelper;
 
 @Getter
 @Setter
@@ -15,6 +16,12 @@ public class Line {
     public Line(Edge edge) {
         this.leftPoint = edge.getLeftPoint();
         this.rightPoint = edge.getRightPoint();
+    }
+
+    private static DeepCopyHelper<Line> helper = new DeepCopyHelper<>();
+
+    public Line deepCopy() {
+        return helper.copy(this);
     }
 
     public boolean is(Point point, CommonSupportType commonSupportType) {

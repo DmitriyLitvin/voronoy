@@ -5,6 +5,7 @@ import com.esotericsoftware.kryo.io.Input;
 import com.esotericsoftware.kryo.io.Output;
 import org.example.entity.Cell;
 import org.example.entity.Edge;
+import org.example.entity.Line;
 import org.example.entity.Point;
 
 public class DeepCopyHelper<T> {
@@ -15,6 +16,7 @@ public class DeepCopyHelper<T> {
         kryo.register(Point.class);
         kryo.register(Edge.class);
         kryo.register(Cell.class);
+        kryo.register(Line.class);
     }
 
     public T copy(T object) {
