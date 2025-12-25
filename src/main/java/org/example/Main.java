@@ -367,14 +367,12 @@ public class Main extends Application {
             Point rightPointOfCommonSupport = upperCommonSupport.getRightPoint();
             Cell rightCell = rightDiagram.get(rightPointOfCommonSupport);
 
-            if (leftDiagram.size() != 4) {
-                upperCommonSupport = dominanceCheck(upperCommonSupport, leftCell, rightCell, leftPolygon, rightPolygon);
-                leftPointOfCommonSupport = upperCommonSupport.getLeftPoint();
-                leftCell = leftDiagram.get(leftPointOfCommonSupport);
-                rightPointOfCommonSupport = upperCommonSupport.getRightPoint();
-                rightCell = rightDiagram.get(rightPointOfCommonSupport);
-            }
 
+            upperCommonSupport = dominanceCheck(upperCommonSupport, leftCell, rightCell, leftPolygon, rightPolygon);
+            leftPointOfCommonSupport = upperCommonSupport.getLeftPoint();
+            leftCell = leftDiagram.get(leftPointOfCommonSupport);
+            rightPointOfCommonSupport = upperCommonSupport.getRightPoint();
+            rightCell = rightDiagram.get(rightPointOfCommonSupport);
             middlePerpendicular = getMiddlePerpendicular(upperCommonSupport);
 
             if (leftDiagram.size() == 4) {
