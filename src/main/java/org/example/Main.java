@@ -285,15 +285,9 @@ public class Main extends Application {
         Line currentSupportLine = supportLine.deepCopy();
         while (leftCounter < leftIncidentCellCenters.size() || rightCounter < rightIncidentCellCenters.size()) {
             log.info("dominance check");
-            Map<Point, Double> leftDistances = new HashMap<>();
-            Map<Point, Double> rightDistances = new HashMap<>();
-
             Point midPoint = currentSupportLine.getMidPoint();
-            leftIncidentCellCenters.forEach(p -> leftDistances.put(p, PointUtils.getLength(midPoint, p)));
-            rightIncidentCellCenters.forEach(p -> rightDistances.put(p, PointUtils.getLength(midPoint, p)));
-
-            Optional<Map.Entry<Point, Double>> leftDistanceEntryOptional = leftDistances.entrySet().stream().min(Comparator.comparingDouble(Map.Entry::getValue));
-            Optional<Map.Entry<Point, Double>> rightDistanceEntryOptional = rightDistances.entrySet().stream().min(Comparator.comparingDouble(Map.Entry::getValue));
+            Optional<AbstractMap.SimpleEntry<Point, Double>> leftDistanceEntryOptional =  leftIncidentCellCenters.stream().map(p -> new AbstractMap.SimpleEntry<>(p, PointUtils.getLength(midPoint, p))).min(Comparator.comparingDouble(Map.Entry::getValue));
+            Optional<AbstractMap.SimpleEntry<Point, Double>> rightDistanceEntryOptional = rightIncidentCellCenters.stream().map(p -> new AbstractMap.SimpleEntry<>(p, PointUtils.getLength(midPoint, p))).min(Comparator.comparingDouble(Map.Entry::getValue));
 
             if (leftDistanceEntryOptional.isEmpty() || rightDistanceEntryOptional.isEmpty()) {
                 break;
