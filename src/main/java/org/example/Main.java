@@ -323,11 +323,7 @@ public class Main extends Application {
                 Point rightPoint = rightDistanceEntry.getKey();
                 boolean isRightPointUpper = PointUtils.dotProduct(new Point(rightPoint.getX() - leftPoint.getX(), rightPoint.getY() - leftPoint.getY()), directionPoint) >= 0;
                 if (isRightPointUpper) {
-                    if (leftDistanceEntry.getValue() - rightDistanceEntry.getValue() == 0) {
-                        return currentSupportLine;
-                    } else {
-                        currentSupportLine.setRightPoint(rightPoint);
-                    }
+                    currentSupportLine.setRightPoint(rightPoint);
                 } else if (rightCounter < rightIncidentCellCenters.size()) {
                     leftPoint = currentSupportLine.getLeftPoint();
                     rightPoint = rightIncidentCellCenters.get(rightCounter);
