@@ -304,7 +304,7 @@ public class Main extends Application {
 
             if (leftDistanceEntry.getValue() - rightDistanceEntry.getValue() == 0) {
                 return currentSupportLine;
-            } else if (leftDistanceEntry.getValue() < rightDistanceEntry.getValue()) {
+            } else if (leftDistanceEntry.getValue() - rightDistanceEntry.getValue() < 0) {
                 Point leftPoint = leftDistanceEntry.getKey();
                 Point rightPoint = currentSupportLine.getRightPoint();
                 boolean isLeftPointUpper = PointUtils.dotProduct(new Point(leftPoint.getX() - rightPoint.getX(), leftPoint.getY() - rightPoint.getY()), directionPoint) >= 0;
@@ -318,7 +318,7 @@ public class Main extends Application {
                     }
                     leftCounter++;
                 }
-            } else if ((leftDistanceEntry.getValue() > rightDistanceEntry.getValue())) {
+            } else if (leftDistanceEntry.getValue() - rightDistanceEntry.getValue() > 0) {
                 Point leftPoint = currentSupportLine.getLeftPoint();
                 Point rightPoint = rightDistanceEntry.getKey();
                 boolean isRightPointUpper = PointUtils.dotProduct(new Point(rightPoint.getX() - leftPoint.getX(), rightPoint.getY() - leftPoint.getY()), directionPoint) >= 0;
