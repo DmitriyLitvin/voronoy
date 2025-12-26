@@ -17,8 +17,6 @@ import org.example.utils.PointUtils;
 
 import java.util.*;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicReference;
-import java.util.stream.Collectors;
 
 import static java.lang.Math.*;
 import static org.example.entity.CommonSupportType.LOWER;
@@ -304,39 +302,39 @@ public class Main extends Application {
             Map.Entry<Point, Double> leftDistanceEntry = leftDistanceEntryOptional.get();
             Map.Entry<Point, Double> rightDistanceEntry = rightDistanceEntryOptional.get();
 
-            Point leftPoint = leftDistanceEntry.getKey();
-            Point rightPoint = currentSupportLine.getRightPoint();
-            boolean isLeftPointUpper = PointUtils.dotProduct(new Point(leftPoint.getX() - rightPoint.getX(), leftPoint.getY() - rightPoint.getY()), directionPoint) >= 0;
-            if (isLeftPointUpper) {
-                if (leftDistanceEntry.getValue() - rightDistanceEntry.getValue() == 0) {
-                    return currentSupportLine;
-                } else {
+            if (leftDistanceEntry.getValue() - rightDistanceEntry.getValue() == 0) {
+                return currentSupportLine;
+            } else if (leftDistanceEntry.getValue() < rightDistanceEntry.getValue()) {
+                Point leftPoint = leftDistanceEntry.getKey();
+                Point rightPoint = currentSupportLine.getRightPoint();
+                boolean isLeftPointUpper = PointUtils.dotProduct(new Point(leftPoint.getX() - rightPoint.getX(), leftPoint.getY() - rightPoint.getY()), directionPoint) >= 0;
+                if (isLeftPointUpper) {
                     currentSupportLine.setLeftPoint(leftPoint);
+                } else if (leftCounter < leftIncidentCellCenters.size()) {
+                    leftPoint = leftIncidentCellCenters.get(leftCounter);
+                    rightPoint = currentSupportLine.getRightPoint();
+                    if (PointUtils.dotProduct(new Point(leftPoint.getX() - rightPoint.getX(), leftPoint.getY() - rightPoint.getY()), directionPoint) >= 0) {
+                        currentSupportLine.setLeftPoint(leftPoint);
+                    }
+                    leftCounter++;
                 }
-            } else if (leftCounter < leftIncidentCellCenters.size()) {
-                leftPoint = leftIncidentCellCenters.get(leftCounter);
-                rightPoint = currentSupportLine.getRightPoint();
-                if (PointUtils.dotProduct(new Point(leftPoint.getX() - rightPoint.getX(), leftPoint.getY() - rightPoint.getY()), directionPoint) >= 0) {
-                    currentSupportLine.setLeftPoint(leftPoint);
-                }
-                leftCounter++;
-            }
-
-            leftPoint = currentSupportLine.getLeftPoint();
-            rightPoint = rightDistanceEntry.getKey();
-            boolean isRightPointUpper = PointUtils.dotProduct(new Point(rightPoint.getX() - leftPoint.getX(), rightPoint.getY() - leftPoint.getY()), directionPoint) >= 0;
-            if (isRightPointUpper) {
-                if (leftDistanceEntry.getValue() - rightDistanceEntry.getValue() == 0) {
-                    return currentSupportLine;
-                } else {
-                    currentSupportLine.setRightPoint(rightPoint);
-                }
-            } else if (rightCounter < rightIncidentCellCenters.size()) {
-                leftPoint = currentSupportLine.getLeftPoint();
-                rightPoint = rightIncidentCellCenters.get(rightCounter);
-                if (PointUtils.dotProduct(new Point(rightPoint.getX() - leftPoint.getX(), rightPoint.getY() - leftPoint.getY()), directionPoint) >= 0) {
-                    currentSupportLine.setRightPoint(rightPoint);
-                    rightCounter++;
+            } else if ((leftDistanceEntry.getValue() > rightDistanceEntry.getValue())) {
+                Point leftPoint = currentSupportLine.getLeftPoint();
+                Point rightPoint = rightDistanceEntry.getKey();
+                boolean isRightPointUpper = PointUtils.dotProduct(new Point(rightPoint.getX() - leftPoint.getX(), rightPoint.getY() - leftPoint.getY()), directionPoint) >= 0;
+                if (isRightPointUpper) {
+                    if (leftDistanceEntry.getValue() - rightDistanceEntry.getValue() == 0) {
+                        return currentSupportLine;
+                    } else {
+                        currentSupportLine.setRightPoint(rightPoint);
+                    }
+                } else if (rightCounter < rightIncidentCellCenters.size()) {
+                    leftPoint = currentSupportLine.getLeftPoint();
+                    rightPoint = rightIncidentCellCenters.get(rightCounter);
+                    if (PointUtils.dotProduct(new Point(rightPoint.getX() - leftPoint.getX(), rightPoint.getY() - leftPoint.getY()), directionPoint) >= 0) {
+                        currentSupportLine.setRightPoint(rightPoint);
+                        rightCounter++;
+                    }
                 }
             }
 
