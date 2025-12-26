@@ -17,6 +17,7 @@ import org.example.utils.PointUtils;
 
 import java.util.*;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 import static java.lang.Math.*;
@@ -252,7 +253,7 @@ public class Main extends Application {
         return joinDiagrams(buildVoronoyDiagram(polygon.subList(0, polygon.size() / 2)), buildVoronoyDiagram(polygon.subList(polygon.size() / 2, polygon.size())));
     }
 
-    private Set<Point> getIncidentCellCenters(Cell cell, Set<Point> polygon) {
+    private Set<Point> getIncidentCellCenters(Cell cell) {
         Set<Point> incidentCellCenters = new HashSet<>();
         incidentCellCenters.add(cell.getCenter());
 
@@ -269,12 +270,12 @@ public class Main extends Application {
             prevEdge = prevEdge.getPrev();
         } while (prevEdge != null && !Objects.equals(new Line(edge), new Line(prevEdge)));
 
-        return incidentCellCenters.stream().filter(polygon::contains).collect(Collectors.toSet());
+        return incidentCellCenters;
     }
 
-    private Line dominanceCheck(Line supportLine, Cell leftCell, Cell rightCell, Set<Point> leftPolygon, Set<Point> rightPolygon) {
-        List<Point> leftIncidentCellCenters = new ArrayList<>(getIncidentCellCenters(leftCell, leftPolygon));
-        List<Point> rightIncidentCellCenters = new ArrayList<>(getIncidentCellCenters(rightCell, rightPolygon));
+    private Line dominanceCheck(Line supportLine, Cell leftCell, Cell rightCell) {
+        List<Point> leftIncidentCellCenters = new ArrayList<>(getIncidentCellCenters(leftCell));
+        List<Point> rightIncidentCellCenters = new ArrayList<>(getIncidentCellCenters(rightCell));
 
         Point currentLeftPoint = supportLine.getLeftPoint();
         Point currentRightPoint = supportLine.getRightPoint();
@@ -348,7 +349,6 @@ public class Main extends Application {
         return supportLine;
     }
 
-
     private Map<Point, Cell> joinDiagrams(Map<Point, Cell> leftDiagram, Map<Point, Cell> rightDiagram) {
         Set<Point> leftPolygon = buildConvexHull(new ArrayList<>(leftDiagram.keySet()));
         Set<Point> rightPolygon = buildConvexHull(new ArrayList<>(rightDiagram.keySet()));
@@ -362,17 +362,12 @@ public class Main extends Application {
         Map<Point, Edge> excludedEdges = new HashMap<>();
         Map<Cell, List<Edge>> disjunctiveChain = new HashMap<>();
         while (!Objects.equals(upperCommonSupport, lowerCommonSupport)) {
+            upperCommonSupport = dominanceCheck(upperCommonSupport, leftDiagram.get(upperCommonSupport.getLeftPoint()), rightDiagram.get(upperCommonSupport.getRightPoint()));
+
             Point leftPointOfCommonSupport = upperCommonSupport.getLeftPoint();
             Cell leftCell = leftDiagram.get(leftPointOfCommonSupport);
             Point rightPointOfCommonSupport = upperCommonSupport.getRightPoint();
             Cell rightCell = rightDiagram.get(rightPointOfCommonSupport);
-
-
-            upperCommonSupport = dominanceCheck(upperCommonSupport, leftCell, rightCell, leftPolygon, rightPolygon);
-            leftPointOfCommonSupport = upperCommonSupport.getLeftPoint();
-            leftCell = leftDiagram.get(leftPointOfCommonSupport);
-            rightPointOfCommonSupport = upperCommonSupport.getRightPoint();
-            rightCell = rightDiagram.get(rightPointOfCommonSupport);
             middlePerpendicular = getMiddlePerpendicular(upperCommonSupport);
 
             if (leftDiagram.size() == 4) {
