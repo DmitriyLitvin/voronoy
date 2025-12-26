@@ -333,8 +333,8 @@ public class Main extends Application {
                     rightPoint = rightIncidentCellCenters.get(rightCounter);
                     if (PointUtils.dotProduct(new Point(rightPoint.getX() - leftPoint.getX(), rightPoint.getY() - leftPoint.getY()), directionPoint) >= 0) {
                         currentSupportLine.setRightPoint(rightPoint);
-                        rightCounter++;
                     }
+                    rightCounter++;
                 }
             }
 
