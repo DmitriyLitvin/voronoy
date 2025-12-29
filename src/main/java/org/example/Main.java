@@ -271,7 +271,7 @@ public class Main extends Application {
         return incidentCellCenters;
     }
 
-    private Line dominanceCheck(Line supportLine, Cell leftCell, Cell rightCell) {
+    private Line dominanceCheck(Line supportLine, Cell leftCell, Cell rightCell, Point currentChainPoint) {
         List<Point> leftIncidentCellCenters = new ArrayList<>(getIncidentCellCenters(leftCell));
         List<Point> rightIncidentCellCenters = new ArrayList<>(getIncidentCellCenters(rightCell));
 
@@ -280,13 +280,16 @@ public class Main extends Application {
         Line prevSupportLine = null;
         Line currentSupportLine = supportLine.deepCopy();
         while (leftCounter < leftIncidentCellCenters.size() || rightCounter < rightIncidentCellCenters.size()) {
-            Point currentLeftPoint = currentSupportLine.getLeftPoint();
-            Point currentRightPoint = currentSupportLine.getRightPoint();
-
             Point midPoint = currentSupportLine.getMidPoint();
+            Point directionPoint;
+            if (currentChainPoint != null) {
+                directionPoint = new Point(midPoint.getX() - currentChainPoint.getX(), midPoint.getY() - currentChainPoint.getY());
+            } else {
+                directionPoint = new Point();
+            }
+
             Optional<AbstractMap.SimpleEntry<Point, Double>> leftDistanceEntryOptional = leftIncidentCellCenters.stream().map(p -> new AbstractMap.SimpleEntry<>(p, PointUtils.getLength(midPoint, p))).min(Comparator.comparingDouble(Map.Entry::getValue));
             Optional<AbstractMap.SimpleEntry<Point, Double>> rightDistanceEntryOptional = rightIncidentCellCenters.stream().map(p -> new AbstractMap.SimpleEntry<>(p, PointUtils.getLength(midPoint, p))).min(Comparator.comparingDouble(Map.Entry::getValue));
-
             if (leftDistanceEntryOptional.isEmpty() || rightDistanceEntryOptional.isEmpty()) {
                 break;
             }
@@ -299,9 +302,8 @@ public class Main extends Application {
             } else if (leftDistanceEntry.getValue() - rightDistanceEntry.getValue() < 0) {
                 Point leftPoint = leftDistanceEntry.getKey();
                 Point rightPoint = currentSupportLine.getRightPoint();
-                Point directionPoint = new Point((currentLeftPoint.getY() - currentRightPoint.getY()), -(currentLeftPoint.getX() - currentRightPoint.getX()));
-                boolean isLeftPointUpper = PointUtils.dotProduct(new Point(leftPoint.getX() - rightPoint.getX(), leftPoint.getY() - rightPoint.getY()), directionPoint) >= 0;
 
+                boolean isLeftPointUpper = PointUtils.dotProduct(new Point(leftPoint.getX() - rightPoint.getX(), leftPoint.getY() - rightPoint.getY()), directionPoint) >= 0;
                 if (isLeftPointUpper) {
                     currentSupportLine.setLeftPoint(leftPoint);
                 } else if (leftCounter < leftIncidentCellCenters.size()) {
@@ -315,7 +317,6 @@ public class Main extends Application {
             } else if (leftDistanceEntry.getValue() - rightDistanceEntry.getValue() > 0) {
                 Point leftPoint = currentSupportLine.getLeftPoint();
                 Point rightPoint = rightDistanceEntry.getKey();
-                Point directionPoint = new Point((currentRightPoint.getY() - currentLeftPoint.getY()), -(currentRightPoint.getX() - currentLeftPoint.getX()));
 
                 boolean isRightPointUpper = PointUtils.dotProduct(new Point(rightPoint.getX() - leftPoint.getX(), rightPoint.getY() - leftPoint.getY()), directionPoint) >= 0;
                 if (isRightPointUpper) {
@@ -352,7 +353,7 @@ public class Main extends Application {
         Map<Point, Edge> excludedEdges = new HashMap<>();
         Map<Cell, List<Edge>> disjunctiveChain = new HashMap<>();
         while (!Objects.equals(upperCommonSupport, lowerCommonSupport)) {
-            upperCommonSupport = dominanceCheck(upperCommonSupport, leftDiagram.get(upperCommonSupport.getLeftPoint()), rightDiagram.get(upperCommonSupport.getRightPoint()));
+            upperCommonSupport = dominanceCheck(upperCommonSupport, leftDiagram.get(upperCommonSupport.getLeftPoint()), rightDiagram.get(upperCommonSupport.getRightPoint()), currentChainPoint);
 
             Point leftPointOfCommonSupport = upperCommonSupport.getLeftPoint();
             Cell leftCell = leftDiagram.get(leftPointOfCommonSupport);
