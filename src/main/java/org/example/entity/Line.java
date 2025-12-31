@@ -12,10 +12,19 @@ import org.example.utils.DeepCopyHelper;
 public class Line {
     private Point leftPoint;
     private Point rightPoint;
+    private boolean isInfiniteLeftEnd = false;
+    private boolean isInfiniteRightEnd = false;
+
+    public Line(Point leftPoint, Point rightPoint) {
+        this.leftPoint = leftPoint;
+        this.rightPoint = rightPoint;
+    }
 
     public Line(Edge edge) {
         this.leftPoint = edge.getLeftPoint();
         this.rightPoint = edge.getRightPoint();
+        this.isInfiniteLeftEnd = edge.isInfiniteLeftEnd();
+        this.isInfiniteRightEnd = edge.isInfiniteRightEnd();
     }
 
     private static DeepCopyHelper<Line> helper = new DeepCopyHelper<>();
