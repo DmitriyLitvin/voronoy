@@ -45,23 +45,23 @@ public class Main extends Application {
         borderPane.setBottom(button);
         pane.getChildren().add(button);
 
-        points.add(new Point(383.0, 859.0));
-        points.add(new Point(642.0, 386.0));
-        points.add(new Point(691.0, 237.0));
-        points.add(new Point(684.0, 313.0));
+//        points.add(new Point(383.0, 859.0));
+//        points.add(new Point(642.0, 386.0));
+//        points.add(new Point(691.0, 237.0));
+//        points.add(new Point(684.0, 313.0));
 //        points.add(new Point(822.0, 395.0));
 //        points.add(new Point(733.0, 361.0));
 //        points.add(new Point(759.0, 576.0));
 //        points.add(new Point(714.0, 506.0));
 
-//        points.add(new Point(673.0, 456.0));
-//        points.add(new Point(506.0, 632.0));
-//        points.add(new Point(638.0, 324.0));
-//        points.add(new Point(692.0, 270.0));
-//        points.add(new Point(711.0, 216.0));
-//        points.add(new Point(720.0, 252.0));
-//        points.add(new Point(725.0, 376.0));
-//        points.add(new Point(778.0, 773.0));
+        points.add(new Point(673.0, 456.0));
+        points.add(new Point(506.0, 632.0));
+        points.add(new Point(638.0, 324.0));
+        points.add(new Point(692.0, 270.0));
+        points.add(new Point(711.0, 216.0));
+        points.add(new Point(720.0, 252.0));
+        points.add(new Point(725.0, 376.0));
+        points.add(new Point(778.0, 773.0));
 
 
         points.forEach(p -> {
@@ -366,22 +366,28 @@ public class Main extends Application {
                 return intersectSupportPoint != null && isIntersected(intersectSupportPoint, sl) && !(isPointInsideAngle(sl.getMidPoint(), anglePoint, upperCommonSupport.getMidPoint(), upperCommonSupport.getLeftPoint()) || isPointInsideAngle(sl.getMidPoint(), anglePoint, upperCommonSupport.getMidPoint(), upperCommonSupport.getRightPoint()));
             }).collect(Collectors.toSet());
 
+            Line preSupportLine = currentSupportLine.deepCopy();
             if (leftLines.isEmpty() && rightLines.isEmpty()) {
                 return currentSupportLine;
             } else if (leftLines.isEmpty()) {
                 rightIncidentCellCenters.stream()
-                        .filter(p -> PointUtils.dotProduct(new Point(p.getX() - midPoint.getX(), p.getY() - midPoint.getY()), directionPoint.get()) >= 0)
                         .map(p -> new AbstractMap.SimpleEntry<>(p, PointUtils.getLength(midPoint, p)))
                         .min(Comparator.comparingDouble(Map.Entry::getValue))
-                        .ifPresent(p -> currentSupportLine.setRightPoint(p.getKey()));
+                        .ifPresent(p -> preSupportLine.setRightPoint(p.getKey()));
             } else if (rightLines.isEmpty()) {
                 leftIncidentCellCenters.stream()
-                        .filter(p -> PointUtils.dotProduct(new Point(p.getX() - midPoint.getX(), p.getY() - midPoint.getY()), directionPoint.get()) >= 0)
                         .map(p -> new AbstractMap.SimpleEntry<>(p, PointUtils.getLength(midPoint, p)))
                         .min(Comparator.comparingDouble(Map.Entry::getValue))
-                        .ifPresent(p -> currentSupportLine.setLeftPoint(p.getKey()));
+                        .ifPresent(p -> preSupportLine.setLeftPoint(p.getKey()));
+
             } else {
                 throw new RuntimeException("right and left lines are intersected, by a current middle perpendicular");
+            }
+
+            if (Objects.equals(preSupportLine, currentSupportLine)) {
+                return currentSupportLine;
+            } else {
+                currentSupportLine = preSupportLine;
             }
         }
     }
@@ -402,10 +408,12 @@ public class Main extends Application {
             upperCommonSupport = dominanceCheck(upperCommonSupport, lowerCommonSupport, leftDiagram, rightDiagram);
 
 
-            javafx.scene.shape.Line line = new javafx.scene.shape.Line(upperCommonSupport.getLeftPoint().getX(), upperCommonSupport.getLeftPoint().getY(), upperCommonSupport.getRightPoint().getX(), upperCommonSupport.getRightPoint().getY());
-            line.setStroke(Color.RED);
-            line.setStrokeWidth(5);
-            pane.getChildren().add(line);
+            if (leftDiagram.size() == 4) {
+                javafx.scene.shape.Line line = new javafx.scene.shape.Line(upperCommonSupport.getLeftPoint().getX(), upperCommonSupport.getLeftPoint().getY(), upperCommonSupport.getRightPoint().getX(), upperCommonSupport.getRightPoint().getY());
+                line.setStroke(Color.RED);
+                line.setStrokeWidth(5);
+                pane.getChildren().add(line);
+            }
 
 
             Point leftPointOfCommonSupport = upperCommonSupport.getLeftPoint();
