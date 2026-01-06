@@ -45,23 +45,23 @@ public class Main extends Application {
         borderPane.setBottom(button);
         pane.getChildren().add(button);
 
-//        points.add(new Point(383.0, 859.0));
-//        points.add(new Point(642.0, 386.0));
-//        points.add(new Point(691.0, 237.0));
-//        points.add(new Point(684.0, 313.0));
-//        points.add(new Point(822.0, 395.0));
-//        points.add(new Point(733.0, 361.0));
-//        points.add(new Point(759.0, 576.0));
-//        points.add(new Point(714.0, 506.0));
+        points.add(new Point(383.0, 859.0));
+        points.add(new Point(642.0, 386.0));
+        points.add(new Point(691.0, 237.0));
+        points.add(new Point(684.0, 313.0));
+        points.add(new Point(822.0, 395.0));
+        points.add(new Point(733.0, 361.0));
+        points.add(new Point(759.0, 576.0));
+        points.add(new Point(714.0, 506.0));
 
-        points.add(new Point(673.0, 456.0));
-        points.add(new Point(506.0, 632.0));
-        points.add(new Point(638.0, 324.0));
-        points.add(new Point(692.0, 270.0));
-        points.add(new Point(711.0, 216.0));
-        points.add(new Point(720.0, 252.0));
-        points.add(new Point(725.0, 376.0));
-        points.add(new Point(778.0, 773.0));
+//        points.add(new Point(673.0, 456.0));
+//        points.add(new Point(506.0, 632.0));
+//        points.add(new Point(638.0, 324.0));
+//        points.add(new Point(692.0, 270.0));
+//        points.add(new Point(711.0, 216.0));
+//        points.add(new Point(720.0, 252.0));
+//        points.add(new Point(725.0, 376.0));
+//        points.add(new Point(778.0, 773.0));
 
 
         points.forEach(p -> {
@@ -302,7 +302,7 @@ public class Main extends Application {
 
             Set<Line> leftLines = new HashSet<>();
             for (Point leftIncidentCellCenter : leftIncidentCellCenters) {
-                if (!Objects.equals(leftIncidentCellCenter, currentSupportLine.getLeftPoint()) && PointUtils.dotProduct(new Point(leftIncidentCellCenter.getX() - midPoint.getX(), leftIncidentCellCenter.getY() - midPoint.getY()), directionPoint.get()) >= 0) {
+                if (!Objects.equals(leftIncidentCellCenter, currentSupportLine.getLeftPoint()) && PointUtils.dotProduct(new Point(leftIncidentCellCenter.getX() - midPoint.getX(), leftIncidentCellCenter.getY() - midPoint.getY()), directionPoint.get()) > 0) {
                     Cell leftCell = leftDiagram.get(leftIncidentCellCenter);
 
                     Edge edge = leftCell.getBoundary();
@@ -326,7 +326,7 @@ public class Main extends Application {
 
             Set<Line> rightLines = new HashSet<>();
             for (Point rightIncidentCellCenter : rightIncidentCellCenters) {
-                if (!Objects.equals(rightIncidentCellCenter, currentSupportLine.getRightPoint()) && PointUtils.dotProduct(new Point(rightIncidentCellCenter.getX() - midPoint.getX(), rightIncidentCellCenter.getY() - midPoint.getY()), directionPoint.get()) >= 0) {
+                if (!Objects.equals(rightIncidentCellCenter, currentSupportLine.getRightPoint()) && PointUtils.dotProduct(new Point(rightIncidentCellCenter.getX() - midPoint.getX(), rightIncidentCellCenter.getY() - midPoint.getY()), directionPoint.get()) > 0) {
                     Cell rightCell = rightDiagram.get(rightIncidentCellCenter);
 
                     Edge edge = rightCell.getBoundary();
@@ -366,16 +366,22 @@ public class Main extends Application {
                 return intersectSupportPoint != null && isIntersected(intersectSupportPoint, sl) && !(isPointInsideAngle(sl.getMidPoint(), anglePoint, upperCommonSupport.getMidPoint(), upperCommonSupport.getLeftPoint()) || isPointInsideAngle(sl.getMidPoint(), anglePoint, upperCommonSupport.getMidPoint(), upperCommonSupport.getRightPoint()));
             }).collect(Collectors.toSet());
 
-            Line preSupportLine = currentSupportLine.deepCopy();
             if (leftLines.isEmpty() && rightLines.isEmpty()) {
                 return currentSupportLine;
-            } else if (leftLines.isEmpty()) {
+            }
+
+            Line preSupportLine = currentSupportLine.deepCopy();
+            if (leftLines.isEmpty()) {
+                Point rightPoint = currentSupportLine.getRightPoint();
                 rightIncidentCellCenters.stream()
+                        .filter(p -> Objects.equals(p, rightPoint) || PointUtils.dotProduct(new Point(p.getX() - midPoint.getX(), p.getY() - midPoint.getY()), directionPoint.get()) > 0)
                         .map(p -> new AbstractMap.SimpleEntry<>(p, PointUtils.getLength(midPoint, p)))
                         .min(Comparator.comparingDouble(Map.Entry::getValue))
                         .ifPresent(p -> preSupportLine.setRightPoint(p.getKey()));
             } else if (rightLines.isEmpty()) {
+                Point leftPoint = currentSupportLine.getLeftPoint();
                 leftIncidentCellCenters.stream()
+                        .filter(p -> Objects.equals(p, leftPoint) || PointUtils.dotProduct(new Point(p.getX() - midPoint.getX(), p.getY() - midPoint.getY()), directionPoint.get()) > 0)
                         .map(p -> new AbstractMap.SimpleEntry<>(p, PointUtils.getLength(midPoint, p)))
                         .min(Comparator.comparingDouble(Map.Entry::getValue))
                         .ifPresent(p -> preSupportLine.setLeftPoint(p.getKey()));
