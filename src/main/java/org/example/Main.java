@@ -54,13 +54,14 @@ public class Main extends Application {
 //        points.add(new Point(692.0, 270.0));
 
         points.add(new Point(711.0, 216.0));
+        points.add(new Point(714.0, 506.0));
         points.add(new Point(720.0, 252.0));
         points.add(new Point(725.0, 376.0));
-        points.add(new Point(778.0, 773.0));
-        points.add(new Point(822.0, 395.0));
         points.add(new Point(733.0, 361.0));
         points.add(new Point(759.0, 576.0));
-        points.add(new Point(714.0, 506.0));
+        points.add(new Point(778.0, 773.0));
+        points.add(new Point(822.0, 395.0));
+
 
 //        points.add(new Point(383.0, 859.0));
 //        points.add(new Point(642.0, 386.0));
@@ -287,14 +288,14 @@ public class Main extends Application {
         while (true) {
             Point midPoint = currentCommonSupport.getMidPoint();
             Line upperPerpendicular = getMiddlePerpendicular(currentCommonSupport);
-            Point currentPoint = intersectionOfLines(currentCommonSupport, lowerCommonSupport);
+            Point currentPoint = getPointOfIntersection(currentCommonSupport, lowerCommonSupport);
             if (currentPoint != null) {
-                Point intersectPoint = intersectionOfLines(upperPerpendicular, lowerPerpendicular);
+                Point intersectPoint = getPointOfIntersection(upperPerpendicular, lowerPerpendicular);
                 assert intersectPoint != null;
                 if (isPointInsideAngle(currentCommonSupport.getLeftPoint(), currentPoint, lowerCommonSupport.getLeftPoint(), intersectPoint)) {
                     directionPoint.set(new Point(intersectPoint.getX() - midPoint.getX(), intersectPoint.getY() - midPoint.getY()));
                 } else {
-                    Point lowerPoint = intersectionOfLines(upperPerpendicular, lowerCommonSupport);
+                    Point lowerPoint = getPointOfIntersection(upperPerpendicular, lowerCommonSupport);
                     if (lowerPoint != null && isIntersected(lowerPoint, new Line(midPoint, intersectPoint))) {
                         directionPoint.set(new Point(intersectPoint.getX() - midPoint.getX(), intersectPoint.getY() - midPoint.getY()));
                     } else {
@@ -302,7 +303,7 @@ public class Main extends Application {
                     }
                 }
             } else {
-                Point lowerPoint = intersectionOfLines(upperPerpendicular, lowerCommonSupport);
+                Point lowerPoint = getPointOfIntersection(upperPerpendicular, lowerCommonSupport);
                 assert lowerPoint != null;
                 directionPoint.set(new Point(lowerPoint.getX() - midPoint.getX(), lowerPoint.getY() - midPoint.getY()));
             }
@@ -317,9 +318,9 @@ public class Main extends Application {
                     do {
                         if (Objects.equals(currentCommonSupport.getLeftPoint(), nextEdge.getTwin().getCell().getCenter())) {
                             Line leftLine = new Line(currentCommonSupport.getLeftPoint(), leftIncidentCellCenter);
-                            Point intersectSupportPoint = intersectionOfLines(leftLine, upperPerpendicular);
-                            Point anglePoint = intersectionOfLines(getMiddlePerpendicular(leftLine), upperPerpendicular);
-                            if (intersectSupportPoint != null && isIntersected(intersectSupportPoint, leftLine) && (!isPointInsideAngle(leftLine.getMidPoint(), anglePoint, midPoint, currentCommonSupport.getLeftPoint()) && !isPointInsideAngle(leftLine.getMidPoint(), anglePoint, midPoint, currentCommonSupport.getRightPoint()))) {
+                            Line nextLine = new Line(nextEdge);
+                            Point anglePoint = getPointOfIntersection(nextLine, upperPerpendicular);
+                            if (isIntersected(getPointOfIntersection(leftLine, upperPerpendicular), leftLine) && isIntersected(getPointOfIntersection(leftLine, nextLine), nextLine) && (!isPointInsideAngle(leftLine.getMidPoint(), anglePoint, midPoint, currentCommonSupport.getLeftPoint()) && !isPointInsideAngle(leftLine.getMidPoint(), anglePoint, midPoint, currentCommonSupport.getRightPoint()))) {
                                 leftLines.add(leftLine);
                             }
                         }
@@ -330,9 +331,9 @@ public class Main extends Application {
                     do {
                         if (Objects.equals(currentCommonSupport.getLeftPoint(), prevEdge.getTwin().getCell().getCenter())) {
                             Line leftLine = new Line(currentCommonSupport.getLeftPoint(), leftIncidentCellCenter);
-                            Point intersectSupportPoint = intersectionOfLines(leftLine, upperPerpendicular);
-                            Point anglePoint = intersectionOfLines(getMiddlePerpendicular(leftLine), upperPerpendicular);
-                            if (intersectSupportPoint != null && isIntersected(intersectSupportPoint, leftLine) && (!isPointInsideAngle(leftLine.getMidPoint(), anglePoint, midPoint, currentCommonSupport.getLeftPoint()) && !isPointInsideAngle(leftLine.getMidPoint(), anglePoint, midPoint, currentCommonSupport.getRightPoint()))) {
+                            Line prevLine = new Line(prevEdge);
+                            Point anglePoint = getPointOfIntersection(prevLine, upperPerpendicular);
+                            if (isIntersected(getPointOfIntersection(leftLine, upperPerpendicular), leftLine) && isIntersected(getPointOfIntersection(leftLine, prevLine), prevLine) && (!isPointInsideAngle(leftLine.getMidPoint(), anglePoint, midPoint, currentCommonSupport.getLeftPoint()) && !isPointInsideAngle(leftLine.getMidPoint(), anglePoint, midPoint, currentCommonSupport.getRightPoint()))) {
                                 leftLines.add(leftLine);
                             }
                         }
@@ -351,9 +352,9 @@ public class Main extends Application {
                     do {
                         if (Objects.equals(currentCommonSupport.getRightPoint(), nextEdge.getTwin().getCell().getCenter())) {
                             Line rightLine = new Line(currentCommonSupport.getRightPoint(), rightIncidentCellCenter);
-                            Point intersectSupportPoint = intersectionOfLines(rightLine, upperPerpendicular);
-                            Point anglePoint = intersectionOfLines(getMiddlePerpendicular(rightLine), upperPerpendicular);
-                            if (intersectSupportPoint != null && isIntersected(intersectSupportPoint, rightLine) && (!isPointInsideAngle(rightLine.getMidPoint(), anglePoint, midPoint, currentCommonSupport.getLeftPoint()) && !isPointInsideAngle(rightLine.getMidPoint(), anglePoint, midPoint, currentCommonSupport.getRightPoint()))) {
+                            Line nextLine = new Line(nextEdge);
+                            Point anglePoint = getPointOfIntersection(nextLine, upperPerpendicular);
+                            if (isIntersected(getPointOfIntersection(rightLine, upperPerpendicular), rightLine) && isIntersected(getPointOfIntersection(rightLine, nextLine), nextLine) && (!isPointInsideAngle(rightLine.getMidPoint(), anglePoint, midPoint, currentCommonSupport.getLeftPoint()) && !isPointInsideAngle(rightLine.getMidPoint(), anglePoint, midPoint, currentCommonSupport.getRightPoint()))) {
                                 rightLines.add(rightLine);
                             }
                         }
@@ -364,9 +365,9 @@ public class Main extends Application {
                     do {
                         if (Objects.equals(currentCommonSupport.getRightPoint(), prevEdge.getTwin().getCell().getCenter())) {
                             Line rightLine = new Line(currentCommonSupport.getRightPoint(), rightIncidentCellCenter);
-                            Point intersectSupportPoint = intersectionOfLines(rightLine, upperPerpendicular);
-                            Point anglePoint = intersectionOfLines(getMiddlePerpendicular(rightLine), upperPerpendicular);
-                            if (intersectSupportPoint != null && isIntersected(intersectSupportPoint, rightLine) && (!isPointInsideAngle(rightLine.getMidPoint(), anglePoint, midPoint, currentCommonSupport.getLeftPoint()) && !isPointInsideAngle(rightLine.getMidPoint(), anglePoint, midPoint, currentCommonSupport.getRightPoint()))) {
+                            Line prevLine = new Line(prevEdge);
+                            Point anglePoint = getPointOfIntersection(prevLine, upperPerpendicular);
+                            if (isIntersected(getPointOfIntersection(rightLine, upperPerpendicular), rightLine) && isIntersected(getPointOfIntersection(rightLine, prevLine), prevLine) && (!isPointInsideAngle(rightLine.getMidPoint(), anglePoint, midPoint, currentCommonSupport.getLeftPoint()) && !isPointInsideAngle(rightLine.getMidPoint(), anglePoint, midPoint, currentCommonSupport.getRightPoint()))) {
                                 rightLines.add(rightLine);
                             }
                         }
@@ -382,18 +383,10 @@ public class Main extends Application {
             Line preSupportLine = currentCommonSupport.deepCopy();
             if (leftLines.isEmpty()) {
                 Point rightPoint = currentCommonSupport.getRightPoint();
-                rightIncidentCellCenters.stream()
-                        .filter(p -> Objects.equals(p, rightPoint) || PointUtils.dotProduct(new Point(p.getX() - midPoint.getX(), p.getY() - midPoint.getY()), directionPoint.get()) > 0)
-                        .map(p -> new AbstractMap.SimpleEntry<>(p, PointUtils.getLength(midPoint, p)))
-                        .min(Comparator.comparingDouble(Map.Entry::getValue))
-                        .ifPresent(p -> preSupportLine.setRightPoint(p.getKey()));
+                rightIncidentCellCenters.stream().filter(p -> Objects.equals(p, rightPoint) || PointUtils.dotProduct(new Point(p.getX() - midPoint.getX(), p.getY() - midPoint.getY()), directionPoint.get()) > 0).map(p -> new AbstractMap.SimpleEntry<>(p, PointUtils.getLength(midPoint, p))).min(Comparator.comparingDouble(Map.Entry::getValue)).ifPresent(p -> preSupportLine.setRightPoint(p.getKey()));
             } else if (rightLines.isEmpty()) {
                 Point leftPoint = currentCommonSupport.getLeftPoint();
-                leftIncidentCellCenters.stream()
-                        .filter(p -> Objects.equals(p, leftPoint) || PointUtils.dotProduct(new Point(p.getX() - midPoint.getX(), p.getY() - midPoint.getY()), directionPoint.get()) > 0)
-                        .map(p -> new AbstractMap.SimpleEntry<>(p, PointUtils.getLength(midPoint, p)))
-                        .min(Comparator.comparingDouble(Map.Entry::getValue))
-                        .ifPresent(p -> preSupportLine.setLeftPoint(p.getKey()));
+                leftIncidentCellCenters.stream().filter(p -> Objects.equals(p, leftPoint) || PointUtils.dotProduct(new Point(p.getX() - midPoint.getX(), p.getY() - midPoint.getY()), directionPoint.get()) > 0).map(p -> new AbstractMap.SimpleEntry<>(p, PointUtils.getLength(midPoint, p))).min(Comparator.comparingDouble(Map.Entry::getValue)).ifPresent(p -> preSupportLine.setLeftPoint(p.getKey()));
 
             } else {
                 throw new RuntimeException("right and left lines are intersected, by a current middle perpendicular");
@@ -442,12 +435,12 @@ public class Main extends Application {
             Edge leftExcludedEdge = getClosestEdge(excludedEdges.get(leftPointOfCommonSupport), middlePerpendicular, currentEdge, currentChainPoint);
             Edge leftEdge = getClosestEdge(leftCell.getBoundary(), middlePerpendicular, currentEdge, currentChainPoint);
             if (leftEdge != null) {
-                leftPoint = intersectionOfLines(middlePerpendicular, new Line(leftEdge));
+                leftPoint = getPointOfIntersection(middlePerpendicular, new Line(leftEdge));
                 assert leftPoint != null;
                 leftDistance = PointUtils.getLength(leftPoint, currentChainPoint == null ? middlePerpendicular.getRightPoint() : currentChainPoint);
             }
             if (leftExcludedEdge != null) {
-                Point leftDeletedEdgeIntersectionPoint = intersectionOfLines(middlePerpendicular, new Line(leftExcludedEdge));
+                Point leftDeletedEdgeIntersectionPoint = getPointOfIntersection(middlePerpendicular, new Line(leftExcludedEdge));
                 if (leftDeletedEdgeIntersectionPoint != null) {
                     double leftDeletedIntersectionDistance = PointUtils.getLength(leftDeletedEdgeIntersectionPoint, currentChainPoint == null ? middlePerpendicular.getRightPoint() : currentChainPoint);
                     if (leftDeletedIntersectionDistance < leftDistance || leftEdge == null) {
@@ -463,12 +456,12 @@ public class Main extends Application {
             Edge rightExcludedEdge = getClosestEdge(excludedEdges.get(rightPointOfCommonSupport), middlePerpendicular, currentEdge, currentChainPoint);
             Edge rightEdge = getClosestEdge(rightCell.getBoundary(), middlePerpendicular, currentEdge, currentChainPoint);
             if (rightEdge != null) {
-                rightPoint = intersectionOfLines(middlePerpendicular, new Line(rightEdge));
+                rightPoint = getPointOfIntersection(middlePerpendicular, new Line(rightEdge));
                 assert rightPoint != null;
                 rightDistance = PointUtils.getLength(rightPoint, currentChainPoint == null ? middlePerpendicular.getRightPoint() : currentChainPoint);
             }
             if (rightExcludedEdge != null) {
-                Point rightDeletedEdgeIntersectionPoint = intersectionOfLines(middlePerpendicular, new Line(rightExcludedEdge));
+                Point rightDeletedEdgeIntersectionPoint = getPointOfIntersection(middlePerpendicular, new Line(rightExcludedEdge));
                 if (rightDeletedEdgeIntersectionPoint != null) {
                     double rightDeletedIntersectionDistance = PointUtils.getLength(rightDeletedEdgeIntersectionPoint, currentChainPoint == null ? middlePerpendicular.getRightPoint() : currentChainPoint);
                     if (rightDeletedIntersectionDistance < rightDistance || rightEdge == null) {
@@ -861,7 +854,7 @@ public class Main extends Application {
         double distance = -1;
         do {
             if (currentEdge == null || !Objects.equals(new Line(currentEdge), new Line(nextEdge))) {
-                Point intersectPoint = intersectionOfLines(middlePerpendicular, new Line(nextEdge));
+                Point intersectPoint = getPointOfIntersection(middlePerpendicular, new Line(nextEdge));
                 if (intersectPoint != null && isIntersected(intersectPoint, new Line(nextEdge)) && isOutsideCell(currentEdge, currentPoint, intersectPoint)) {
                     double currentDistance = PointUtils.getLength(intersectPoint, middlePerpendicular.getRightPoint());
                     if (distance == -1 || currentDistance < distance) {
@@ -876,7 +869,7 @@ public class Main extends Application {
         Edge prevEdge = edge;
         do {
             if (currentEdge == null || !Objects.equals(new Line(currentEdge), new Line(prevEdge))) {
-                Point intersectPoint = intersectionOfLines(middlePerpendicular, new Line(prevEdge));
+                Point intersectPoint = getPointOfIntersection(middlePerpendicular, new Line(prevEdge));
                 if (intersectPoint != null && isIntersected(intersectPoint, new Line(prevEdge)) && isOutsideCell(currentEdge, currentPoint, intersectPoint)) {
                     double currentDistance = PointUtils.getLength(intersectPoint, middlePerpendicular.getRightPoint());
                     if (distance == -1 || currentDistance < distance) {
@@ -892,6 +885,9 @@ public class Main extends Application {
     }
 
     public boolean isIntersected(Point point, Line line) {
+        if (point == null) {
+            return false;
+        }
         double x1 = line.getLeftPoint().getX();
         double y1 = line.getLeftPoint().getY();
 
@@ -973,7 +969,7 @@ public class Main extends Application {
         return (isPointLower(line, a) && isPointLower(line, b)) || (isPointUpper(line, a) && isPointUpper(line, b));
     }
 
-    private Point intersectionOfLines(Line a, Line b) {
+    private Point getPointOfIntersection(Line a, Line b) {
         Point a1 = a.getLeftPoint();
         Point b1 = a.getRightPoint();
 
