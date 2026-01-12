@@ -11,11 +11,6 @@ public class PointUtils {
         return sqrt(Math.pow(b.getX() - a.getX(), 2) + Math.pow(b.getY() - a.getY(), 2));
     }
 
-    public static double getLength(Line line) {
-        Point a = line.getLeftPoint();
-        Point b = line.getRightPoint();
-        return sqrt(Math.pow(b.getX() - a.getX(), 2) + Math.pow(b.getY() - a.getY(), 2));
-    }
 
     public static double crossProduct(Point a, Point b) {
         return a.getX() * b.getY() - a.getY() * b.getX();
