@@ -62,14 +62,14 @@ public class Main extends Application {
 //        points.add(new Point(822.0, 395.0));
 
 
-        points.add(new Point(383.0, 859.0));
-        points.add(new Point(642.0, 386.0));
-        points.add(new Point(691.0, 237.0));
-        points.add(new Point(684.0, 313.0));
-        points.add(new Point(822.0, 395.0));
-        points.add(new Point(733.0, 361.0));
-        points.add(new Point(759.0, 576.0));
-        points.add(new Point(714.0, 506.0));
+//        points.add(new Point(383.0, 859.0));
+//        points.add(new Point(642.0, 386.0));
+//        points.add(new Point(691.0, 237.0));
+//        points.add(new Point(684.0, 313.0));
+//        points.add(new Point(822.0, 395.0));
+//        points.add(new Point(733.0, 361.0));
+//        points.add(new Point(759.0, 576.0));
+//        points.add(new Point(714.0, 506.0));
 
 
         points.forEach(p -> {
@@ -278,7 +278,7 @@ public class Main extends Application {
         if (currentPoint != null) {
             Point intersectPoint = getPointOfIntersection(upperPerpendicular, lowerPerpendicular);
             assert intersectPoint != null;
-            if (isPointInsideAngle(upperCommonSupport.getLeftPoint(), currentPoint, lowerCommonSupport.getLeftPoint(), intersectPoint)) {
+            if (isPointInsideAngle(upperCommonSupport.getLeftPoint(), currentPoint, lowerCommonSupport.getLeftPoint(), intersectPoint) || isPointInsideAngle(upperCommonSupport.getRightPoint(), currentPoint, lowerCommonSupport.getRightPoint(), intersectPoint)) {
                 directionPoint = new Point(intersectPoint.getX() - midPoint.getX(), intersectPoint.getY() - midPoint.getY());
             } else {
                 Point lowerPoint = getPointOfIntersection(upperPerpendicular, lowerCommonSupport);
@@ -290,8 +290,11 @@ public class Main extends Application {
             }
         } else {
             Point lowerPoint = getPointOfIntersection(upperPerpendicular, lowerCommonSupport);
-            assert lowerPoint != null;
-            directionPoint = new Point(lowerPoint.getX() - midPoint.getX(), lowerPoint.getY() - midPoint.getY());
+            if (lowerPoint != null) {
+                directionPoint = new Point(lowerPoint.getX() - midPoint.getX(), lowerPoint.getY() - midPoint.getY());
+            } else {
+                directionPoint = new Point(0, 0);
+            }
         }
 
         while (!Objects.equals(upperCommonSupport, lowerCommonSupport)) {
@@ -305,7 +308,7 @@ public class Main extends Application {
             if (currentChainPoint == null) {
                 isInfiniteLeftEnd = true;
                 Point leftUpperPoint = middlePerpendicular.getLeftPoint();
-                if (PointUtils.dotProduct(new Point(midPoint.getX() - leftUpperPoint.getX(), midPoint.getY() - leftUpperPoint.getY()), directionPoint) > 0) {
+                if (PointUtils.dotProduct(new Point(midPoint.getX() - leftUpperPoint.getX(), midPoint.getY() - leftUpperPoint.getY()), directionPoint) >= 0) {
                     currentChainPoint = leftUpperPoint;
                 } else {
                     currentChainPoint = middlePerpendicular.getRightPoint();
@@ -720,9 +723,9 @@ public class Main extends Application {
         double cp = crossProduct(a, c);
 
         if (cp > 0) {
-            return crossProduct(a, b) >= 0 && crossProduct(b, c) >= 0;
+            return crossProduct(a, b) > 0 && crossProduct(b, c) > 0;
         } else {
-            return crossProduct(a, b) <= 0 && crossProduct(b, c) <= 0;
+            return crossProduct(a, b) < 0 && crossProduct(b, c) < 0;
         }
     }
 
@@ -787,8 +790,8 @@ public class Main extends Application {
     }
 
     private Line getMiddlePerpendicular(Line line) {
-        int width = 10 * this.width;
-        int height = 10 * this.height;
+        int width = 1_500_000;
+        int height = 1_000_000;
 
         Point point = line.getMidPoint();
         double x1 = point.getX();
