@@ -43,33 +43,14 @@ public class Main extends Application {
         borderPane.setBottom(button);
         pane.getChildren().add(button);
 
-//        points.add(new Point(383.0, 859.0));
-//        points.add(new Point(642.0, 386.0));
-//        points.add(new Point(691.0, 237.0));
-//        points.add(new Point(684.0, 313.0));
-//        points.add(new Point(673.0, 456.0));
-//        points.add(new Point(506.0, 632.0));
-//        points.add(new Point(638.0, 324.0));
-//        points.add(new Point(692.0, 270.0));
-
-//        points.add(new Point(711.0, 216.0));
-//        points.add(new Point(714.0, 506.0));
-//        points.add(new Point(720.0, 252.0));
-//        points.add(new Point(725.0, 376.0));
-//        points.add(new Point(733.0, 361.0));
-//        points.add(new Point(759.0, 576.0));
-//        points.add(new Point(778.0, 773.0));
-//        points.add(new Point(822.0, 395.0));
-
-
-//        points.add(new Point(383.0, 859.0));
-//        points.add(new Point(642.0, 386.0));
-//        points.add(new Point(691.0, 237.0));
-//        points.add(new Point(684.0, 313.0));
-//        points.add(new Point(822.0, 395.0));
-//        points.add(new Point(733.0, 361.0));
-//        points.add(new Point(759.0, 576.0));
-//        points.add(new Point(714.0, 506.0));
+        points.add(new Point(383.0, 859.0));
+        points.add(new Point(642.0, 386.0));
+        points.add(new Point(691.0, 237.0));
+        points.add(new Point(684.0, 313.0));
+        points.add(new Point(673.0, 456.0));
+        points.add(new Point(506.0, 632.0));
+        points.add(new Point(638.0, 324.0));
+        points.add(new Point(692.0, 270.0));
 
 
         points.forEach(p -> {
