@@ -588,39 +588,40 @@ public class Main extends Application {
         }
 
         disjunctiveChain.forEach((cell, chain) -> {
-            Edge firstEdge = chain.get(0);
-            Edge firstLeftEdge = cell.getConnectedEdge(firstEdge.getLeftPoint());
-            if (firstLeftEdge != null && Objects.equals(firstEdge.getLeftPoint(), firstLeftEdge.getLeftPoint()) && Objects.equals(firstEdge.getRightPoint(), firstLeftEdge.getRightPoint())) {
+            Edge firstChainEdge = chain.get(0);
+            Edge firstLeftEdge = cell.getConnectedEdge(firstChainEdge.getLeftPoint());
+            if (firstLeftEdge != null && Objects.equals(new Line(firstChainEdge), new Line(firstLeftEdge))) {
                 firstLeftEdge = null;
             }
+            Edge fistRightEdge = cell.getConnectedEdge(firstChainEdge.getRightPoint());
+            if (fistRightEdge != null && Objects.equals(new Line(firstChainEdge), new Line(fistRightEdge))) {
+                fistRightEdge = null;
+            }
 
-            Edge lastEdge = chain.get(chain.size() - 1);
-            Edge lastRightEdge = cell.getConnectedEdge(lastEdge.getRightPoint());
-            if (lastRightEdge != null && Objects.equals(lastEdge.getLeftPoint(), lastRightEdge.getLeftPoint()) && Objects.equals(lastEdge.getRightPoint(), lastRightEdge.getRightPoint())) {
+            Edge lastChainEdge = chain.get(chain.size() - 1);
+            Edge lastRightEdge = cell.getConnectedEdge(lastChainEdge.getRightPoint());
+            if (lastRightEdge != null && Objects.equals(new Line(lastChainEdge), new Line(lastRightEdge))) {
                 lastRightEdge = null;
             }
-
-            if (!firstEdge.isInfiniteLeftEnd() && firstLeftEdge != null) {
-                firstEdge.setPrev(firstLeftEdge);
-                firstLeftEdge.setNext(firstEdge);
+            Edge lastLeftEdge = cell.getConnectedEdge(lastChainEdge.getLeftPoint());
+            if (lastLeftEdge != null && Objects.equals(new Line(lastChainEdge), new Line(lastLeftEdge))) {
+                lastLeftEdge = null;
             }
 
-            for (int i = 0; i < chain.size() - 1; i++) {
-                Edge prevEdge = chain.get(i);
-                Edge nextEdge = chain.get(i + 1);
-                if (nextEdge.getPrev() == null) {
-                    Edge connectedEdge = prevEdge.getNext();
-                    if (connectedEdge != null) {
-                        connectedEdge.setPrev(prevEdge);
-                        connectedEdge.setNext(nextEdge);
-                        nextEdge.setPrev(connectedEdge);
-                    }
-                }
+            if (firstLeftEdge != null) {
+                firstChainEdge.setPrev(firstLeftEdge);
+                firstLeftEdge.setNext(firstChainEdge);
+            } else if (fistRightEdge != null) {
+                firstChainEdge.setNext(fistRightEdge);
+                fistRightEdge.setPrev(firstChainEdge);
             }
 
-            if (!lastEdge.isInfiniteRightEnd() && lastRightEdge != null) {
-                lastEdge.setNext(lastRightEdge);
-                lastRightEdge.setPrev(lastEdge);
+            if (lastRightEdge != null) {
+                lastChainEdge.setNext(lastRightEdge);
+                lastRightEdge.setPrev(lastChainEdge);
+            } else if (lastLeftEdge != null) {
+                lastChainEdge.setPrev(lastLeftEdge);
+                lastLeftEdge.setNext(lastChainEdge);
             }
         });
 
@@ -831,17 +832,17 @@ public class Main extends Application {
             return new Point(a1.getX(), b.getEquationOfLine(a1.getX()));
         } else if (d3 == 0) {
             return new Point(a2.getX(), a.getEquationOfLine(a2.getX()));
-        } else {
-            double k1 = d2 / d1;
-            double k2 = d4 / d3;
-
-            if (d2 * d3 - d4 * d1 == 0) {
-                return null;
-            }
-
-            double x = (a2.getY() - a1.getY() + a1.getX() * k1 - a2.getX() * k2) / (k1 - k2);
-            return new Point(x, a.getEquationOfLine(x));
         }
+
+        double k1 = d2 / d1;
+        double k2 = d4 / d3;
+
+        if (d2 * d3 - d4 * d1 == 0) {
+            return null;
+        }
+
+        double x = (a2.getY() - a1.getY() + a1.getX() * k1 - a2.getX() * k2) / (k1 - k2);
+        return new Point(x, a.getEquationOfLine(x));
     }
 
     public static void main(String[] args) {
