@@ -275,15 +275,6 @@ public class Main extends Application {
         }
 
         while (!Objects.equals(upperCommonSupport, lowerCommonSupport)) {
-
-            if (rightDiagram.size() == 4) {
-                javafx.scene.shape.Line line = new javafx.scene.shape.Line(upperCommonSupport.getLeftPoint().getX(), upperCommonSupport.getLeftPoint().getY(), upperCommonSupport.getRightPoint().getX(), upperCommonSupport.getRightPoint().getY());
-                line.setStroke(Color.RED);
-                line.setStrokeWidth(5);
-                pane.getChildren().add(line);
-            }
-
-
             Point leftPointOfCommonSupport = upperCommonSupport.getLeftPoint();
             Cell leftCell = leftDiagram.get(leftPointOfCommonSupport);
 
