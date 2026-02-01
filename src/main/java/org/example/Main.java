@@ -119,7 +119,6 @@ public class Main extends Application {
         log.info("End drawing");
     }
 
-
     private Set<Point> buildConvexHull(List<Point> points) {
         if (points.size() <= 2) {
             return new HashSet<>(points);
