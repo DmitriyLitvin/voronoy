@@ -43,16 +43,22 @@ public class Main extends Application {
         borderPane.setBottom(button);
         pane.getChildren().add(button);
 
-
-        points.add(new Point(738.0, 223.0));
-        points.add(new Point(732.0, 293.0));
-        points.add(new Point(748.0, 505.0));
-        points.add(new Point(687.0, 327.0));
-        points.add(new Point(450.0, 843.0));
-        points.add(new Point(666.0, 299.0));
-        points.add(new Point(679.0, 375.0));
-        points.add(new Point(673.0, 474.0));
-
+        points.add(new Point(69.0, 530.0));
+        points.add(new Point(149.0, 369.0));
+        points.add(new Point(153.0, 270.0));
+        points.add(new Point(165.0, 347.0));
+        points.add(new Point(180.0, 431.0));
+        points.add(new Point(179.0, 399.0));
+        points.add(new Point(248.0, 653.0));
+        points.add(new Point(227.0, 856.0));
+        points.add(new Point(780.0, 490.0));
+        points.add(new Point(889.0, 235.0));
+        points.add(new Point(898.0, 343.0));
+        points.add(new Point(866.0, 351.0));
+        points.add(new Point(874.0, 377.0));
+        points.add(new Point(843.0, 434.0));
+        points.add(new Point(895.0, 504.0));
+        points.add(new Point(918.0, 784.0));
 
         points.forEach(p -> {
             Circle circle = new Circle(p.getX(), p.getY(), 3, Color.RED);
@@ -283,6 +289,13 @@ public class Main extends Application {
 
             middlePerpendicular = getMiddlePerpendicular(upperCommonSupport);
 
+            if (rightDiagram.size() == 4) {
+                javafx.scene.shape.Line line = new javafx.scene.shape.Line(upperCommonSupport.getLeftPoint().getX(), upperCommonSupport.getLeftPoint().getY(), upperCommonSupport.getRightPoint().getX(), upperCommonSupport.getRightPoint().getY());
+                line.setStroke(Color.RED);
+                line.setStrokeWidth(5);
+                pane.getChildren().add(line);
+            }
+
             boolean isInfiniteLeftEnd = false;
             if (currentChainPoint == null) {
                 isInfiniteLeftEnd = true;
@@ -451,11 +464,9 @@ public class Main extends Application {
                     }
                 }
                 assert leftTwinEdge != null;
-
                 Edge nextLeftEdge = new Edge(currentChainPoint, leftPoint, leftCell);
                 nextLeftEdge.setInfiniteLeftEnd(isInfiniteLeftEnd);
                 nextLeftEdge.setInfiniteRightEnd(false);
-                leftEdge.setPrev(nextLeftEdge);
 
                 List<Edge> leftChain = disjunctiveChain.get(leftCell);
                 if (leftChain == null || leftChain.isEmpty()) {
@@ -603,11 +614,9 @@ public class Main extends Application {
                     }
                 }
                 assert rightTwinEdge != null;
-
                 Edge nextRightEdge = new Edge(currentChainPoint, rightPoint, rightCell);
                 nextRightEdge.setInfiniteLeftEnd(isInfiniteLeftEnd);
                 nextRightEdge.setInfiniteRightEnd(false);
-                rightEdge.setPrev(nextRightEdge);
 
                 List<Edge> rightChain = disjunctiveChain.get(rightCell);
                 if (rightChain == null || rightChain.isEmpty()) {

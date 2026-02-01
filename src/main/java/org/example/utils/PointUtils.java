@@ -1,6 +1,5 @@
 package org.example.utils;
 
-import org.example.entity.Line;
 import org.example.entity.Point;
 
 import static java.lang.Math.sqrt;
