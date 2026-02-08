@@ -98,7 +98,7 @@ public class Main extends Application {
 
     public void drawVoronoyDiagram(List<Point> polygon) {
         log.info("Start drawing ");
-        buildVoronoyDiagram(polygon.stream().sorted(Comparator.comparingDouble(Point::getX)).toList()).values().forEach(voronoyCell -> {
+        buildVoronoyDiagram(polygon.stream().sorted(Comparator.comparingDouble(Point::getX)).toList()).values().stream().filter(a -> a.getCenter().equals(new Point(248.0, 653.0))).forEach(voronoyCell -> {
             Edge edge = voronoyCell.getBoundary();
             Edge nextEdge = voronoyCell.getBoundary();
             do {
@@ -473,7 +473,6 @@ public class Main extends Application {
                     leftEdge.setNext(nextLeftEdge);
                     disjunctiveChain.put(leftCell, nextLeftEdge);
                 }
-                leftCell.setBoundary(nextLeftEdge);
 
                 Edge nextRightEdge = new Edge(leftPoint, currentChainPoint, rightCell);
                 nextRightEdge.setInfiniteLeftEnd(isInfiniteLeftEnd);
@@ -486,7 +485,6 @@ public class Main extends Application {
                     nextRightEdge.setNext(rightChainEdge);
                     rightChainEdge.setPrev(nextRightEdge);
                     disjunctiveChain.put(rightCell, nextRightEdge);
-                    rightCell.setBoundary(nextRightEdge);
                 }
 
                 upperCommonSupport.setLeftPoint(leftTwinEdge.getCell().getCenter());
@@ -621,7 +619,6 @@ public class Main extends Application {
                     rightEdge.setNext(nextRightEdge);
                     disjunctiveChain.put(rightCell, nextRightEdge);
                 }
-                rightCell.setBoundary(nextRightEdge);
 
                 Edge nextLeftEdge = new Edge(rightPoint, currentChainPoint, leftCell);
                 nextLeftEdge.setInfiniteLeftEnd(isInfiniteLeftEnd);
@@ -634,7 +631,6 @@ public class Main extends Application {
                     nextLeftEdge.setNext(leftChainEdge);
                     leftChainEdge.setPrev(nextLeftEdge);
                     disjunctiveChain.put(leftCell, nextLeftEdge);
-                    leftCell.setBoundary(leftChainEdge);
                 }
 
                 upperCommonSupport.setRightPoint(rightTwinEdge.getCell().getCenter());
@@ -663,7 +659,6 @@ public class Main extends Application {
             leftChainEdge.setPrev(leftEdge);
             leftEdge.setNext(leftChainEdge);
             disjunctiveChain.put(leftCell, leftEdge);
-            leftCell.setBoundary(leftEdge);
         }
 
         Edge rightChainEdge = disjunctiveChain.get(rightEdge.getCell());
@@ -673,7 +668,6 @@ public class Main extends Application {
             rightChainEdge.setPrev(rightEdge);
             rightEdge.setNext(rightChainEdge);
             disjunctiveChain.put(rightCell, rightEdge);
-            rightCell.setBoundary(rightEdge);
         }
 
 //        disjunctiveChain.forEach((cell, edge) -> {
