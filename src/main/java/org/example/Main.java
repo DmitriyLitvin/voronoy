@@ -997,8 +997,8 @@ public class Main extends Application {
         return point.getY() < line.getEquationOfLine(point.getX());
     }
 
-    private boolean isOnTheSameSide(Line line, Point a, Point b) {
-        return (isPointLower(line, a) && isPointLower(line, b)) || (isPointUpper(line, a) && isPointUpper(line, b));
+    private boolean isOnTheSameSide(Line line, Point firstPoint, Point secondPoint) {
+        return (isPointLower(line, firstPoint) && isPointLower(line, secondPoint)) || (isPointUpper(line, firstPoint) && isPointUpper(line, secondPoint));
     }
 
     private Point getPointOfIntersection(Line firstLine, Line secondLine) {
