@@ -677,7 +677,7 @@ public class Main extends Application {
         }
 
 //        disjunctiveChain.forEach((cell, edge) -> {
-//            Edge firstChainEdge = getFirstEdge(edge);
+//            Edge firstChainEdge = getStartEdge(edge);
 //            Point firstPoint = isConnected(edge, firstChainEdge);
 //            Edge firstEdge = null;
 //            if (firstPoint != null) {
@@ -725,7 +725,7 @@ public class Main extends Application {
         return diagram;
     }
 
-    public Edge getFirstEdge(Edge edge) {
+    public Edge getStartEdge(Edge edge) {
         Edge currentEdge = edge;
         while (true) {
             Edge prevEdge = currentEdge.deepCopy();
@@ -772,17 +772,20 @@ public class Main extends Application {
         return null;
     }
 
-    private Point getJointPoint(Edge edge, Edge connectedEdge) {
+    private Point getJointPoint(Edge firstEdge, Edge secondEdge) {
+        if (secondEdge == null) {
+            return null;
+        }
         Point jointPoint = null;
-        Point leftPrevPoint = connectedEdge.getLeftPoint();
-        Point rightPrevPoint = connectedEdge.getRightPoint();
-        if (Objects.equals(leftPrevPoint, edge.getLeftPoint()) || Objects.equals(leftPrevPoint, edge.getRightPoint())) {
+        Point leftPrevPoint = secondEdge.getLeftPoint();
+        Point rightPrevPoint = secondEdge.getRightPoint();
+        if (Objects.equals(leftPrevPoint, firstEdge.getLeftPoint()) || Objects.equals(leftPrevPoint, firstEdge.getRightPoint())) {
             jointPoint = leftPrevPoint;
-        } else if (Objects.equals(rightPrevPoint, edge.getLeftPoint()) || Objects.equals(rightPrevPoint, edge.getRightPoint())) {
+        } else if (Objects.equals(rightPrevPoint, firstEdge.getLeftPoint()) || Objects.equals(rightPrevPoint, firstEdge.getRightPoint())) {
             jointPoint = rightPrevPoint;
         }
 
-        if (Objects.equals(jointPoint, edge.getLeftPoint()) || Objects.equals(jointPoint, edge.getRightPoint())) {
+        if (Objects.equals(jointPoint, firstEdge.getLeftPoint()) || Objects.equals(jointPoint, firstEdge.getRightPoint())) {
             return jointPoint;
         }
 
@@ -790,27 +793,50 @@ public class Main extends Application {
     }
 
     private Point isConnected(Edge firstEdge, Edge secondEdge) {
-        Edge prevEdge = firstEdge.getPrev();
-        Edge nextEdge = firstEdge.getNext();
+        Edge startFirstEdge = getStartEdge(firstEdge);
+        Edge lastFirstEdge = getLastEdge(firstEdge);
+        Edge startSecondEdge = getStartEdge(secondEdge);
+        Edge lastdSecondEdge = getLastEdge(secondEdge);
 
-        if (prevEdge == null && nextEdge == null) {
-            Point leftPoint = firstEdge.getLeftPoint();
-            Point rightPoint = firstEdge.getRightPoint();
-            if (Objects.equals(leftPoint, secondEdge.getRightPoint()) || Objects.equals(leftPoint, secondEdge.getLeftPoint())) {
-                return leftPoint;
-            } else if (Objects.equals(rightPoint, secondEdge.getLeftPoint()) || Objects.equals(rightPoint, secondEdge.getRightPoint())) {
-                return rightPoint;
+        Point startFirstPoint;
+        Point lastFirstPoint;
+        Point startSecondPoint;
+        Point lastSecondPoint;
+
+        if (firstEdge.getPrev() == null && firstEdge.getNext() == null) {
+            startFirstPoint = firstEdge.getLeftPoint();
+            lastFirstPoint = firstEdge.getRightPoint();
+        } else {
+            startFirstPoint = getJointPoint(startFirstEdge, startFirstEdge.getNext());
+            if (startFirstPoint == null) {
+                startFirstPoint = getJointPoint(startFirstEdge, startFirstEdge.getPrev());
             }
-        } else if (prevEdge != null && nextEdge == null) {
-            Point jointPoint = getJointPoint(firstEdge, prevEdge);
-            if (jointPoint != null && Objects.equals(jointPoint, secondEdge.getLeftPoint()) || Objects.equals(jointPoint, secondEdge.getRightPoint())) {
-                return jointPoint;
+
+            lastFirstPoint = getJointPoint(lastFirstEdge, lastFirstEdge.getNext());
+            if (lastFirstPoint == null) {
+                lastFirstPoint = getJointPoint(lastFirstEdge, lastFirstEdge.getPrev());
             }
-        } else if (prevEdge == null) {
-            Point jointPoint = getJointPoint(firstEdge, nextEdge);
-            if (jointPoint != null && Objects.equals(jointPoint, secondEdge.getLeftPoint()) || Objects.equals(jointPoint, secondEdge.getRightPoint())) {
-                return jointPoint;
+        }
+
+        if (secondEdge.getPrev() == null && secondEdge.getNext() == null) {
+            startSecondPoint = secondEdge.getLeftPoint();
+            lastSecondPoint = secondEdge.getRightPoint();
+        } else {
+            startSecondPoint = getJointPoint(startSecondEdge, startSecondEdge.getNext());
+            if (startSecondPoint == null) {
+                startSecondPoint = getJointPoint(startSecondEdge, startSecondEdge.getPrev());
             }
+
+            lastSecondPoint = getJointPoint(lastdSecondEdge, lastdSecondEdge.getNext());
+            if (lastSecondPoint == null) {
+                lastSecondPoint = getJointPoint(lastdSecondEdge, lastdSecondEdge.getPrev());
+            }
+        }
+
+        if (Objects.equals(startFirstPoint, startSecondPoint) || (Objects.equals(startFirstPoint, lastSecondPoint))) {
+            return startFirstPoint;
+        } else if (Objects.equals(lastFirstPoint, startSecondPoint) || (Objects.equals(lastFirstPoint, lastSecondPoint))) {
+            return lastFirstPoint;
         }
 
         return null;
@@ -975,34 +1001,34 @@ public class Main extends Application {
         return (isPointLower(line, a) && isPointLower(line, b)) || (isPointUpper(line, a) && isPointUpper(line, b));
     }
 
-    private Point getPointOfIntersection(Line a, Line b) {
-        Point a1 = a.getLeftPoint();
-        Point b1 = a.getRightPoint();
+    private Point getPointOfIntersection(Line firstLine, Line secondLine) {
+        Point firstLineLeftPoint = firstLine.getLeftPoint();
+        Point firstLineRightPoint = firstLine.getRightPoint();
 
-        Point a2 = b.getLeftPoint();
-        Point b2 = b.getRightPoint();
+        Point secondLineLeftPoint = secondLine.getLeftPoint();
+        Point secondLineRightPoint = secondLine.getRightPoint();
 
-        double d1 = b1.getX() - a1.getX();
-        double d2 = b1.getY() - a1.getY();
+        double firstDelta = firstLineRightPoint.getX() - firstLineLeftPoint.getX();
+        double secondDelta = firstLineRightPoint.getY() - firstLineLeftPoint.getY();
 
-        double d3 = b2.getX() - a2.getX();
-        double d4 = b2.getY() - a2.getY();
+        double thirdDelta = secondLineRightPoint.getX() - secondLineLeftPoint.getX();
+        double forthDelta = secondLineRightPoint.getY() - secondLineLeftPoint.getY();
 
-        if (d1 == 0) {
-            return new Point(a1.getX(), b.getEquationOfLine(a1.getX()));
-        } else if (d3 == 0) {
-            return new Point(a2.getX(), a.getEquationOfLine(a2.getX()));
+        if (firstDelta == 0) {
+            return new Point(firstLineLeftPoint.getX(), secondLine.getEquationOfLine(firstLineLeftPoint.getX()));
+        } else if (thirdDelta == 0) {
+            return new Point(secondLineLeftPoint.getX(), firstLine.getEquationOfLine(secondLineLeftPoint.getX()));
         }
 
-        double k1 = d2 / d1;
-        double k2 = d4 / d3;
+        double firstSlope = secondDelta / firstDelta;
+        double secondSlope = forthDelta / thirdDelta;
 
-        if (d2 * d3 - d4 * d1 == 0) {
+        if (secondDelta * thirdDelta - forthDelta * firstDelta == 0) {
             return null;
         }
 
-        double x = (a2.getY() - a1.getY() + a1.getX() * k1 - a2.getX() * k2) / (k1 - k2);
-        return new Point(x, a.getEquationOfLine(x));
+        double x = (secondLineLeftPoint.getY() - firstLineLeftPoint.getY() + firstLineLeftPoint.getX() * firstSlope - secondLineLeftPoint.getX() * secondSlope) / (firstSlope - secondSlope);
+        return new Point(x, firstLine.getEquationOfLine(x));
     }
 
     public static void main(String[] args) {
