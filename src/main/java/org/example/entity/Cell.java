@@ -1,9 +1,11 @@
 package org.example.entity;
 
 import lombok.*;
-import org.example.utils.PointUtils;
+import org.example.utils.VectorUtils;
 
 import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Getter
 @Setter
@@ -39,7 +41,12 @@ public class Cell {
         return currentEdge;
     }
 
+    public Set<Edge> getConnectedEdge(Set<Point> points) {
+        return points.stream().map(this::getConnectedEdge).collect(Collectors.toSet());
+    }
+
+
     private boolean isConnected(Point point, Edge currentEdge) {
-        return PointUtils.getLength(point, currentEdge.getRightPoint()) != 0 && PointUtils.getLength(point, currentEdge.getLeftPoint()) != 0;
+        return VectorUtils.getLength(point, currentEdge.getRightPoint()) != 0 && VectorUtils.getLength(point, currentEdge.getLeftPoint()) != 0;
     }
 }

@@ -1,7 +1,6 @@
 package org.example.entity;
 
 import lombok.*;
-import org.example.utils.DeepCopyHelper;
 
 @Getter
 @Setter
@@ -25,12 +24,6 @@ public class Line {
         this.rightPoint = edge.getRightPoint();
         this.isInfiniteLeftEnd = edge.isInfiniteLeftEnd();
         this.isInfiniteRightEnd = edge.isInfiniteRightEnd();
-    }
-
-    private static DeepCopyHelper<Line> helper = new DeepCopyHelper<>();
-
-    public Line deepCopy() {
-        return helper.copy(this);
     }
 
     public boolean is(Point point, CommonSupportType commonSupportType) {

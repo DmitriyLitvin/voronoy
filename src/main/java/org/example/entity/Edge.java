@@ -6,6 +6,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.example.utils.DeepCopyHelper;
 
+import java.util.Objects;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -35,5 +37,31 @@ public class Edge {
     public Edge(Point leftPoint, Point rightPoint) {
         this.leftPoint = leftPoint;
         this.rightPoint = rightPoint;
+    }
+
+    public Edge getStartEdge() {
+        Edge currentEdge = this;
+        while (true) {
+            Edge prevEdge = currentEdge.deepCopy();
+            currentEdge = currentEdge.getPrev();
+            if (currentEdge == null) {
+                return prevEdge;
+            } else if (Objects.equals(new Line(this), new Line(currentEdge))) {
+                return null;
+            }
+        }
+    }
+
+    public Edge getLastEdge() {
+        Edge currentEdge = this;
+        while (true) {
+            Edge prevEdge = currentEdge.deepCopy();
+            currentEdge = currentEdge.getNext();
+            if (currentEdge == null) {
+                return prevEdge;
+            } else if (Objects.equals(new Line(this), new Line(currentEdge))) {
+                return null;
+            }
+        }
     }
 }
