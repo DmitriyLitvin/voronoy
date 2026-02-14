@@ -1,11 +1,9 @@
 package org.example.utils;
 
-import lombok.extern.slf4j.Slf4j;
 import org.example.entity.Point;
 
 import static java.lang.Math.sqrt;
 
-@Slf4j
 public class VectorUtils {
 
     public static double getLength(Point firstPoint, Point secondPoint) {
