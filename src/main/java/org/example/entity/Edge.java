@@ -40,28 +40,28 @@ public class Edge {
     }
 
     public Edge getStartEdge() {
-        Edge currentEdge = this;
+        Edge boundary = this;
         while (true) {
-            Edge prevEdge = currentEdge.deepCopy();
-            currentEdge = currentEdge.getPrev();
+            Edge currentEdge = boundary.getPrev();
             if (currentEdge == null) {
-                return prevEdge;
+                return boundary;
             } else if (Objects.equals(new Line(this), new Line(currentEdge))) {
                 return null;
             }
+            boundary = currentEdge;
         }
     }
 
     public Edge getLastEdge() {
-        Edge currentEdge = this;
+        Edge boundary = this;
         while (true) {
-            Edge prevEdge = currentEdge.deepCopy();
-            currentEdge = currentEdge.getNext();
+            Edge currentEdge = boundary.getNext();
             if (currentEdge == null) {
-                return prevEdge;
+                return boundary;
             } else if (Objects.equals(new Line(this), new Line(currentEdge))) {
                 return null;
             }
+            boundary = currentEdge;
         }
     }
 }
