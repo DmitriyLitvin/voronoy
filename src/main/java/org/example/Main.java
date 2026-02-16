@@ -44,14 +44,14 @@ public class Main extends Application {
         pane.getChildren().add(button);
 
 
-        points.add(new Point(69.0, 530.0));
-        points.add(new Point(149.0, 369.0));
-        points.add(new Point(153.0, 270.0));
-        points.add(new Point(165.0, 347.0));
-        points.add(new Point(180.0, 431.0));
-        points.add(new Point(179.0, 399.0));
-        points.add(new Point(248.0, 653.0));
-        points.add(new Point(227.0, 856.0));
+//        points.add(new Point(69.0, 530.0));
+//        points.add(new Point(149.0, 369.0));
+//        points.add(new Point(153.0, 270.0));
+//        points.add(new Point(165.0, 347.0));
+//        points.add(new Point(180.0, 431.0));
+//        points.add(new Point(179.0, 399.0));
+//        points.add(new Point(248.0, 653.0));
+//        points.add(new Point(227.0, 856.0));
 
 
         points.add(new Point(780.0, 490.0));
@@ -99,7 +99,7 @@ public class Main extends Application {
 
     public void drawVoronoyDiagram(List<Point> polygon) {
         log.info("Start drawing ");
-        buildVoronoyDiagram(polygon.stream().sorted(Comparator.comparingDouble(Point::getX)).toList()).values().stream().filter(a -> a.getCenter().equals(new Point(780, 490))).forEach(voronoyCell -> {
+        buildVoronoyDiagram(polygon.stream().sorted(Comparator.comparingDouble(Point::getX)).toList()).values().stream().filter(a -> a.getCenter().equals(new Point(895, 504))).forEach(voronoyCell -> {
             Edge edge = voronoyCell.getBoundary();
             Edge nextEdge = voronoyCell.getBoundary();
             do {
@@ -476,13 +476,23 @@ public class Main extends Application {
                     //nextLeftEdge.setNext(leftEdge);
                     disjunctiveChain.put(leftCell, new ArrayList<>(List.of(nextLeftEdge)));
                 } else {
-                    Edge lastEdge = leftChain.get(leftChain.size() - 1);
-                    if (isConnected(lastEdge, nextLeftEdge)) {
-                        nextLeftEdge.setPrev(lastEdge);
-                        lastEdge.setNext(nextLeftEdge);
+                    Edge firstEdge = leftChain.stream().findFirst().get();
+
+                    Edge startEdge = firstEdge.getStartEdge();
+                    if (isConnected(startEdge, nextLeftEdge)) {
+                        nextLeftEdge.setPrev(startEdge);
+                        startEdge.setNext(nextLeftEdge);
                         //nextLeftEdge.setNext(leftEdge);
+                    } else {
+                        Edge lastEdge = firstEdge.getLastEdge();
+                        if (isConnected(lastEdge, nextLeftEdge)) {
+                            nextLeftEdge.setPrev(lastEdge);
+                            lastEdge.setNext(nextLeftEdge);
+                            //nextLeftEdge.setNext(leftEdge);
+                        } else {
+                            log.error("can't be connected");
+                        }
                     }
-                    leftChain.add(nextLeftEdge);
                 }
 
                 Edge nextRightEdge = new Edge(currentChainPoint, leftPoint, rightCell);
@@ -493,12 +503,21 @@ public class Main extends Application {
                 if (rightChain == null || rightChain.isEmpty()) {
                     disjunctiveChain.put(rightCell, new ArrayList<>(List.of(nextRightEdge)));
                 } else {
-                    Edge lastEdge = rightChain.get(rightChain.size() - 1);
-                    if (isConnected(lastEdge, nextRightEdge)) {
-                        nextRightEdge.setPrev(lastEdge);
-                        lastEdge.setNext(nextRightEdge);
+                    Edge firstEdge = rightChain.stream().findFirst().get();
+
+                    Edge startEdge = firstEdge.getStartEdge();
+                    if (isConnected(startEdge, nextRightEdge)) {
+                        nextRightEdge.setPrev(startEdge);
+                        startEdge.setNext(nextRightEdge);
+                    } else {
+                        Edge lastEdge = firstEdge.getLastEdge();
+                        if (isConnected(lastEdge, nextRightEdge)) {
+                            nextRightEdge.setPrev(lastEdge);
+                            lastEdge.setNext(nextRightEdge);
+                        } else {
+                            log.error("can't be connected");
+                        }
                     }
-                    rightChain.add(nextRightEdge);
                 }
 
                 upperCommonSupport.setLeftPoint(leftTwinEdge.getCell().getCenter());
@@ -626,13 +645,22 @@ public class Main extends Application {
                     //nextRightEdge.setNext(rightEdge);
                     disjunctiveChain.put(rightCell, new ArrayList<>(List.of(nextRightEdge)));
                 } else {
-                    Edge lastEdge = rightChain.get(rightChain.size() - 1);
-                    if (isConnected(lastEdge, nextRightEdge)) {
-                        nextRightEdge.setPrev(lastEdge);
+                    Edge firstEdge = rightChain.stream().findFirst().get();
+
+                    Edge startEdge = firstEdge.getStartEdge();
+                    if (isConnected(startEdge, nextRightEdge)) {
+                        nextRightEdge.setPrev(startEdge);
+                        startEdge.setNext(nextRightEdge);
                         //nextRightEdge.setNext(rightEdge);
-                        lastEdge.setNext(nextRightEdge);
+                    } else {
+                        Edge lastEdge = firstEdge.getLastEdge();
+                        if (isConnected(lastEdge, nextRightEdge)) {
+                            nextRightEdge.setPrev(lastEdge);
+                            lastEdge.setNext(nextRightEdge);
+                        } else {
+                            log.error("can't be connected");
+                        }
                     }
-                    rightChain.add(nextRightEdge);
                 }
 
                 Edge nextLeftEdge = new Edge(currentChainPoint, rightPoint, leftCell);
@@ -643,12 +671,21 @@ public class Main extends Application {
                 if (leftChain == null || leftChain.isEmpty()) {
                     disjunctiveChain.put(leftCell, new ArrayList<>(List.of(nextLeftEdge)));
                 } else {
-                    Edge lastEdge = leftChain.get(leftChain.size() - 1);
-                    if (isConnected(lastEdge, nextLeftEdge)) {
-                        nextLeftEdge.setPrev(lastEdge);
-                        lastEdge.setNext(nextLeftEdge);
+                    Edge firstEdge = leftChain.stream().findFirst().get();
+
+                    Edge startEdge = firstEdge.getStartEdge();
+                    if (isConnected(startEdge, nextLeftEdge)) {
+                        nextLeftEdge.setPrev(startEdge);
+                        startEdge.setNext(nextLeftEdge);
+                    } else {
+                        Edge lastEdge = firstEdge.getLastEdge();
+                        if (isConnected(lastEdge, nextLeftEdge)) {
+                            nextLeftEdge.setPrev(lastEdge);
+                            lastEdge.setNext(nextLeftEdge);
+                        } else {
+                            log.error("can't be connected");
+                        }
                     }
-                    leftChain.add(nextLeftEdge);
                 }
 
                 upperCommonSupport.setRightPoint(rightTwinEdge.getCell().getCenter());
@@ -674,19 +711,23 @@ public class Main extends Application {
         if (leftChain == null || leftChain.isEmpty()) {
             disjunctiveChain.put(leftEdge.getCell(), new ArrayList<>(List.of(leftEdge)));
         } else {
-            Edge lastLeftEdge = leftChain.get(leftChain.size() - 1);
-            Edge lastEdge = lastLeftEdge.getStartEdge();
-            if (isConnected(lastEdge, leftEdge)) {
-                lastEdge.setNext(leftEdge);
-                leftEdge.setPrev(lastEdge);
-                leftChain.add(leftEdge);
+            boolean isConnected = false;
+            Edge lastLeftEdge = leftChain.stream().findFirst().get();
+            Edge startEdge = lastLeftEdge.getStartEdge();
+            if (isConnected(startEdge, leftEdge)) {
+                startEdge.setNext(leftEdge);
+                leftEdge.setPrev(startEdge);
+                isConnected = true;
             } else {
-                lastEdge = lastLeftEdge.getLastEdge();
+                Edge lastEdge = lastLeftEdge.getLastEdge();
                 if (isConnected(lastEdge, leftEdge)) {
                     lastEdge.setNext(leftEdge);
                     leftEdge.setPrev(lastEdge);
-                    leftChain.add(leftEdge);
+                    isConnected = true;
                 }
+            }
+            if (!isConnected) {
+                leftChain.add(leftEdge);
             }
         }
 
@@ -694,89 +735,96 @@ public class Main extends Application {
         if (rightChain == null || rightChain.isEmpty()) {
             disjunctiveChain.put(rightEdge.getCell(), new ArrayList<>(List.of(rightEdge)));
         } else {
-            Edge lastRightEdge = rightChain.get(rightChain.size() - 1);
-            Edge lastEdge = lastRightEdge.getStartEdge();
-            if (isConnected(lastEdge, rightEdge)) {
-                lastEdge.setNext(rightEdge);
-                rightEdge.setPrev(lastEdge);
-                rightChain.add(rightEdge);
+            boolean isConnected = false;
+            Edge lastRightEdge = rightChain.stream().findFirst().get();
+            Edge startEdge = lastRightEdge.getStartEdge();
+            if (isConnected(startEdge, rightEdge)) {
+                startEdge.setNext(rightEdge);
+                rightEdge.setPrev(startEdge);
+                isConnected = true;
             } else {
-                lastEdge = lastRightEdge.getLastEdge();
+                Edge lastEdge = lastRightEdge.getLastEdge();
                 if (isConnected(lastEdge, rightEdge)) {
                     lastEdge.setNext(rightEdge);
                     rightEdge.setPrev(lastEdge);
-                    rightChain.add(rightEdge);
+                    isConnected = true;
                 }
+            }
+            if (!isConnected) {
+                rightChain.add(rightEdge);
             }
         }
 
-        disjunctiveChain.forEach((cell, chain) -> {
-            Edge firstChainEdge = chain.get(0);
-            Edge firstLeftEdge = cell.getConnectedEdge(firstChainEdge.getLeftPoint());
-            Edge fistRightEdge = cell.getConnectedEdge(firstChainEdge.getRightPoint());
+        disjunctiveChain.forEach((cell, edges) -> {
+            edges.forEach(edge -> {
 
-            Edge lastChainEdge = chain.get(chain.size() - 1);
-            Edge lastRightEdge = cell.getConnectedEdge(lastChainEdge.getRightPoint());
-            if (lastRightEdge != null && ((firstLeftEdge != null && Objects.equals(new Line(firstLeftEdge), new Line(lastRightEdge))) || (fistRightEdge != null && Objects.equals(new Line(fistRightEdge), new Line(lastRightEdge))))) {
-                lastRightEdge = null;
-            }
+                Edge firstChainEdge = edge.getStartEdge();
+                Edge firstLeftEdge = cell.getConnectedEdge(firstChainEdge.getLeftPoint());
+                Edge fistRightEdge = cell.getConnectedEdge(firstChainEdge.getRightPoint());
 
-            Edge lastLeftEdge = cell.getConnectedEdge(lastChainEdge.getLeftPoint());
-            if (lastLeftEdge != null && ((firstLeftEdge != null && Objects.equals(new Line(firstLeftEdge), new Line(lastLeftEdge))) || (fistRightEdge != null && Objects.equals(new Line(fistRightEdge), new Line(lastLeftEdge))))) {
-                lastLeftEdge = null;
-            }
+                Edge lastChainEdge = edge.getLastEdge();
+                Edge lastRightEdge = cell.getConnectedEdge(lastChainEdge.getRightPoint());
+                if (lastRightEdge != null && ((firstLeftEdge != null && Objects.equals(new Line(firstLeftEdge), new Line(lastRightEdge))) || (fistRightEdge != null && Objects.equals(new Line(fistRightEdge), new Line(lastRightEdge))))) {
+                    lastRightEdge = null;
+                }
 
-            if (firstLeftEdge != null) {
-                if (firstLeftEdge.getNext() == null) {
-                    firstLeftEdge.setNext(firstChainEdge);
-                    if (firstChainEdge.getPrev() == null) {
-                        firstChainEdge.setPrev(firstLeftEdge);
+                Edge lastLeftEdge = cell.getConnectedEdge(lastChainEdge.getLeftPoint());
+                if (lastLeftEdge != null && ((firstLeftEdge != null && Objects.equals(new Line(firstLeftEdge), new Line(lastLeftEdge))) || (fistRightEdge != null && Objects.equals(new Line(fistRightEdge), new Line(lastLeftEdge))))) {
+                    lastLeftEdge = null;
+                }
+
+                if (firstLeftEdge != null) {
+                    if (firstLeftEdge.getNext() == null) {
+                        firstLeftEdge.setNext(firstChainEdge);
+                        if (firstChainEdge.getPrev() == null) {
+                            firstChainEdge.setPrev(firstLeftEdge);
+                        }
+                    } else if (firstLeftEdge.getPrev() == null) {
+                        firstLeftEdge.setPrev(firstChainEdge);
+                        if (firstChainEdge.getNext() == null) {
+                            firstChainEdge.setNext(firstLeftEdge);
+                        }
                     }
-                } else if (firstLeftEdge.getPrev() == null) {
-                    firstLeftEdge.setPrev(firstChainEdge);
-                    if (firstChainEdge.getNext() == null) {
-                        firstChainEdge.setNext(firstLeftEdge);
+                } else if (fistRightEdge != null) {
+                    if (fistRightEdge.getNext() == null) {
+                        fistRightEdge.setNext(firstChainEdge);
+                        if (firstChainEdge.getPrev() == null) {
+                            firstChainEdge.setPrev(fistRightEdge);
+                        }
+                    } else if (fistRightEdge.getPrev() == null) {
+                        fistRightEdge.setPrev(firstChainEdge);
+                        if (firstChainEdge.getNext() == null) {
+                            firstChainEdge.setNext(fistRightEdge);
+                        }
                     }
                 }
-            } else if (fistRightEdge != null) {
-                if (fistRightEdge.getNext() == null) {
-                    fistRightEdge.setNext(firstChainEdge);
-                    if (firstChainEdge.getPrev() == null) {
-                        firstChainEdge.setPrev(fistRightEdge);
-                    }
-                } else if (fistRightEdge.getPrev() == null) {
-                    fistRightEdge.setPrev(firstChainEdge);
-                    if (firstChainEdge.getNext() == null) {
-                        firstChainEdge.setNext(fistRightEdge);
-                    }
-                }
-            }
 
-            if (lastRightEdge != null) {
-                if (lastRightEdge.getPrev() == null) {
-                    lastRightEdge.setPrev(lastChainEdge);
-                    if (lastChainEdge.getNext() == null) {
-                        lastChainEdge.setNext(lastRightEdge);
+                if (lastRightEdge != null) {
+                    if (lastRightEdge.getPrev() == null) {
+                        lastRightEdge.setPrev(lastChainEdge);
+                        if (lastChainEdge.getNext() == null) {
+                            lastChainEdge.setNext(lastRightEdge);
+                        }
+                    } else if (lastRightEdge.getNext() == null) {
+                        lastRightEdge.setNext(lastChainEdge);
+                        if (lastChainEdge.getPrev() == null) {
+                            lastChainEdge.setPrev(lastRightEdge);
+                        }
                     }
-                } else if (lastRightEdge.getNext() == null) {
-                    lastRightEdge.setNext(lastChainEdge);
-                    if (lastChainEdge.getPrev() == null) {
-                        lastChainEdge.setPrev(lastRightEdge);
+                } else if (lastLeftEdge != null) {
+                    if (lastLeftEdge.getPrev() == null) {
+                        lastLeftEdge.setPrev(lastChainEdge);
+                        if (lastChainEdge.getNext() == null) {
+                            lastChainEdge.setNext(lastLeftEdge);
+                        }
+                    } else if (lastLeftEdge.getNext() == null) {
+                        lastLeftEdge.setNext(lastChainEdge);
+                        if (lastChainEdge.getPrev() == null) {
+                            lastChainEdge.setPrev(lastLeftEdge);
+                        }
                     }
                 }
-            } else if (lastLeftEdge != null) {
-                if (lastLeftEdge.getPrev() == null) {
-                    lastLeftEdge.setPrev(lastChainEdge);
-                    if (lastChainEdge.getNext() == null) {
-                        lastChainEdge.setNext(lastLeftEdge);
-                    }
-                } else if (lastLeftEdge.getNext() == null) {
-                    lastLeftEdge.setNext(lastChainEdge);
-                    if (lastChainEdge.getPrev() == null) {
-                        lastChainEdge.setPrev(lastLeftEdge);
-                    }
-                }
-            }
+            });
         });
 
         Map<Point, Cell> diagram = new HashMap<>();
