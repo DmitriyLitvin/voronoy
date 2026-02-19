@@ -44,24 +44,24 @@ public class Main extends Application {
         pane.getChildren().add(button);
 
 
-//        points.add(new Point(69.0, 530.0));
-//        points.add(new Point(149.0, 369.0));
-//        points.add(new Point(153.0, 270.0));
-//        points.add(new Point(165.0, 347.0));
-//        points.add(new Point(180.0, 431.0));
-//        points.add(new Point(179.0, 399.0));
-//        points.add(new Point(248.0, 653.0));
-//        points.add(new Point(227.0, 856.0));
+        points.add(new Point(69.0, 530.0));
+        points.add(new Point(149.0, 369.0));
+        points.add(new Point(153.0, 270.0));
+        points.add(new Point(165.0, 347.0));
+        points.add(new Point(180.0, 431.0));
+        points.add(new Point(179.0, 399.0));
+        points.add(new Point(248.0, 653.0));
+        points.add(new Point(227.0, 856.0));
 
 
-        points.add(new Point(780.0, 490.0));
-        points.add(new Point(866.0, 351.0));
-        points.add(new Point(874.0, 377.0));
-        points.add(new Point(843.0, 434.0));
-        points.add(new Point(895.0, 504.0));
-        points.add(new Point(918.0, 784.0));
-        points.add(new Point(889.0, 235.0));
-        points.add(new Point(898.0, 343.0));
+//        points.add(new Point(780.0, 490.0));
+//        points.add(new Point(866.0, 351.0));
+//        points.add(new Point(874.0, 377.0));
+//        points.add(new Point(843.0, 434.0));
+//        points.add(new Point(895.0, 504.0));
+//        points.add(new Point(918.0, 784.0));
+//        points.add(new Point(889.0, 235.0));
+//        points.add(new Point(898.0, 343.0));
 
         points.forEach(p -> {
             Circle circle = new Circle(p.getX(), p.getY(), 3, Color.RED);
@@ -99,7 +99,7 @@ public class Main extends Application {
 
     public void drawVoronoyDiagram(List<Point> polygon) {
         log.info("Start drawing ");
-        buildVoronoyDiagram(polygon.stream().sorted(Comparator.comparingDouble(Point::getX)).toList()).values().stream().filter(a -> a.getCenter().equals(new Point(895, 504))).forEach(voronoyCell -> {
+        buildVoronoyDiagram(polygon.stream().sorted(Comparator.comparingDouble(Point::getX)).toList()).values().stream().forEach(voronoyCell -> {
             Edge edge = voronoyCell.getBoundary();
             Edge nextEdge = voronoyCell.getBoundary();
             do {
@@ -290,13 +290,6 @@ public class Main extends Application {
             Cell rightCell = rightDiagram.get(rightPointOfCommonSupport);
 
             middlePerpendicular = getMiddlePerpendicular(upperCommonSupport);
-
-            if (rightDiagram.size() == 4) {
-                javafx.scene.shape.Line line = new javafx.scene.shape.Line(upperCommonSupport.getLeftPoint().getX(), upperCommonSupport.getLeftPoint().getY(), upperCommonSupport.getRightPoint().getX(), upperCommonSupport.getRightPoint().getY());
-                line.setStroke(Color.RED);
-                line.setStrokeWidth(5);
-                pane.getChildren().add(line);
-            }
 
             boolean isInfiniteLeftEnd = false;
             if (currentChainPoint == null) {
@@ -711,22 +704,16 @@ public class Main extends Application {
         if (leftChain == null || leftChain.isEmpty()) {
             disjunctiveChain.put(leftEdge.getCell(), new ArrayList<>(List.of(leftEdge)));
         } else {
-            boolean isConnected = false;
             Edge lastLeftEdge = leftChain.stream().findFirst().get();
             Edge startEdge = lastLeftEdge.getStartEdge();
+            Edge lastEdge = lastLeftEdge.getLastEdge();
             if (isConnected(startEdge, leftEdge)) {
                 startEdge.setNext(leftEdge);
                 leftEdge.setPrev(startEdge);
-                isConnected = true;
+            } else if (isConnected(lastEdge, leftEdge)) {
+                lastEdge.setNext(leftEdge);
+                leftEdge.setPrev(lastEdge);
             } else {
-                Edge lastEdge = lastLeftEdge.getLastEdge();
-                if (isConnected(lastEdge, leftEdge)) {
-                    lastEdge.setNext(leftEdge);
-                    leftEdge.setPrev(lastEdge);
-                    isConnected = true;
-                }
-            }
-            if (!isConnected) {
                 leftChain.add(leftEdge);
             }
         }
@@ -735,22 +722,16 @@ public class Main extends Application {
         if (rightChain == null || rightChain.isEmpty()) {
             disjunctiveChain.put(rightEdge.getCell(), new ArrayList<>(List.of(rightEdge)));
         } else {
-            boolean isConnected = false;
             Edge lastRightEdge = rightChain.stream().findFirst().get();
             Edge startEdge = lastRightEdge.getStartEdge();
+            Edge lastEdge = lastRightEdge.getLastEdge();
             if (isConnected(startEdge, rightEdge)) {
                 startEdge.setNext(rightEdge);
                 rightEdge.setPrev(startEdge);
-                isConnected = true;
+            } else if (isConnected(lastEdge, rightEdge)) {
+                lastEdge.setNext(rightEdge);
+                rightEdge.setPrev(lastEdge);
             } else {
-                Edge lastEdge = lastRightEdge.getLastEdge();
-                if (isConnected(lastEdge, rightEdge)) {
-                    lastEdge.setNext(rightEdge);
-                    rightEdge.setPrev(lastEdge);
-                    isConnected = true;
-                }
-            }
-            if (!isConnected) {
                 rightChain.add(rightEdge);
             }
         }
@@ -774,54 +755,38 @@ public class Main extends Application {
                 }
 
                 if (firstLeftEdge != null) {
-                    if (firstLeftEdge.getNext() == null) {
+                    if (firstLeftEdge.getNext() == null && firstChainEdge.getPrev() == null) {
                         firstLeftEdge.setNext(firstChainEdge);
-                        if (firstChainEdge.getPrev() == null) {
-                            firstChainEdge.setPrev(firstLeftEdge);
-                        }
-                    } else if (firstLeftEdge.getPrev() == null) {
+                        firstChainEdge.setPrev(firstLeftEdge);
+                    } else if (firstLeftEdge.getPrev() == null && firstChainEdge.getNext() == null) {
                         firstLeftEdge.setPrev(firstChainEdge);
-                        if (firstChainEdge.getNext() == null) {
-                            firstChainEdge.setNext(firstLeftEdge);
-                        }
+                        firstChainEdge.setNext(firstLeftEdge);
                     }
                 } else if (fistRightEdge != null) {
-                    if (fistRightEdge.getNext() == null) {
+                    if (fistRightEdge.getNext() == null && firstChainEdge.getPrev() == null) {
                         fistRightEdge.setNext(firstChainEdge);
-                        if (firstChainEdge.getPrev() == null) {
-                            firstChainEdge.setPrev(fistRightEdge);
-                        }
-                    } else if (fistRightEdge.getPrev() == null) {
+                        firstChainEdge.setPrev(fistRightEdge);
+                    } else if (fistRightEdge.getPrev() == null && firstChainEdge.getNext() == null) {
                         fistRightEdge.setPrev(firstChainEdge);
-                        if (firstChainEdge.getNext() == null) {
-                            firstChainEdge.setNext(fistRightEdge);
-                        }
+                        firstChainEdge.setNext(fistRightEdge);
                     }
                 }
 
                 if (lastRightEdge != null) {
-                    if (lastRightEdge.getPrev() == null) {
+                    if (lastRightEdge.getPrev() == null && lastChainEdge.getNext() == null) {
                         lastRightEdge.setPrev(lastChainEdge);
-                        if (lastChainEdge.getNext() == null) {
-                            lastChainEdge.setNext(lastRightEdge);
-                        }
-                    } else if (lastRightEdge.getNext() == null) {
+                        lastChainEdge.setNext(lastRightEdge);
+                    } else if (lastRightEdge.getNext() == null && lastChainEdge.getPrev() == null) {
                         lastRightEdge.setNext(lastChainEdge);
-                        if (lastChainEdge.getPrev() == null) {
-                            lastChainEdge.setPrev(lastRightEdge);
-                        }
+                        lastChainEdge.setPrev(lastRightEdge);
                     }
                 } else if (lastLeftEdge != null) {
-                    if (lastLeftEdge.getPrev() == null) {
+                    if (lastLeftEdge.getPrev() == null && lastChainEdge.getNext() == null) {
                         lastLeftEdge.setPrev(lastChainEdge);
-                        if (lastChainEdge.getNext() == null) {
-                            lastChainEdge.setNext(lastLeftEdge);
-                        }
-                    } else if (lastLeftEdge.getNext() == null) {
+                        lastChainEdge.setNext(lastLeftEdge);
+                    } else if (lastLeftEdge.getNext() == null && lastChainEdge.getPrev() == null) {
                         lastLeftEdge.setNext(lastChainEdge);
-                        if (lastChainEdge.getPrev() == null) {
-                            lastChainEdge.setPrev(lastLeftEdge);
-                        }
+                        lastChainEdge.setPrev(lastLeftEdge);
                     }
                 }
             });
