@@ -99,7 +99,7 @@ public class Main extends Application {
 
     public void drawVoronoyDiagram(List<Point> polygon) {
         log.info("Start drawing ");
-        buildVoronoyDiagram(polygon.stream().sorted(Comparator.comparingDouble(Point::getX)).toList()).values().stream().filter(q -> q.getCenter().equals(new Point(895.0, 504.0))).forEach(voronoyCell -> {
+        buildVoronoyDiagram(polygon.stream().sorted(Comparator.comparingDouble(Point::getX)).toList()).values().stream().filter(q -> q.getCenter().equals(new Point(780, 490))).forEach(voronoyCell -> {
             Edge edge = voronoyCell.getBoundary();
             Edge nextEdge = voronoyCell.getBoundary();
             do {
@@ -255,7 +255,7 @@ public class Main extends Application {
         Edge currentEdge = null;
         Line middlePerpendicular;
         Map<Point, List<Edge>> excludedEdges = new HashMap<>();
-        Map<Cell, List<Edge>> disjunctiveChain = new HashMap<>();
+        Map<Cell, Edge> disjunctiveChain = new HashMap<>();
 
         Point directionPoint = null;
         Line lowerPerpendicular = getMiddlePerpendicular(lowerCommonSupport);
@@ -464,20 +464,18 @@ public class Main extends Application {
                 nextLeftEdge.setInfiniteLeftEnd(isInfiniteLeftEnd);
                 nextLeftEdge.setInfiniteRightEnd(false);
 
-                List<Edge> leftChain = disjunctiveChain.get(leftCell);
-                if (leftChain == null || leftChain.isEmpty()) {
+                Edge edge = disjunctiveChain.get(leftCell);
+                if (edge == null) {
                     //nextLeftEdge.setNext(leftEdge);
-                    disjunctiveChain.put(leftCell, new ArrayList<>(List.of(nextLeftEdge)));
+                    disjunctiveChain.put(leftCell, nextLeftEdge);
                 } else {
-                    Edge firstEdge = leftChain.stream().findFirst().get();
-
-                    Edge startEdge = firstEdge.getStartEdge();
+                    Edge startEdge = edge.getStartEdge();
                     if (isConnected(startEdge, nextLeftEdge)) {
                         nextLeftEdge.setPrev(startEdge);
                         startEdge.setNext(nextLeftEdge);
                         //nextLeftEdge.setNext(leftEdge);
                     } else {
-                        Edge lastEdge = firstEdge.getLastEdge();
+                        Edge lastEdge = edge.getLastEdge();
                         if (isConnected(lastEdge, nextLeftEdge)) {
                             nextLeftEdge.setPrev(lastEdge);
                             lastEdge.setNext(nextLeftEdge);
@@ -492,18 +490,16 @@ public class Main extends Application {
                 nextRightEdge.setInfiniteLeftEnd(isInfiniteLeftEnd);
                 nextRightEdge.setInfiniteRightEnd(false);
                 nextRightEdge.setTwin(nextLeftEdge);
-                List<Edge> rightChain = disjunctiveChain.get(rightCell);
-                if (rightChain == null || rightChain.isEmpty()) {
-                    disjunctiveChain.put(rightCell, new ArrayList<>(List.of(nextRightEdge)));
+                edge = disjunctiveChain.get(rightCell);
+                if (edge == null) {
+                    disjunctiveChain.put(rightCell, nextRightEdge);
                 } else {
-                    Edge firstEdge = rightChain.stream().findFirst().get();
-
-                    Edge startEdge = firstEdge.getStartEdge();
+                    Edge startEdge = edge.getStartEdge();
                     if (isConnected(startEdge, nextRightEdge)) {
                         nextRightEdge.setNext(startEdge);
                         startEdge.setPrev(nextRightEdge);
                     } else {
-                        Edge lastEdge = firstEdge.getLastEdge();
+                        Edge lastEdge = edge.getLastEdge();
                         if (isConnected(lastEdge, nextRightEdge)) {
                             nextRightEdge.setNext(lastEdge);
                             lastEdge.setPrev(nextRightEdge);
@@ -633,20 +629,18 @@ public class Main extends Application {
                 nextRightEdge.setInfiniteLeftEnd(isInfiniteLeftEnd);
                 nextRightEdge.setInfiniteRightEnd(false);
 
-                List<Edge> rightChain = disjunctiveChain.get(rightCell);
-                if (rightChain == null || rightChain.isEmpty()) {
+                Edge edge = disjunctiveChain.get(rightCell);
+                if (edge == null) {
                     //nextRightEdge.setNext(rightEdge);
-                    disjunctiveChain.put(rightCell, new ArrayList<>(List.of(nextRightEdge)));
+                    disjunctiveChain.put(rightCell, nextRightEdge);
                 } else {
-                    Edge firstEdge = rightChain.stream().findFirst().get();
-
-                    Edge startEdge = firstEdge.getStartEdge();
+                    Edge startEdge = edge.getStartEdge();
                     if (isConnected(startEdge, nextRightEdge)) {
                         nextRightEdge.setNext(startEdge);
                         startEdge.setPrev(nextRightEdge);
                         //nextRightEdge.setNext(rightEdge);
                     } else {
-                        Edge lastEdge = firstEdge.getLastEdge();
+                        Edge lastEdge = edge.getLastEdge();
                         if (isConnected(lastEdge, nextRightEdge)) {
                             nextRightEdge.setNext(lastEdge);
                             lastEdge.setPrev(nextRightEdge);
@@ -660,18 +654,16 @@ public class Main extends Application {
                 nextLeftEdge.setInfiniteLeftEnd(isInfiniteLeftEnd);
                 nextLeftEdge.setInfiniteRightEnd(false);
                 nextLeftEdge.setTwin(nextRightEdge);
-                List<Edge> leftChain = disjunctiveChain.get(leftCell);
-                if (leftChain == null || leftChain.isEmpty()) {
-                    disjunctiveChain.put(leftCell, new ArrayList<>(List.of(nextLeftEdge)));
+                edge = disjunctiveChain.get(leftCell);
+                if (edge == null) {
+                    disjunctiveChain.put(leftCell, nextLeftEdge);
                 } else {
-                    Edge firstEdge = leftChain.stream().findFirst().get();
-
-                    Edge startEdge = firstEdge.getStartEdge();
+                    Edge startEdge = edge.getStartEdge();
                     if (isConnected(startEdge, nextLeftEdge)) {
                         nextLeftEdge.setPrev(startEdge);
                         startEdge.setNext(nextLeftEdge);
                     } else {
-                        Edge lastEdge = firstEdge.getLastEdge();
+                        Edge lastEdge = edge.getLastEdge();
                         if (isConnected(lastEdge, nextLeftEdge)) {
                             nextLeftEdge.setPrev(lastEdge);
                             lastEdge.setNext(nextLeftEdge);
@@ -700,13 +692,12 @@ public class Main extends Application {
         leftEdge.setTwin(rightEdge);
         rightEdge.setTwin(leftEdge);
 
-        List<Edge> leftChain = disjunctiveChain.get(leftEdge.getCell());
-        if (leftChain == null || leftChain.isEmpty()) {
-            disjunctiveChain.put(leftEdge.getCell(), new ArrayList<>(List.of(leftEdge)));
+        Edge edge = disjunctiveChain.get(leftEdge.getCell());
+        if (edge == null) {
+            disjunctiveChain.put(leftEdge.getCell(), leftEdge);
         } else {
-            Edge lastLeftEdge = leftChain.stream().findFirst().get();
-            Edge startEdge = lastLeftEdge.getStartEdge();
-            Edge lastEdge = lastLeftEdge.getLastEdge();
+            Edge startEdge = edge.getStartEdge();
+            Edge lastEdge = edge.getLastEdge();
             if (isConnected(startEdge, leftEdge)) {
                 startEdge.setNext(leftEdge);
                 leftEdge.setPrev(startEdge);
@@ -714,17 +705,16 @@ public class Main extends Application {
                 lastEdge.setNext(leftEdge);
                 leftEdge.setPrev(lastEdge);
             } else {
-                leftChain.add(leftEdge);
+                addChainEdges(leftCell, leftEdge);
             }
         }
 
-        List<Edge> rightChain = disjunctiveChain.get(rightEdge.getCell());
-        if (rightChain == null || rightChain.isEmpty()) {
-            disjunctiveChain.put(rightEdge.getCell(), new ArrayList<>(List.of(rightEdge)));
+        edge = disjunctiveChain.get(rightEdge.getCell());
+        if (edge == null) {
+            disjunctiveChain.put(rightEdge.getCell(), rightEdge);
         } else {
-            Edge lastRightEdge = rightChain.stream().findFirst().get();
-            Edge startEdge = lastRightEdge.getStartEdge();
-            Edge lastEdge = lastRightEdge.getLastEdge();
+            Edge startEdge = edge.getStartEdge();
+            Edge lastEdge = edge.getLastEdge();
             if (isConnected(startEdge, rightEdge)) {
                 startEdge.setPrev(rightEdge);
                 rightEdge.setNext(startEdge);
@@ -732,64 +722,12 @@ public class Main extends Application {
                 lastEdge.setPrev(rightEdge);
                 rightEdge.setNext(lastEdge);
             } else {
-                rightChain.add(rightEdge);
+                addChainEdges(rightCell, rightEdge);
             }
         }
 
-        disjunctiveChain.forEach((cell, edges) -> {
-            edges.forEach(edge -> {
-
-                Edge firstChainEdge = edge.getStartEdge();
-                Edge firstLeftEdge = cell.getConnectedEdge(firstChainEdge.getLeftPoint());
-                Edge fistRightEdge = cell.getConnectedEdge(firstChainEdge.getRightPoint());
-
-                Edge lastChainEdge = edge.getLastEdge();
-                Edge lastRightEdge = cell.getConnectedEdge(lastChainEdge.getRightPoint());
-                if (lastRightEdge != null && ((firstLeftEdge != null && Objects.equals(new Line(firstLeftEdge), new Line(lastRightEdge))) || (fistRightEdge != null && Objects.equals(new Line(fistRightEdge), new Line(lastRightEdge))))) {
-                    lastRightEdge = null;
-                }
-
-                Edge lastLeftEdge = cell.getConnectedEdge(lastChainEdge.getLeftPoint());
-                if (lastLeftEdge != null && ((firstLeftEdge != null && Objects.equals(new Line(firstLeftEdge), new Line(lastLeftEdge))) || (fistRightEdge != null && Objects.equals(new Line(fistRightEdge), new Line(lastLeftEdge))))) {
-                    lastLeftEdge = null;
-                }
-
-                if (firstLeftEdge != null) {
-                    if (firstLeftEdge.getNext() == null && firstChainEdge.getPrev() == null) {
-                        firstLeftEdge.setNext(firstChainEdge);
-                        firstChainEdge.setPrev(firstLeftEdge);
-                    } else if (firstLeftEdge.getPrev() == null && firstChainEdge.getNext() == null) {
-                        firstLeftEdge.setPrev(firstChainEdge);
-                        firstChainEdge.setNext(firstLeftEdge);
-                    }
-                } else if (fistRightEdge != null) {
-                    if (fistRightEdge.getNext() == null && firstChainEdge.getPrev() == null) {
-                        fistRightEdge.setNext(firstChainEdge);
-                        firstChainEdge.setPrev(fistRightEdge);
-                    } else if (fistRightEdge.getPrev() == null && firstChainEdge.getNext() == null) {
-                        fistRightEdge.setPrev(firstChainEdge);
-                        firstChainEdge.setNext(fistRightEdge);
-                    }
-                }
-
-                if (lastRightEdge != null) {
-                    if (lastRightEdge.getPrev() == null && lastChainEdge.getNext() == null) {
-                        lastRightEdge.setPrev(lastChainEdge);
-                        lastChainEdge.setNext(lastRightEdge);
-                    } else if (lastRightEdge.getNext() == null && lastChainEdge.getPrev() == null) {
-                        lastRightEdge.setNext(lastChainEdge);
-                        lastChainEdge.setPrev(lastRightEdge);
-                    }
-                } else if (lastLeftEdge != null) {
-                    if (lastLeftEdge.getPrev() == null && lastChainEdge.getNext() == null) {
-                        lastLeftEdge.setPrev(lastChainEdge);
-                        lastChainEdge.setNext(lastLeftEdge);
-                    } else if (lastLeftEdge.getNext() == null && lastChainEdge.getPrev() == null) {
-                        lastLeftEdge.setNext(lastChainEdge);
-                        lastChainEdge.setPrev(lastLeftEdge);
-                    }
-                }
-            });
+        disjunctiveChain.forEach((cell, chain) -> {
+            addChainEdges(cell, chain);
         });
 
         Map<Point, Cell> diagram = new HashMap<>();
@@ -797,6 +735,59 @@ public class Main extends Application {
         diagram.putAll(rightDiagram);
 
         return diagram;
+    }
+
+    public void addChainEdges(Cell cell, Edge chain) {
+        Edge firstChainEdge = chain.getStartEdge();
+        Edge firstLeftEdge = cell.getConnectedEdge(firstChainEdge.getLeftPoint());
+        Edge fistRightEdge = cell.getConnectedEdge(firstChainEdge.getRightPoint());
+
+        Edge lastChainEdge = chain.getLastEdge();
+        Edge lastRightEdge = cell.getConnectedEdge(lastChainEdge.getRightPoint());
+        if (lastRightEdge != null && ((firstLeftEdge != null && Objects.equals(new Line(firstLeftEdge), new Line(lastRightEdge))) || (fistRightEdge != null && Objects.equals(new Line(fistRightEdge), new Line(lastRightEdge))))) {
+            lastRightEdge = null;
+        }
+
+        Edge lastLeftEdge = cell.getConnectedEdge(lastChainEdge.getLeftPoint());
+        if (lastLeftEdge != null && ((firstLeftEdge != null && Objects.equals(new Line(firstLeftEdge), new Line(lastLeftEdge))) || (fistRightEdge != null && Objects.equals(new Line(fistRightEdge), new Line(lastLeftEdge))))) {
+            lastLeftEdge = null;
+        }
+
+        if (firstLeftEdge != null) {
+            if (firstLeftEdge.getNext() == null && firstChainEdge.getPrev() == null) {
+                firstLeftEdge.setNext(firstChainEdge);
+                firstChainEdge.setPrev(firstLeftEdge);
+            } else if (firstLeftEdge.getPrev() == null && firstChainEdge.getNext() == null) {
+                firstLeftEdge.setPrev(firstChainEdge);
+                firstChainEdge.setNext(firstLeftEdge);
+            }
+        } else if (fistRightEdge != null) {
+            if (fistRightEdge.getNext() == null && firstChainEdge.getPrev() == null) {
+                fistRightEdge.setNext(firstChainEdge);
+                firstChainEdge.setPrev(fistRightEdge);
+            } else if (fistRightEdge.getPrev() == null && firstChainEdge.getNext() == null) {
+                fistRightEdge.setPrev(firstChainEdge);
+                firstChainEdge.setNext(fistRightEdge);
+            }
+        }
+
+        if (lastRightEdge != null) {
+            if (lastRightEdge.getPrev() == null && lastChainEdge.getNext() == null) {
+                lastRightEdge.setPrev(lastChainEdge);
+                lastChainEdge.setNext(lastRightEdge);
+            } else if (lastRightEdge.getNext() == null && lastChainEdge.getPrev() == null) {
+                lastRightEdge.setNext(lastChainEdge);
+                lastChainEdge.setPrev(lastRightEdge);
+            }
+        } else if (lastLeftEdge != null) {
+            if (lastLeftEdge.getPrev() == null && lastChainEdge.getNext() == null) {
+                lastLeftEdge.setPrev(lastChainEdge);
+                lastChainEdge.setNext(lastLeftEdge);
+            } else if (lastLeftEdge.getNext() == null && lastChainEdge.getPrev() == null) {
+                lastLeftEdge.setNext(lastChainEdge);
+                lastChainEdge.setPrev(lastLeftEdge);
+            }
+        }
     }
 
     private Edge eraseEdges(Edge edge, Point point) {
