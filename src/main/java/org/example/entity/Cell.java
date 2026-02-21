@@ -41,11 +41,6 @@ public class Cell {
         return currentEdge;
     }
 
-    public Set<Edge> getConnectedEdge(Set<Point> points) {
-        return points.stream().map(this::getConnectedEdge).collect(Collectors.toSet());
-    }
-
-
     private boolean isConnected(Point point, Edge currentEdge) {
         return VectorUtils.getLength(point, currentEdge.getRightPoint()) != 0 && VectorUtils.getLength(point, currentEdge.getLeftPoint()) != 0;
     }
