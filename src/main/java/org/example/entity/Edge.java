@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.example.utils.DeepCopyHelper;
+import org.example.utils.VectorUtils;
 
 import java.util.Objects;
 
@@ -22,12 +23,6 @@ public class Edge {
     private boolean isInfiniteLeftEnd = true;
     private boolean isInfiniteRightEnd = true;
 
-    private static DeepCopyHelper<Edge> helper = new DeepCopyHelper<>();
-
-    public Edge deepCopy() {
-        return helper.copy(this);
-    }
-
     public Edge(Point leftPoint, Point rightPoint, Cell cell) {
         this.leftPoint = leftPoint;
         this.rightPoint = rightPoint;
@@ -40,28 +35,56 @@ public class Edge {
     }
 
     public Edge getStartEdge() {
-        Edge boundary = this;
+        Edge prevEdge = this;
         while (true) {
-            Edge currentEdge = boundary.getPrev();
+            Edge currentEdge = prevEdge.getPrev();
             if (currentEdge == null) {
-                return boundary;
+                return prevEdge;
             } else if (Objects.equals(new Line(this), new Line(currentEdge))) {
                 return null;
             }
-            boundary = currentEdge;
+            prevEdge = currentEdge;
         }
     }
 
     public Edge getLastEdge() {
-        Edge boundary = this;
+        Edge nextEdge = this;
         while (true) {
-            Edge currentEdge = boundary.getNext();
+            Edge currentEdge = nextEdge.getNext();
             if (currentEdge == null) {
-                return boundary;
+                return nextEdge;
             } else if (Objects.equals(new Line(this), new Line(currentEdge))) {
                 return null;
             }
-            boundary = currentEdge;
+            nextEdge = currentEdge;
         }
+    }
+
+    public Edge getConnectedEdge(Point point) {
+        Edge currentEdge = this;
+        while (isConnected(point, currentEdge)) {
+            currentEdge = currentEdge.getPrev();
+            if (currentEdge == null || Objects.equals(new Line(this), new Line(currentEdge))) {
+                break;
+            }
+        }
+
+        if (currentEdge != null) {
+            return currentEdge;
+        }
+
+        currentEdge = this;
+        while (isConnected(point, currentEdge)) {
+            currentEdge = currentEdge.getNext();
+            if (currentEdge == null || Objects.equals(new Line(this), new Line(currentEdge))) {
+                break;
+            }
+        }
+
+        return currentEdge;
+    }
+
+    private boolean isConnected(Point point, Edge currentEdge) {
+        return !Objects.equals(point, currentEdge.getRightPoint()) && !Objects.equals(point, currentEdge.getLeftPoint());
     }
 }
