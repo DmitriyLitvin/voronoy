@@ -43,26 +43,6 @@ public class Main extends Application {
         borderPane.setBottom(button);
         pane.getChildren().add(button);
 
-        points.add(new Point(69.0, 530.0));
-        points.add(new Point(149.0, 369.0));
-        points.add(new Point(153.0, 270.0));
-        points.add(new Point(165.0, 347.0));
-        points.add(new Point(180.0, 431.0));
-        points.add(new Point(179.0, 399.0));
-        points.add(new Point(248.0, 653.0));
-        points.add(new Point(227.0, 856.0));
-
-
-        points.add(new Point(780.0, 490.0));
-        points.add(new Point(866.0, 351.0));
-        points.add(new Point(874.0, 377.0));
-        points.add(new Point(843.0, 434.0));
-        points.add(new Point(895.0, 504.0));
-        points.add(new Point(918.0, 784.0));
-        points.add(new Point(889.0, 235.0));
-        points.add(new Point(898.0, 343.0));
-
-
         points.forEach(p -> {
             Circle circle = new Circle(p.getX(), p.getY(), 3, Color.RED);
             Label label = new Label(+circle.getCenterX() + ", " + circle.getCenterY());
