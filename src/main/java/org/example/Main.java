@@ -43,6 +43,26 @@ public class Main extends Application {
         borderPane.setBottom(button);
         pane.getChildren().add(button);
 
+        points.add(new Point(69.0, 530.0));
+        points.add(new Point(149.0, 369.0));
+        points.add(new Point(153.0, 270.0));
+        points.add(new Point(165.0, 347.0));
+        points.add(new Point(180.0, 431.0));
+        points.add(new Point(179.0, 399.0));
+        points.add(new Point(248.0, 653.0));
+        points.add(new Point(227.0, 856.0));
+
+
+        points.add(new Point(780.0, 490.0));
+        points.add(new Point(866.0, 351.0));
+        points.add(new Point(874.0, 377.0));
+        points.add(new Point(843.0, 434.0));
+        points.add(new Point(895.0, 504.0));
+        points.add(new Point(918.0, 784.0));
+        points.add(new Point(889.0, 235.0));
+        points.add(new Point(898.0, 343.0));
+
+
         points.forEach(p -> {
             Circle circle = new Circle(p.getX(), p.getY(), 3, Color.RED);
             Label label = new Label(+circle.getCenterX() + ", " + circle.getCenterY());
@@ -701,64 +721,81 @@ public class Main extends Application {
         return diagram;
     }
 
-    public void addChainEdges(Edge boundary, Edge chain) {
+    private Point getPoint(Edge edge) {
+        if (edge == null) {
+            return null;
+        }
+
+        Edge nextEdge = edge.getNext();
+        if (nextEdge != null && (Objects.equals(nextEdge.getLeftPoint(), edge.getLeftPoint()) || Objects.equals(nextEdge.getRightPoint(), edge.getLeftPoint()))) {
+            return edge.getRightPoint();
+        }
+        if (nextEdge != null && (Objects.equals(nextEdge.getLeftPoint(), edge.getRightPoint()) || Objects.equals(nextEdge.getRightPoint(), edge.getRightPoint()))) {
+            return edge.getLeftPoint();
+        }
+
+        Edge prevEdge = edge.getPrev();
+        if (prevEdge != null && (Objects.equals(prevEdge.getLeftPoint(), edge.getLeftPoint()) || Objects.equals(prevEdge.getRightPoint(), edge.getLeftPoint()))) {
+            return edge.getRightPoint();
+        }
+        if (prevEdge != null && (Objects.equals(prevEdge.getLeftPoint(), edge.getRightPoint()) || Objects.equals(prevEdge.getRightPoint(), edge.getRightPoint()))) {
+            return edge.getLeftPoint();
+        }
+
+        return null;
+    }
+
+    private boolean isOne(Edge edge) {
+        return edge.getPrev() == null && edge.getNext() == null;
+    }
+
+
+    private void addChainEdges(Edge boundary, Edge chain) {
         Edge firstChainEdge = chain.getStartEdge();
-        Edge firstLeftEdge = null;
-        Edge fistRightEdge = null;
-
-        if (firstChainEdge != null) {
-            firstLeftEdge = boundary.getConnectedEdge(firstChainEdge.getLeftPoint());
-            fistRightEdge = boundary.getConnectedEdge(firstChainEdge.getRightPoint());
-        }
-
         Edge lastChainEdge = chain.getLastEdge();
-        Edge lastRightEdge = null;
-        Edge lastLeftEdge = null;
-        if (lastChainEdge != null) {
-            lastRightEdge = boundary.getConnectedEdge(lastChainEdge.getRightPoint());
-            if (lastRightEdge != null && ((firstLeftEdge != null && Objects.equals(new Line(firstLeftEdge), new Line(lastRightEdge))) || (fistRightEdge != null && Objects.equals(new Line(fistRightEdge), new Line(lastRightEdge))))) {
-                lastRightEdge = null;
-            }
 
-            lastLeftEdge = boundary.getConnectedEdge(lastChainEdge.getLeftPoint());
-            if (lastLeftEdge != null && ((firstLeftEdge != null && Objects.equals(new Line(firstLeftEdge), new Line(lastLeftEdge))) || (fistRightEdge != null && Objects.equals(new Line(fistRightEdge), new Line(lastLeftEdge))))) {
-                lastLeftEdge = null;
+        Point firstPoint;
+        Point lastPoint;
+        if (isOne(chain)) {
+            firstPoint = chain.getLeftPoint();
+            lastPoint = chain.getRightPoint();
+        } else {
+            firstPoint = firstChainEdge == null ? null : getPoint(firstChainEdge);
+            lastPoint = lastChainEdge == null ? null : getPoint(lastChainEdge);
+        }
+
+
+        Edge firstEdge = null;
+        if (firstPoint != null) {
+            firstEdge = boundary.getConnectedEdge(firstPoint);
+        }
+
+
+        Edge lastEdge = null;
+        if (lastPoint != null) {
+            lastEdge = boundary.getConnectedEdge(lastPoint);
+        }
+        if (lastEdge != null && (firstEdge != null && Objects.equals(new Line(firstEdge), new Line(lastEdge)))) {
+            lastEdge = null;
+        }
+
+        if (firstEdge != null) {
+            if (firstEdge.getNext() == null && firstChainEdge.getPrev() == null) {
+                firstEdge.setNext(firstChainEdge);
+                firstChainEdge.setPrev(firstEdge);
+            } else if (firstEdge.getPrev() == null && firstChainEdge.getNext() == null) {
+                firstEdge.setPrev(firstChainEdge);
+                firstChainEdge.setNext(firstEdge);
             }
         }
 
-        if (firstLeftEdge != null) {
-            if (firstLeftEdge.getNext() == null && firstChainEdge.getPrev() == null) {
-                firstLeftEdge.setNext(firstChainEdge);
-                firstChainEdge.setPrev(firstLeftEdge);
-            } else if (firstLeftEdge.getPrev() == null && firstChainEdge.getNext() == null) {
-                firstLeftEdge.setPrev(firstChainEdge);
-                firstChainEdge.setNext(firstLeftEdge);
-            }
-        } else if (fistRightEdge != null) {
-            if (fistRightEdge.getNext() == null && firstChainEdge.getPrev() == null) {
-                fistRightEdge.setNext(firstChainEdge);
-                firstChainEdge.setPrev(fistRightEdge);
-            } else if (fistRightEdge.getPrev() == null && firstChainEdge.getNext() == null) {
-                fistRightEdge.setPrev(firstChainEdge);
-                firstChainEdge.setNext(fistRightEdge);
-            }
-        }
-
-        if (lastRightEdge != null) {
-            if (lastRightEdge.getPrev() == null && lastChainEdge.getNext() == null) {
-                lastRightEdge.setPrev(lastChainEdge);
-                lastChainEdge.setNext(lastRightEdge);
-            } else if (lastRightEdge.getNext() == null && lastChainEdge.getPrev() == null) {
-                lastRightEdge.setNext(lastChainEdge);
-                lastChainEdge.setPrev(lastRightEdge);
-            }
-        } else if (lastLeftEdge != null) {
-            if (lastLeftEdge.getPrev() == null && lastChainEdge.getNext() == null) {
-                lastLeftEdge.setPrev(lastChainEdge);
-                lastChainEdge.setNext(lastLeftEdge);
-            } else if (lastLeftEdge.getNext() == null && lastChainEdge.getPrev() == null) {
-                lastLeftEdge.setNext(lastChainEdge);
-                lastChainEdge.setPrev(lastLeftEdge);
+        if (lastEdge != null) {
+            if (lastEdge.getPrev() == null && lastChainEdge.getNext() == null) {
+                lastEdge.setPrev(lastChainEdge);
+                lastChainEdge.setNext(lastEdge);
+            } else if (lastEdge.getNext() == null && lastChainEdge.getPrev() == null) {
+                lastEdge.setNext(lastChainEdge);
+                lastChainEdge.setPrev(lastEdge);
             }
         }
     }
