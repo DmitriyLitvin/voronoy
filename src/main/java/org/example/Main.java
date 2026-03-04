@@ -71,6 +71,7 @@ public class Main extends Application {
             pane.getChildren().addAll(label, circle);
         });
 
+
         Scene scene = new Scene(borderPane, width, height);
         scene.setOnMouseClicked((MouseEvent event) -> {
             double x = event.getX();
@@ -754,14 +755,22 @@ public class Main extends Application {
         Edge firstChainEdge = chain.getStartEdge();
         Edge lastChainEdge = chain.getLastEdge();
 
-        Point firstPoint;
-        Point lastPoint;
-        if (isOne(chain)) {
-            firstPoint = chain.getLeftPoint();
-            lastPoint = chain.getRightPoint();
-        } else {
-            firstPoint = firstChainEdge == null ? null : getPoint(firstChainEdge);
-            lastPoint = lastChainEdge == null ? null : getPoint(lastChainEdge);
+        Point firstPoint = null;
+        Point lastPoint = null;
+        if (firstChainEdge != null) {
+            if (isOne(firstChainEdge)) {
+                firstPoint = firstChainEdge.getLeftPoint();
+            } else {
+                firstPoint = getPoint(firstChainEdge);
+            }
+        }
+        if (lastChainEdge != null) {
+            if (isOne(lastChainEdge)) {
+                lastPoint = lastChainEdge.getRightPoint();
+            } else {
+                lastPoint = getPoint(lastChainEdge);
+
+            }
         }
 
 
