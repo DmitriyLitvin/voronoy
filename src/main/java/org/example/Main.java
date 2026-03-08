@@ -658,7 +658,7 @@ public class Main extends Application {
                 lastEdge.setNext(leftEdge);
                 leftEdge.setPrev(lastEdge);
             } else {
-                addChainEdges(leftCell.getBoundary(), leftEdge);
+                addChainEdges(leftCell, leftEdge);
             }
         }
 
@@ -675,12 +675,12 @@ public class Main extends Application {
                 lastEdge.setPrev(rightEdge);
                 rightEdge.setNext(lastEdge);
             } else {
-                addChainEdges(rightCell.getBoundary(), rightEdge);
+                addChainEdges(rightCell, rightEdge);
             }
         }
 
         disjunctiveChain.forEach((cell, chain) -> {
-            addChainEdges(cell.getBoundary(), chain);
+            addChainEdges(cell, chain);
         });
 
 
@@ -720,7 +720,8 @@ public class Main extends Application {
     }
 
 
-    private void addChainEdges(Edge boundary, Edge chain) {
+    private void addChainEdges(Cell cell, Edge chain) {
+        Edge boundary = cell.getBoundary();
         Edge firstChainEdge = chain.getStartEdge();
         Edge lastChainEdge = chain.getLastEdge();
 
