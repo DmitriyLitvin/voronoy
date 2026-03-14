@@ -41,7 +41,7 @@ public class Main extends Application {
         pane.getChildren().add(button);
 
         points.forEach(p -> {
-            Circle circle = new Circle(p.getX(), p.getY(), 3, Color.RED);
+            Circle circle = new Circle(p.getX(), p.getY(), 2, Color.RED);
             Label label = new Label(+circle.getCenterX() + ", " + circle.getCenterY());
 
             label.relocate(circle.getCenterX() + 1, circle.getCenterY() + 1);
@@ -57,7 +57,7 @@ public class Main extends Application {
             double y = event.getY();
 
             // Додаємо точку на екран
-            Circle circle = new Circle(x, y, 3, Color.RED);
+            Circle circle = new Circle(x, y, 2, Color.RED);
             borderPane.getChildren().add(circle);
 
             // Зберігаємо координати
