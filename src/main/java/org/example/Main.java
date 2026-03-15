@@ -40,6 +40,16 @@ public class Main extends Application {
         borderPane.setBottom(button);
         pane.getChildren().add(button);
 
+//        points.add(new Point(514.0, 488.0));
+//        points.add(new Point(667.0, 210.0));
+//        points.add(new Point(657.0, 329.0));
+//        points.add(new Point(600.0, 412.0));
+//        points.add(new Point(627.0, 450.0));
+//        points.add(new Point(712.0, 730.0));
+//        points.add(new Point(548.0, 842.0));
+//        points.add(new Point(1089.0, 781.0));
+
+
         points.forEach(p -> {
             Circle circle = new Circle(p.getX(), p.getY(), 2, Color.RED);
             Label label = new Label(+circle.getCenterX() + ", " + circle.getCenterY());
@@ -864,7 +874,7 @@ public class Main extends Application {
             Edge nextEdge = edge;
             double distance = 0;
             do {
-                if ((currentEdge == null || currentChainEdge == null) || (!Objects.equals(new Line(currentEdge), new Line(nextEdge)) && !Objects.equals(new Line(currentChainEdge), new Line(nextEdge)))) {
+                if ((currentChainEdge == null || !Objects.equals(new Line(currentChainEdge), new Line(nextEdge))) && (currentEdge == null || !Objects.equals(new Line(currentEdge), new Line(nextEdge)))) {
                     Point intersectPoint = getPointOfIntersection(middlePerpendicular, new Line(nextEdge));
                     if (intersectPoint != null && isIntersected(intersectPoint, new Line(nextEdge)) && isOutsideCell(currentEdge, currentChainPoint, intersectPoint)) {
                         double currentDistance = VectorUtils.getLength(intersectPoint, middlePerpendicular.getRightPoint());
@@ -879,7 +889,7 @@ public class Main extends Application {
 
             Edge prevEdge = edge;
             do {
-                if ((currentEdge == null || currentChainEdge == null) || (!Objects.equals(new Line(currentEdge), new Line(prevEdge)) && !Objects.equals(new Line(currentChainEdge), new Line(prevEdge)))) {
+                if ((currentChainEdge == null || !Objects.equals(new Line(currentChainEdge), new Line(prevEdge))) && (currentEdge == null || !Objects.equals(new Line(currentEdge), new Line(prevEdge)))) {
                     Point intersectPoint = getPointOfIntersection(middlePerpendicular, new Line(prevEdge));
                     if (intersectPoint != null && isIntersected(intersectPoint, new Line(prevEdge)) && isOutsideCell(currentEdge, currentChainPoint, intersectPoint)) {
                         double currentDistance = VectorUtils.getLength(intersectPoint, middlePerpendicular.getRightPoint());
