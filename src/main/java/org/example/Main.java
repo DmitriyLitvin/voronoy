@@ -40,14 +40,23 @@ public class Main extends Application {
         borderPane.setBottom(button);
         pane.getChildren().add(button);
 
-//        points.add(new Point(514.0, 488.0));
-//        points.add(new Point(667.0, 210.0));
-//        points.add(new Point(657.0, 329.0));
-//        points.add(new Point(600.0, 412.0));
-//        points.add(new Point(627.0, 450.0));
-//        points.add(new Point(712.0, 730.0));
-//        points.add(new Point(548.0, 842.0));
-//        points.add(new Point(1089.0, 781.0));
+        points.add(new Point(334.0, 866.0));
+        points.add(new Point(337.0, 688.0));
+        points.add(new Point(380.0, 454.0));
+        points.add(new Point(423.0, 567.0));
+        points.add(new Point(447.0, 441.0));
+        points.add(new Point(451.0, 654.0));
+        points.add(new Point(453.0, 367.0));
+        points.add(new Point(454.0, 700.0));
+
+        points.add(new Point(454.0, 670.0));
+        points.add(new Point(478.0, 233.0));
+        points.add(new Point(478.0, 750.0));
+        points.add(new Point(479.0, 471.0));
+        points.add(new Point(482.0, 374.0));
+        points.add(new Point(482.0, 680.0));
+        points.add(new Point(500.0, 313.0));
+        points.add(new Point(521.0, 614.0));
 
 
         points.forEach(p -> {
@@ -470,7 +479,28 @@ public class Main extends Application {
 
                 edge = disjunctiveChain.get(rightCell);
                 if (edge == null) {
-                    disjunctiveChain.put(rightCell, nextRightEdge);
+                    Edge boundary = rightCell.getBoundary();
+                    Edge startEdge = boundary.getStartEdge();
+                    Edge lastEdge = boundary.getLastEdge();
+                    if (startEdge != null && isConnected(startEdge, nextRightEdge)) {
+                        if (startEdge.getPrev() == null) {
+                            startEdge.setPrev(nextRightEdge);
+                            nextRightEdge.setNext(startEdge);
+                        } else if (startEdge.getNext() == null) {
+                            startEdge.setNext(nextRightEdge);
+                            nextRightEdge.setPrev(startEdge);
+                        }
+                    } else if (lastEdge != null && isConnected(lastEdge, nextRightEdge)) {
+                        if (lastEdge.getPrev() == null) {
+                            lastEdge.setPrev(nextRightEdge);
+                            nextRightEdge.setNext(lastEdge);
+                        } else if (lastEdge.getNext() == null) {
+                            lastEdge.setNext(nextRightEdge);
+                            nextRightEdge.setPrev(lastEdge);
+                        }
+                    } else {
+                        disjunctiveChain.put(rightCell, nextRightEdge);
+                    }
                 } else {
                     Edge startEdge = edge.getStartEdge();
                     if (isConnected(startEdge, nextRightEdge)) {
@@ -620,9 +650,31 @@ public class Main extends Application {
                 nextLeftEdge.setInfiniteLeftEnd(isInfiniteLeftEnd);
                 nextLeftEdge.setInfiniteRightEnd(false);
                 nextLeftEdge.setTwin(nextRightEdge);
+
                 edge = disjunctiveChain.get(leftCell);
                 if (edge == null) {
-                    disjunctiveChain.put(leftCell, nextLeftEdge);
+                    Edge boundary = leftCell.getBoundary();
+                    Edge startEdge = boundary.getStartEdge();
+                    Edge lastEdge = boundary.getLastEdge();
+                    if (startEdge != null && isConnected(startEdge, nextLeftEdge)) {
+                        if (startEdge.getNext() == null) {
+                            startEdge.setNext(nextLeftEdge);
+                            nextLeftEdge.setPrev(startEdge);
+                        } else if (startEdge.getPrev() == null) {
+                            startEdge.setPrev(nextLeftEdge);
+                            nextLeftEdge.setNext(startEdge);
+                        }
+                    } else if (lastEdge != null && isConnected(lastEdge, nextLeftEdge)) {
+                        if (lastEdge.getNext() == null) {
+                            lastEdge.setNext(nextLeftEdge);
+                            nextLeftEdge.setPrev(lastEdge);
+                        } else if (lastEdge.getPrev() == null) {
+                            lastEdge.setPrev(nextLeftEdge);
+                            nextLeftEdge.setNext(lastEdge);
+                        }
+                    } else {
+                        disjunctiveChain.put(leftCell, nextLeftEdge);
+                    }
                 } else {
                     Edge startEdge = edge.getStartEdge();
                     if (isConnected(startEdge, nextLeftEdge)) {
@@ -669,8 +721,6 @@ public class Main extends Application {
             } else if (isConnected(lastEdge, leftEdge)) {
                 lastEdge.setNext(leftEdge);
                 leftEdge.setPrev(lastEdge);
-            } else {
-                addChainEdges(leftCell, leftEdge);
             }
         }
 
@@ -686,13 +736,12 @@ public class Main extends Application {
             } else if (isConnected(lastEdge, rightEdge)) {
                 lastEdge.setPrev(rightEdge);
                 rightEdge.setNext(lastEdge);
-            } else {
-                addChainEdges(rightCell, rightEdge);
             }
         }
 
+        System.out.println("-------------------------------------------------------");
         disjunctiveChain.forEach(this::addChainEdges);
-
+        System.out.println("-------------------------------------------------------");
 
         Map<Point, Cell> diagram = new HashMap<>();
         diagram.putAll(leftDiagram);
@@ -768,9 +817,11 @@ public class Main extends Application {
 
         if (firstEdge != null) {
             if (firstEdge.getNext() == null && firstChainEdge.getPrev() == null) {
+                System.out.println("4");
                 firstEdge.setNext(firstChainEdge);
                 firstChainEdge.setPrev(firstEdge);
             } else if (firstEdge.getPrev() == null && firstChainEdge.getNext() == null) {
+                System.out.println("4");
                 firstEdge.setPrev(firstChainEdge);
                 firstChainEdge.setNext(firstEdge);
             }
@@ -778,9 +829,11 @@ public class Main extends Application {
 
         if (lastEdge != null) {
             if (lastEdge.getPrev() == null && lastChainEdge.getNext() == null) {
+                System.out.println("4");
                 lastEdge.setPrev(lastChainEdge);
                 lastChainEdge.setNext(lastEdge);
             } else if (lastEdge.getNext() == null && lastChainEdge.getPrev() == null) {
+                System.out.println("4");
                 lastEdge.setNext(lastChainEdge);
                 lastChainEdge.setPrev(lastEdge);
             }
