@@ -739,9 +739,7 @@ public class Main extends Application {
             }
         }
 
-        System.out.println("-------------------------------------------------------");
         disjunctiveChain.forEach(this::addChainEdges);
-        System.out.println("-------------------------------------------------------");
 
         Map<Point, Cell> diagram = new HashMap<>();
         diagram.putAll(leftDiagram);
@@ -817,11 +815,9 @@ public class Main extends Application {
 
         if (firstEdge != null) {
             if (firstEdge.getNext() == null && firstChainEdge.getPrev() == null) {
-                System.out.println("4");
                 firstEdge.setNext(firstChainEdge);
                 firstChainEdge.setPrev(firstEdge);
             } else if (firstEdge.getPrev() == null && firstChainEdge.getNext() == null) {
-                System.out.println("4");
                 firstEdge.setPrev(firstChainEdge);
                 firstChainEdge.setNext(firstEdge);
             }
@@ -829,11 +825,9 @@ public class Main extends Application {
 
         if (lastEdge != null) {
             if (lastEdge.getPrev() == null && lastChainEdge.getNext() == null) {
-                System.out.println("4");
                 lastEdge.setPrev(lastChainEdge);
                 lastChainEdge.setNext(lastEdge);
             } else if (lastEdge.getNext() == null && lastChainEdge.getPrev() == null) {
-                System.out.println("4");
                 lastEdge.setNext(lastChainEdge);
                 lastChainEdge.setPrev(lastEdge);
             }
