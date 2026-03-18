@@ -15,6 +15,7 @@ import org.example.entity.*;
 import org.example.entity.Point;
 import org.example.utils.VectorUtils;
 
+import javax.crypto.spec.PSource;
 import java.util.*;
 import java.util.List;;
 
@@ -460,15 +461,13 @@ public class Main extends Application {
                     disjunctiveChain.put(leftCell, nextLeftEdge);
                 } else {
                     Edge startEdge = edge.getStartEdge();
+                    Edge lastEdge = edge.getLastEdge();
                     if (isConnected(startEdge, nextLeftEdge)) {
                         nextLeftEdge.setPrev(startEdge);
                         startEdge.setNext(nextLeftEdge);
-                    } else {
-                        Edge lastEdge = edge.getLastEdge();
-                        if (isConnected(lastEdge, nextLeftEdge)) {
-                            nextLeftEdge.setPrev(lastEdge);
-                            lastEdge.setNext(nextLeftEdge);
-                        }
+                    } else if (isConnected(lastEdge, nextLeftEdge)) {
+                        nextLeftEdge.setPrev(lastEdge);
+                        lastEdge.setNext(nextLeftEdge);
                     }
                 }
 
@@ -503,15 +502,13 @@ public class Main extends Application {
                     }
                 } else {
                     Edge startEdge = edge.getStartEdge();
+                    Edge lastEdge = edge.getLastEdge();
                     if (isConnected(startEdge, nextRightEdge)) {
                         nextRightEdge.setNext(startEdge);
                         startEdge.setPrev(nextRightEdge);
-                    } else {
-                        Edge lastEdge = edge.getLastEdge();
-                        if (isConnected(lastEdge, nextRightEdge)) {
-                            nextRightEdge.setNext(lastEdge);
-                            lastEdge.setPrev(nextRightEdge);
-                        }
+                    } else if (isConnected(lastEdge, nextRightEdge)) {
+                        nextRightEdge.setNext(lastEdge);
+                        lastEdge.setPrev(nextRightEdge);
                     }
                 }
 
@@ -634,15 +631,13 @@ public class Main extends Application {
                     disjunctiveChain.put(rightCell, nextRightEdge);
                 } else {
                     Edge startEdge = edge.getStartEdge();
+                    Edge lastEdge = edge.getLastEdge();
                     if (isConnected(startEdge, nextRightEdge)) {
                         nextRightEdge.setNext(startEdge);
                         startEdge.setPrev(nextRightEdge);
-                    } else {
-                        Edge lastEdge = edge.getLastEdge();
-                        if (isConnected(lastEdge, nextRightEdge)) {
-                            nextRightEdge.setNext(lastEdge);
-                            lastEdge.setPrev(nextRightEdge);
-                        }
+                    } else if (isConnected(lastEdge, nextRightEdge)) {
+                        nextRightEdge.setNext(lastEdge);
+                        lastEdge.setPrev(nextRightEdge);
                     }
                 }
 
@@ -677,15 +672,13 @@ public class Main extends Application {
                     }
                 } else {
                     Edge startEdge = edge.getStartEdge();
+                    Edge lastEdge = edge.getLastEdge();
                     if (isConnected(startEdge, nextLeftEdge)) {
                         nextLeftEdge.setPrev(startEdge);
                         startEdge.setNext(nextLeftEdge);
-                    } else {
-                        Edge lastEdge = edge.getLastEdge();
-                        if (isConnected(lastEdge, nextLeftEdge)) {
-                            nextLeftEdge.setPrev(lastEdge);
-                            lastEdge.setNext(nextLeftEdge);
-                        }
+                    } else if (isConnected(lastEdge, nextLeftEdge)) {
+                        nextLeftEdge.setPrev(lastEdge);
+                        lastEdge.setNext(nextLeftEdge);
                     }
                 }
 
