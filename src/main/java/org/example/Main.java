@@ -257,48 +257,17 @@ public class Main extends Application {
         Map<Cell, List<Edge>> excludedEdges = new HashMap<>();
         Map<Cell, Edge> disjunctiveChain = new HashMap<>();
 
-        Point directionPoint = null;
-        Point midPoint = upperCommonSupport.getMidPoint();
-        Line lowerPerpendicular = getMiddlePerpendicular(lowerCommonSupport);
-        Line upperPerpendicular = getMiddlePerpendicular(upperCommonSupport);
-        Point currentPoint = getPointOfIntersection(upperCommonSupport, lowerCommonSupport);
-        if (currentPoint != null) {
-            Point intersectPoint = getPointOfIntersection(upperPerpendicular, lowerPerpendicular);
-            assert intersectPoint != null;
-            if (isPointInsideAngle(upperCommonSupport.getLeftPoint(), currentPoint, lowerCommonSupport.getLeftPoint(), intersectPoint) || isPointInsideAngle(upperCommonSupport.getRightPoint(), currentPoint, lowerCommonSupport.getRightPoint(), intersectPoint)) {
-                directionPoint = VectorUtils.getDirectionPoint(midPoint, intersectPoint);
-            } else {
-                Point lowerPoint = getPointOfIntersection(upperPerpendicular, lowerCommonSupport);
-                if (lowerPoint != null && isIntersected(lowerPoint, new Line(midPoint, intersectPoint))) {
-                    directionPoint = VectorUtils.getDirectionPoint(midPoint, intersectPoint);
-                } else {
-                    directionPoint = VectorUtils.getDirectionPoint(intersectPoint, midPoint);
-                }
-            }
-        } else {
-            Point lowerPoint = getPointOfIntersection(upperPerpendicular, lowerCommonSupport);
-            if (lowerPoint != null) {
-                directionPoint = VectorUtils.getDirectionPoint(midPoint, lowerPoint);
-            }
-        }
-
         while (!Objects.equals(upperCommonSupport, lowerCommonSupport)) {
             Cell leftCell = leftDiagram.get(upperCommonSupport.getLeftPoint());
             Cell rightCell = rightDiagram.get(upperCommonSupport.getRightPoint());
 
             middlePerpendicular = getMiddlePerpendicular(upperCommonSupport);
-            midPoint = upperCommonSupport.getMidPoint();
+            Point midPoint = upperCommonSupport.getMidPoint();
 
             boolean isInfiniteLeftEnd = false;
             if (currentChainPoint == null) {
                 isInfiniteLeftEnd = true;
-                Point leftUpperPoint = middlePerpendicular.getLeftPoint();
-                assert directionPoint != null;
-                if (VectorUtils.dotProduct(VectorUtils.getDirectionPoint(leftUpperPoint, midPoint), directionPoint) > 0) {
-                    currentChainPoint = leftUpperPoint;
-                } else {
-                    currentChainPoint = middlePerpendicular.getRightPoint();
-                }
+                currentChainPoint = middlePerpendicular.getRightPoint();
             }
 
             boolean isLeftExcludedEdge = false;
