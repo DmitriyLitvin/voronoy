@@ -40,23 +40,35 @@ public class Main extends Application {
         borderPane.setBottom(button);
         pane.getChildren().add(button);
 
-        points.add(new Point(334.0, 866.0));
-        points.add(new Point(337.0, 688.0));
-        points.add(new Point(380.0, 454.0));
-        points.add(new Point(423.0, 567.0));
-        points.add(new Point(447.0, 441.0));
-        points.add(new Point(451.0, 654.0));
-        points.add(new Point(453.0, 367.0));
-        points.add(new Point(454.0, 700.0));
 
-        points.add(new Point(454.0, 670.0));
-        points.add(new Point(478.0, 233.0));
-        points.add(new Point(478.0, 750.0));
-        points.add(new Point(479.0, 471.0));
-        points.add(new Point(482.0, 374.0));
-        points.add(new Point(482.0, 680.0));
-        points.add(new Point(500.0, 313.0));
-        points.add(new Point(521.0, 614.0));
+//        points.add(new Point(264.0, 613.0));
+//        points.add(new Point(428.0, 861.0));
+//        points.add(new Point(498.0, 629.0));
+//        points.add(new Point(454.0, 292.0));
+
+        points.add(new Point(697.0, 269.0));
+        points.add(new Point(526.0, 479.0));
+        points.add(new Point(567.0, 504.0));
+        points.add(new Point(600.0, 746.0));
+
+
+//        points.add(new Point(334.0, 866.0));
+//        points.add(new Point(337.0, 688.0));
+//        points.add(new Point(380.0, 454.0));
+//        points.add(new Point(423.0, 567.0));
+//        points.add(new Point(447.0, 441.0));
+//        points.add(new Point(451.0, 654.0));
+//        points.add(new Point(453.0, 367.0));
+//        points.add(new Point(454.0, 700.0));
+//
+//        points.add(new Point(454.0, 670.0));
+//        points.add(new Point(478.0, 233.0));
+//        points.add(new Point(478.0, 750.0));
+//        points.add(new Point(479.0, 471.0));
+//        points.add(new Point(482.0, 374.0));
+//        points.add(new Point(482.0, 680.0));
+//        points.add(new Point(500.0, 313.0));
+//        points.add(new Point(521.0, 614.0));
 
 
         points.forEach(p -> {
@@ -98,7 +110,7 @@ public class Main extends Application {
 
     public void drawVoronoyDiagram(List<Point> polygon) {
         log.info("Start drawing ");
-        buildVoronoyDiagram(polygon.stream().sorted(Comparator.comparingDouble(Point::getX)).toList()).values().stream().forEach(voronoyCell -> {
+        buildVoronoyDiagram(polygon.stream().sorted(Comparator.comparingDouble(Point::getX)).toList()).values().stream().filter(a -> a.getCenter().equals(new Point(526.0, 479.0))).forEach(voronoyCell -> {
             Edge edge = voronoyCell.getBoundary();
             Edge nextEdge = voronoyCell.getBoundary();
             do {
@@ -444,6 +456,8 @@ public class Main extends Application {
                     if (lastEdge != null && isConnected(lastEdge, nextLeftEdge)) {
                         nextLeftEdge.setPrev(lastEdge);
                         lastEdge.setNext(nextLeftEdge);
+
+                        disjunctiveChain.remove(leftCell);
                     }
                 }
 
@@ -466,6 +480,8 @@ public class Main extends Application {
                     if (startEdge != null && isConnected(startEdge, nextRightEdge)) {
                         nextRightEdge.setNext(startEdge);
                         startEdge.setPrev(nextRightEdge);
+
+                        disjunctiveChain.remove(rightCell);
                     }
                 }
 
@@ -599,6 +615,8 @@ public class Main extends Application {
                     if (startEdge != null && isConnected(startEdge, nextRightEdge)) {
                         nextRightEdge.setNext(startEdge);
                         startEdge.setPrev(nextRightEdge);
+
+                        disjunctiveChain.remove(rightCell);
                     }
                 }
 
@@ -621,6 +639,8 @@ public class Main extends Application {
                     if (lastEdge != null && isConnected(lastEdge, nextLeftEdge)) {
                         nextLeftEdge.setPrev(lastEdge);
                         lastEdge.setNext(nextLeftEdge);
+
+                        disjunctiveChain.remove(leftCell);
                     }
                 }
 
@@ -856,6 +876,7 @@ public class Main extends Application {
 
     private Line getMiddlePerpendicular(Line line) {
         int height = 1_000_000;
+        int width = 1_000_000;
 
         Point point = line.getMidPoint();
         double x = point.getX();
@@ -863,9 +884,9 @@ public class Main extends Application {
 
         Point directionPoint = VectorUtils.getDirectionPoint(line.getLeftPoint(), line.getRightPoint());
         if (VectorUtils.dotProduct(directionPoint, new Point(1, 0)) == 0) {
-            return new Line(new Point(x, y), new Point(0, y));
+            return new Line(new Point(-width, y), new Point(width, y));
         } else if (VectorUtils.dotProduct(directionPoint, new Point(0, 1)) == 0) {
-            return new Line(new Point(x, y), new Point(x, 0));
+            return new Line(new Point(x, -height), new Point(x, height));
         } else {
             if (directionPoint.getX() == 0) {
                 return new Line(new Point(x, -height), new Point(x, height));
@@ -873,6 +894,7 @@ public class Main extends Application {
             return new Line(new Point((y * directionPoint.getY()) / directionPoint.getX() + x, 0), new Point((-(height - y) * directionPoint.getY()) / directionPoint.getX() + x, height));
         }
     }
+
 
     private boolean isOnTheSameSide(Point firstPoint, Point secondPoint, Point midPoint) {
         return VectorUtils.dotProduct(VectorUtils.getDirectionPoint(midPoint, firstPoint), VectorUtils.getDirectionPoint(midPoint, secondPoint)) >= 0;
