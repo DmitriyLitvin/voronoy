@@ -41,35 +41,23 @@ public class Main extends Application {
         pane.getChildren().add(button);
 
 
-//        points.add(new Point(264.0, 613.0));
-//        points.add(new Point(428.0, 861.0));
-//        points.add(new Point(498.0, 629.0));
-//        points.add(new Point(454.0, 292.0));
+        points.add(new Point(389.0, 429.0));
+        points.add(new Point(460.0, 486.0));
+        points.add(new Point(462.0, 395.0));
+        points.add(new Point(477.0, 577.0));
+        points.add(new Point(480.0, 348.0));
+        points.add(new Point(499.0, 724.0));
+        points.add(new Point(500.0, 350.0));
+        points.add(new Point(505.0, 468.0));
 
-        points.add(new Point(697.0, 269.0));
-        points.add(new Point(526.0, 479.0));
-        points.add(new Point(567.0, 504.0));
-        points.add(new Point(600.0, 746.0));
-
-
-//        points.add(new Point(334.0, 866.0));
-//        points.add(new Point(337.0, 688.0));
-//        points.add(new Point(380.0, 454.0));
-//        points.add(new Point(423.0, 567.0));
-//        points.add(new Point(447.0, 441.0));
-//        points.add(new Point(451.0, 654.0));
-//        points.add(new Point(453.0, 367.0));
-//        points.add(new Point(454.0, 700.0));
-//
-//        points.add(new Point(454.0, 670.0));
-//        points.add(new Point(478.0, 233.0));
-//        points.add(new Point(478.0, 750.0));
-//        points.add(new Point(479.0, 471.0));
-//        points.add(new Point(482.0, 374.0));
-//        points.add(new Point(482.0, 680.0));
-//        points.add(new Point(500.0, 313.0));
-//        points.add(new Point(521.0, 614.0));
-
+        points.add(new Point(511.0, 322.0));
+        points.add(new Point(519.0, 218.0));
+        points.add(new Point(528.0, 639.0));
+        points.add(new Point(531.0, 444.0));
+        points.add(new Point(571.0, 503.0));
+        points.add(new Point(585.0, 688.0));
+        points.add(new Point(592.0, 615.0));
+        points.add(new Point(627.0, 785.0));
 
         points.forEach(p -> {
             Circle circle = new Circle(p.getX(), p.getY(), 2, Color.RED);
@@ -110,7 +98,7 @@ public class Main extends Application {
 
     public void drawVoronoyDiagram(List<Point> polygon) {
         log.info("Start drawing ");
-        buildVoronoyDiagram(polygon.stream().sorted(Comparator.comparingDouble(Point::getX)).toList()).values().stream().filter(a -> a.getCenter().equals(new Point(526.0, 479.0))).forEach(voronoyCell -> {
+        buildVoronoyDiagram(polygon.stream().sorted(Comparator.comparingDouble(Point::getX)).toList()).values().stream().filter(a -> a.getCenter().equals(new Point(571, 503))).forEach(voronoyCell -> {
             Edge edge = voronoyCell.getBoundary();
             Edge nextEdge = voronoyCell.getBoundary();
             do {
@@ -442,22 +430,16 @@ public class Main extends Application {
 
                 Edge edge = disjunctiveChain.get(leftCell);
                 if (edge == null) {
-                    if (isLeftExcludedEdge) {
-                        Edge lastEdge = leftCell.getBoundary().getLastEdge();
-                        if (lastEdge != null && isConnected(lastEdge, nextLeftEdge)) {
-                            nextLeftEdge.setPrev(lastEdge);
-                            lastEdge.setNext(nextLeftEdge);
-                        }
-                    } else {
-                        disjunctiveChain.put(leftCell, nextLeftEdge);
+                    Edge lastEdge = leftCell.getBoundary().getLastEdge();
+                    if (isLeftExcludedEdge && lastEdge != null && isConnected(lastEdge, nextLeftEdge)) {
+                        nextLeftEdge.setPrev(lastEdge);
+                        lastEdge.setNext(nextLeftEdge);
                     }
                 } else {
                     Edge lastEdge = edge.getLastEdge();
                     if (lastEdge != null && isConnected(lastEdge, nextLeftEdge)) {
                         nextLeftEdge.setPrev(lastEdge);
                         lastEdge.setNext(nextLeftEdge);
-
-                        disjunctiveChain.remove(leftCell);
                     }
                 }
 
@@ -480,8 +462,6 @@ public class Main extends Application {
                     if (startEdge != null && isConnected(startEdge, nextRightEdge)) {
                         nextRightEdge.setNext(startEdge);
                         startEdge.setPrev(nextRightEdge);
-
-                        disjunctiveChain.remove(rightCell);
                     }
                 }
 
@@ -601,22 +581,16 @@ public class Main extends Application {
 
                 Edge edge = disjunctiveChain.get(rightCell);
                 if (edge == null) {
-                    if (isRightExcludedEdge) {
-                        Edge startEdge = rightCell.getBoundary().getStartEdge();
-                        if (startEdge != null && isConnected(startEdge, nextRightEdge)) {
-                            nextRightEdge.setNext(startEdge);
-                            startEdge.setPrev(nextRightEdge);
-                        }
-                    } else {
-                        disjunctiveChain.put(rightCell, nextRightEdge);
+                    Edge startEdge = rightCell.getBoundary().getStartEdge();
+                    if (isRightExcludedEdge && startEdge != null && isConnected(startEdge, nextRightEdge)) {
+                        nextRightEdge.setNext(startEdge);
+                        startEdge.setPrev(nextRightEdge);
                     }
                 } else {
                     Edge startEdge = edge.getStartEdge();
                     if (startEdge != null && isConnected(startEdge, nextRightEdge)) {
                         nextRightEdge.setNext(startEdge);
                         startEdge.setPrev(nextRightEdge);
-
-                        disjunctiveChain.remove(rightCell);
                     }
                 }
 
@@ -639,8 +613,6 @@ public class Main extends Application {
                     if (lastEdge != null && isConnected(lastEdge, nextLeftEdge)) {
                         nextLeftEdge.setPrev(lastEdge);
                         lastEdge.setNext(nextLeftEdge);
-
-                        disjunctiveChain.remove(leftCell);
                     }
                 }
 
