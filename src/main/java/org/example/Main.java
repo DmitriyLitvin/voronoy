@@ -40,7 +40,6 @@ public class Main extends Application {
         borderPane.setBottom(button);
         pane.getChildren().add(button);
 
-
         points.add(new Point(389.0, 429.0));
         points.add(new Point(460.0, 486.0));
         points.add(new Point(462.0, 395.0));
@@ -66,7 +65,6 @@ public class Main extends Application {
             label.relocate(circle.getCenterX() + 1, circle.getCenterY() + 1);
             pane.getChildren().addAll(label, circle);
         });
-
 
         int width = 1500;
         int height = 1000;
@@ -637,21 +635,8 @@ public class Main extends Application {
         leftEdge.setTwin(rightEdge);
         rightEdge.setTwin(leftEdge);
 
-        Edge edge = disjunctiveChain.get(leftCell);
-        if (edge == null) {
-            addLeftEdge(leftCell, leftEdge);
-        } else {
-            addLeftEdge(leftCell, edge);
-            addLeftEdge(leftCell, leftEdge);
-        }
-
-        edge = disjunctiveChain.get(rightCell);
-        if (edge == null) {
-            addRightEdge(rightCell, rightEdge);
-        } else {
-            addRightEdge(rightCell, edge);
-            addRightEdge(rightCell, rightEdge);
-        }
+        addLeftEdge(leftCell, leftEdge);
+        addRightEdge(rightCell, rightEdge);
 
         Map<Point, Cell> diagram = new HashMap<>();
         diagram.putAll(leftDiagram);

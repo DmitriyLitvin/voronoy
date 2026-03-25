@@ -59,32 +59,4 @@ public class Edge {
             nextEdge = currentEdge;
         }
     }
-
-    public Edge getConnectedEdge(Point point) {
-        Edge currentEdge = this;
-        while (isConnected(point, currentEdge)) {
-            currentEdge = currentEdge.getPrev();
-            if (currentEdge == null || Objects.equals(new Line(this), new Line(currentEdge))) {
-                break;
-            }
-        }
-
-        if (currentEdge != null) {
-            return currentEdge;
-        }
-
-        currentEdge = this;
-        while (isConnected(point, currentEdge)) {
-            currentEdge = currentEdge.getNext();
-            if (currentEdge == null || Objects.equals(new Line(this), new Line(currentEdge))) {
-                break;
-            }
-        }
-
-        return currentEdge;
-    }
-
-    private boolean isConnected(Point point, Edge currentEdge) {
-        return !Objects.equals(point, currentEdge.getRightPoint()) && !Objects.equals(point, currentEdge.getLeftPoint());
-    }
 }
