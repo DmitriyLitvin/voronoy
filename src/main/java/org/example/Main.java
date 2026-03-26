@@ -40,24 +40,6 @@ public class Main extends Application {
         borderPane.setBottom(button);
         pane.getChildren().add(button);
 
-        points.add(new Point(389.0, 429.0));
-        points.add(new Point(460.0, 486.0));
-        points.add(new Point(462.0, 395.0));
-        points.add(new Point(477.0, 577.0));
-        points.add(new Point(480.0, 348.0));
-        points.add(new Point(499.0, 724.0));
-        points.add(new Point(500.0, 350.0));
-        points.add(new Point(505.0, 468.0));
-
-        points.add(new Point(511.0, 322.0));
-        points.add(new Point(519.0, 218.0));
-        points.add(new Point(528.0, 639.0));
-        points.add(new Point(531.0, 444.0));
-        points.add(new Point(571.0, 503.0));
-        points.add(new Point(585.0, 688.0));
-        points.add(new Point(592.0, 615.0));
-        points.add(new Point(627.0, 785.0));
-
         points.forEach(p -> {
             Circle circle = new Circle(p.getX(), p.getY(), 2, Color.RED);
             Label label = new Label(+circle.getCenterX() + ", " + circle.getCenterY());
@@ -96,7 +78,7 @@ public class Main extends Application {
 
     public void drawVoronoyDiagram(List<Point> polygon) {
         log.info("Start drawing ");
-        buildVoronoyDiagram(polygon.stream().sorted(Comparator.comparingDouble(Point::getX)).toList()).values().stream().filter(a -> a.getCenter().equals(new Point(571, 503))).forEach(voronoyCell -> {
+        buildVoronoyDiagram(polygon.stream().sorted(Comparator.comparingDouble(Point::getX)).toList()).values().forEach(voronoyCell -> {
             Edge edge = voronoyCell.getBoundary();
             Edge nextEdge = voronoyCell.getBoundary();
             do {
@@ -638,6 +620,7 @@ public class Main extends Application {
         addLeftEdge(leftCell, leftEdge);
         addRightEdge(rightCell, rightEdge);
 
+
         Map<Point, Cell> diagram = new HashMap<>();
         diagram.putAll(leftDiagram);
         diagram.putAll(rightDiagram);
@@ -848,7 +831,7 @@ public class Main extends Application {
             if (directionPoint.getX() == 0) {
                 return new Line(new Point(x, -height), new Point(x, height));
             }
-            return new Line(new Point((y * directionPoint.getY()) / directionPoint.getX() + x, 0), new Point((-(height - y) * directionPoint.getY()) / directionPoint.getX() + x, height));
+            return new Line(new Point(((y + height) * directionPoint.getY()) / directionPoint.getX() + x, -height), new Point((-(height - y) * directionPoint.getY()) / directionPoint.getX() + x, height));
         }
     }
 
