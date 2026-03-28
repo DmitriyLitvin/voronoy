@@ -253,8 +253,8 @@ public class Main extends Application {
             boolean isLeftExcludedEdge = false;
             double leftDistance = 0;
             Point leftPoint = null;
-            Edge leftExcludedEdge = getClosestEdge(excludedEdges.get(leftCell), middlePerpendicular, currentEdge, currentChainEdge, currentChainPoint);
-            Edge leftEdge = getClosestEdge(new ArrayList<>(List.of(leftCell.getBoundary())), middlePerpendicular, currentEdge, currentChainEdge, currentChainPoint);
+            Edge leftExcludedEdge = getClosestEdge(leftCell == null ? null : excludedEdges.get(leftCell), middlePerpendicular, currentEdge, currentChainEdge, currentChainPoint);
+            Edge leftEdge = getClosestEdge((leftCell == null || leftCell.getBoundary() == null) ? null : List.of(leftCell.getBoundary()), middlePerpendicular, currentEdge, currentChainEdge, currentChainPoint);
             if (leftEdge != null) {
                 leftPoint = getPointOfIntersection(middlePerpendicular, new Line(leftEdge));
                 assert leftPoint != null;
@@ -276,8 +276,8 @@ public class Main extends Application {
             boolean isRightExcludedEdge = false;
             double rightDistance = 0;
             Point rightPoint = null;
-            Edge rightExcludedEdge = getClosestEdge(excludedEdges.get(rightCell), middlePerpendicular, currentEdge, currentChainEdge, currentChainPoint);
-            Edge rightEdge = getClosestEdge(new ArrayList<>(List.of(rightCell.getBoundary())), middlePerpendicular, currentEdge, currentChainEdge, currentChainPoint);
+            Edge rightExcludedEdge = getClosestEdge(rightCell == null ? null : excludedEdges.get(rightCell), middlePerpendicular, currentEdge, currentChainEdge, currentChainPoint);
+            Edge rightEdge = getClosestEdge((rightCell == null || rightCell.getBoundary() == null) ? null : List.of(rightCell.getBoundary()), middlePerpendicular, currentEdge, currentChainEdge, currentChainPoint);
             if (rightEdge != null) {
                 rightPoint = getPointOfIntersection(middlePerpendicular, new Line(rightEdge));
                 assert rightPoint != null;
@@ -428,14 +428,19 @@ public class Main extends Application {
                 nextRightEdge.setInfiniteRightEnd(false);
                 nextRightEdge.setTwin(nextLeftEdge);
 
-                edge = disjunctiveChain.get(rightCell);
+                edge =  disjunctiveChain.get(rightCell);
                 if (edge == null) {
-                    Edge startEdge = rightCell.getBoundary().getStartEdge();
-                    if (startEdge != null && isConnected(startEdge, nextRightEdge)) {
-                        nextRightEdge.setNext(startEdge);
-                        startEdge.setPrev(nextRightEdge);
+                    Edge boundary =  rightCell.getBoundary();
+                    if (boundary == null) {
+                        rightCell.setBoundary(nextRightEdge);
                     } else {
-                        disjunctiveChain.put(rightCell, nextRightEdge);
+                        Edge startEdge = boundary.getStartEdge();
+                        if (startEdge != null && isConnected(startEdge, nextRightEdge)) {
+                            nextRightEdge.setNext(startEdge);
+                            startEdge.setPrev(nextRightEdge);
+                        } else {
+                            disjunctiveChain.put(rightCell, nextRightEdge);
+                        }
                     }
                 } else {
                     Edge startEdge = edge.getStartEdge();
@@ -581,12 +586,17 @@ public class Main extends Application {
 
                 edge = disjunctiveChain.get(leftCell);
                 if (edge == null) {
-                    Edge lastEdge = leftCell.getBoundary().getLastEdge();
-                    if (lastEdge != null && isConnected(lastEdge, nextLeftEdge)) {
-                        nextLeftEdge.setPrev(lastEdge);
-                        lastEdge.setNext(nextLeftEdge);
+                    Edge boundary = leftCell.getBoundary();
+                    if (boundary == null) {
+                        leftCell.setBoundary(nextLeftEdge);
                     } else {
-                        disjunctiveChain.put(leftCell, nextLeftEdge);
+                        Edge lastEdge = boundary.getLastEdge();
+                        if (lastEdge != null && isConnected(lastEdge, nextLeftEdge)) {
+                            nextLeftEdge.setPrev(lastEdge);
+                            lastEdge.setNext(nextLeftEdge);
+                        } else {
+                            disjunctiveChain.put(leftCell, nextLeftEdge);
+                        }
                     }
                 } else {
                     Edge lastEdge = edge.getLastEdge();
