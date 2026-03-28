@@ -632,7 +632,7 @@ public class Main extends Application {
         Edge boundary = leftCell.getBoundary();
         Edge startEdge = boundary.getStartEdge();
         Edge lastEdge = boundary.getLastEdge();
-        if (startEdge != null && isConnected(startEdge, leftEdge) && !Objects.equals(new Line(startEdge), new Line(leftEdge))) {
+        if (startEdge != null && isConnected(startEdge, leftEdge)) {
             if (startEdge.getNext() == null) {
                 startEdge.setNext(leftEdge);
                 leftEdge.setPrev(startEdge);
@@ -640,7 +640,7 @@ public class Main extends Application {
                 startEdge.setPrev(leftEdge);
                 leftEdge.setNext(startEdge);
             }
-        } else if (lastEdge != null && isConnected(lastEdge, leftEdge) && !Objects.equals(new Line(lastEdge), new Line(leftEdge))) {
+        } else if (lastEdge != null && isConnected(lastEdge, leftEdge)) {
             if (lastEdge.getNext() == null) {
                 lastEdge.setNext(leftEdge);
                 leftEdge.setPrev(lastEdge);
@@ -655,7 +655,7 @@ public class Main extends Application {
         Edge boundary = rightCell.getBoundary();
         Edge startEdge = boundary.getStartEdge();
         Edge lastEdge = boundary.getLastEdge();
-        if (startEdge != null && isConnected(startEdge, rightEdge) && !Objects.equals(new Line(startEdge), new Line(rightEdge))) {
+        if (startEdge != null && isConnected(startEdge, rightEdge)) {
             if (startEdge.getPrev() == null) {
                 startEdge.setPrev(rightEdge);
                 rightEdge.setNext(startEdge);
@@ -663,7 +663,7 @@ public class Main extends Application {
                 startEdge.setNext(rightEdge);
                 rightEdge.setPrev(startEdge);
             }
-        } else if (lastEdge != null && isConnected(lastEdge, rightEdge) && !Objects.equals(new Line(lastEdge), new Line(rightEdge))) {
+        } else if (lastEdge != null && isConnected(lastEdge, rightEdge)) {
             if (lastEdge.getPrev() == null) {
                 lastEdge.setPrev(rightEdge);
                 rightEdge.setNext(lastEdge);
