@@ -428,25 +428,27 @@ public class Main extends Application {
                 nextRightEdge.setInfiniteRightEnd(false);
                 nextRightEdge.setTwin(nextLeftEdge);
 
-                edge =  disjunctiveChain.get(rightCell);
-                if (edge == null) {
-                    Edge boundary =  rightCell.getBoundary();
-                    if (boundary == null) {
-                        rightCell.setBoundary(nextRightEdge);
+                if (rightCell != null) {
+                    edge = disjunctiveChain.get(rightCell);
+                    if (edge == null) {
+                        Edge boundary = rightCell.getBoundary();
+                        if (boundary == null) {
+                            rightCell.setBoundary(nextRightEdge);
+                        } else {
+                            Edge startEdge = boundary.getStartEdge();
+                            if (startEdge != null && isConnected(startEdge, nextRightEdge)) {
+                                nextRightEdge.setNext(startEdge);
+                                startEdge.setPrev(nextRightEdge);
+                            } else {
+                                disjunctiveChain.put(rightCell, nextRightEdge);
+                            }
+                        }
                     } else {
-                        Edge startEdge = boundary.getStartEdge();
+                        Edge startEdge = edge.getStartEdge();
                         if (startEdge != null && isConnected(startEdge, nextRightEdge)) {
                             nextRightEdge.setNext(startEdge);
                             startEdge.setPrev(nextRightEdge);
-                        } else {
-                            disjunctiveChain.put(rightCell, nextRightEdge);
                         }
-                    }
-                } else {
-                    Edge startEdge = edge.getStartEdge();
-                    if (startEdge != null && isConnected(startEdge, nextRightEdge)) {
-                        nextRightEdge.setNext(startEdge);
-                        startEdge.setPrev(nextRightEdge);
                     }
                 }
 
@@ -584,25 +586,27 @@ public class Main extends Application {
                 nextLeftEdge.setInfiniteRightEnd(false);
                 nextLeftEdge.setTwin(nextRightEdge);
 
-                edge = disjunctiveChain.get(leftCell);
-                if (edge == null) {
-                    Edge boundary = leftCell.getBoundary();
-                    if (boundary == null) {
-                        leftCell.setBoundary(nextLeftEdge);
+                if (leftCell != null) {
+                    edge = disjunctiveChain.get(leftCell);
+                    if (edge == null) {
+                        Edge boundary = leftCell.getBoundary();
+                        if (boundary == null) {
+                            leftCell.setBoundary(nextLeftEdge);
+                        } else {
+                            Edge lastEdge = boundary.getLastEdge();
+                            if (lastEdge != null && isConnected(lastEdge, nextLeftEdge)) {
+                                nextLeftEdge.setPrev(lastEdge);
+                                lastEdge.setNext(nextLeftEdge);
+                            } else {
+                                disjunctiveChain.put(leftCell, nextLeftEdge);
+                            }
+                        }
                     } else {
-                        Edge lastEdge = boundary.getLastEdge();
+                        Edge lastEdge = edge.getLastEdge();
                         if (lastEdge != null && isConnected(lastEdge, nextLeftEdge)) {
                             nextLeftEdge.setPrev(lastEdge);
                             lastEdge.setNext(nextLeftEdge);
-                        } else {
-                            disjunctiveChain.put(leftCell, nextLeftEdge);
                         }
-                    }
-                } else {
-                    Edge lastEdge = edge.getLastEdge();
-                    if (lastEdge != null && isConnected(lastEdge, nextLeftEdge)) {
-                        nextLeftEdge.setPrev(lastEdge);
-                        lastEdge.setNext(nextLeftEdge);
                     }
                 }
 
