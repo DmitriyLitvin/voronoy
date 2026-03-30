@@ -631,18 +631,6 @@ public class Main extends Application {
         leftEdge.setTwin(rightEdge);
         rightEdge.setTwin(leftEdge);
 
-        addLeftEdge(leftCell, leftEdge);
-        addRightEdge(rightCell, rightEdge);
-
-
-        Map<Point, Cell> diagram = new HashMap<>();
-        diagram.putAll(leftDiagram);
-        diagram.putAll(rightDiagram);
-
-        return diagram;
-    }
-
-    private void addLeftEdge(Cell leftCell, Edge leftEdge) {
         Edge boundary = leftCell.getBoundary();
         Edge startEdge = boundary.getStartEdge();
         Edge lastEdge = boundary.getLastEdge();
@@ -663,12 +651,10 @@ public class Main extends Application {
                 leftEdge.setNext(lastEdge);
             }
         }
-    }
 
-    private void addRightEdge(Cell rightCell, Edge rightEdge) {
-        Edge boundary = rightCell.getBoundary();
-        Edge startEdge = boundary.getStartEdge();
-        Edge lastEdge = boundary.getLastEdge();
+        boundary = rightCell.getBoundary();
+        startEdge = boundary.getStartEdge();
+        lastEdge = boundary.getLastEdge();
         if (startEdge != null && isConnected(startEdge, rightEdge)) {
             if (startEdge.getPrev() == null) {
                 startEdge.setPrev(rightEdge);
@@ -686,8 +672,14 @@ public class Main extends Application {
                 rightEdge.setPrev(lastEdge);
             }
         }
-    }
 
+
+        Map<Point, Cell> diagram = new HashMap<>();
+        diagram.putAll(leftDiagram);
+        diagram.putAll(rightDiagram);
+
+        return diagram;
+    }
 
     private Edge eraseEdges(Edge edge, Point point) {
         Edge nextEdge = edge.getNext();
