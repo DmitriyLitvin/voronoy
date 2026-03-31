@@ -42,10 +42,10 @@ public class Main extends Application {
 
         points.forEach(p -> {
             Circle circle = new Circle(p.getX(), p.getY(), 2, Color.RED);
-            Label label = new Label(+circle.getCenterX() + ", " + circle.getCenterY());
-
-            label.relocate(circle.getCenterX() + 1, circle.getCenterY() + 1);
-            pane.getChildren().addAll(label, circle);
+//            Label label = new Label(+circle.getCenterX() + ", " + circle.getCenterY());
+//
+//            label.relocate(circle.getCenterX() + 1, circle.getCenterY() + 1);
+            pane.getChildren().addAll(circle);
         });
 
         int width = 1500;
@@ -78,7 +78,7 @@ public class Main extends Application {
 
     public void drawVoronoyDiagram(List<Point> polygon) {
         log.info("Start drawing ");
-        buildVoronoyDiagram(polygon.stream().sorted(Comparator.comparingDouble(Point::getX)).toList()).values().forEach(voronoyCell -> {
+        buildVoronoyDiagram(polygon.stream().sorted(Comparator.comparingDouble(Point::getX)).toList()).values().stream().forEach(voronoyCell -> {
             Edge edge = voronoyCell.getBoundary();
             Edge nextEdge = voronoyCell.getBoundary();
             do {
@@ -223,6 +223,38 @@ public class Main extends Application {
         return joinDiagrams(buildVoronoyDiagram(polygon.subList(0, polygon.size() / 2)), buildVoronoyDiagram(polygon.subList(polygon.size() / 2, polygon.size())));
     }
 
+    private Point getDirectionPoint(Line upperCommonSupport, Line lowerCommonSupport) {
+        Point directionPoint = null;
+        Point midPoint = upperCommonSupport.getMidPoint();
+        Line lowerPerpendicular = getMiddlePerpendicular(lowerCommonSupport);
+        Line upperPerpendicular = getMiddlePerpendicular(upperCommonSupport);
+        Point currentPoint = getPointOfIntersection(upperCommonSupport, lowerCommonSupport);
+        if (currentPoint != null) {
+            Point intersectPoint = getPointOfIntersection(upperPerpendicular, lowerPerpendicular);
+            if (intersectPoint != null) {
+                if (isPointInsideAngle(upperCommonSupport.getLeftPoint(), currentPoint, lowerCommonSupport.getLeftPoint(), intersectPoint) || isPointInsideAngle(upperCommonSupport.getRightPoint(), currentPoint, lowerCommonSupport.getRightPoint(), intersectPoint)) {
+                    directionPoint = VectorUtils.getDirectionPoint(midPoint, intersectPoint);
+                } else {
+                    Point lowerPoint = getPointOfIntersection(upperPerpendicular, lowerCommonSupport);
+                    if (lowerPoint != null && isIntersected(lowerPoint, new Line(midPoint, intersectPoint))) {
+                        directionPoint = VectorUtils.getDirectionPoint(midPoint, intersectPoint);
+                    } else {
+                        directionPoint = VectorUtils.getDirectionPoint(intersectPoint, midPoint);
+                    }
+                }
+            } else {
+
+            }
+        } else {
+            Point lowerPoint = getPointOfIntersection(upperPerpendicular, lowerCommonSupport);
+            if (lowerPoint != null) {
+                directionPoint = VectorUtils.getDirectionPoint(midPoint, lowerPoint);
+            }
+        }
+
+        return directionPoint;
+    }
+
     private Map<Point, Cell> joinDiagrams(Map<Point, Cell> leftDiagram, Map<Point, Cell> rightDiagram) {
         Set<Point> leftPolygon = buildConvexHull(new ArrayList<>(leftDiagram.keySet()));
         Set<Point> rightPolygon = buildConvexHull(new ArrayList<>(rightDiagram.keySet()));
@@ -237,17 +269,24 @@ public class Main extends Application {
         Map<Cell, List<Edge>> excludedEdges = new HashMap<>();
         Map<Cell, Edge> disjunctiveChain = new HashMap<>();
 
-        while (!Objects.equals(upperCommonSupport, lowerCommonSupport)) {
-            Cell leftCell = leftDiagram.get(upperCommonSupport.getLeftPoint());
-            Cell rightCell = rightDiagram.get(upperCommonSupport.getRightPoint());
+        Line commonSupport = upperCommonSupport.deepCopy();
+        while (!Objects.equals(commonSupport, lowerCommonSupport)) {
+            Cell leftCell = leftDiagram.get(commonSupport.getLeftPoint());
+            Cell rightCell = rightDiagram.get(commonSupport.getRightPoint());
 
-            middlePerpendicular = getMiddlePerpendicular(upperCommonSupport);
-            Point midPoint = upperCommonSupport.getMidPoint();
+            middlePerpendicular = getMiddlePerpendicular(commonSupport);
+            Point midPoint = commonSupport.getMidPoint();
 
             boolean isInfiniteLeftEnd = false;
             if (currentChainPoint == null) {
                 isInfiniteLeftEnd = true;
-                currentChainPoint = middlePerpendicular.getRightPoint();
+                Point leftUpperPoint = middlePerpendicular.getLeftPoint();
+                Point directionPoint = getDirectionPoint(commonSupport, lowerCommonSupport);
+                if (VectorUtils.dotProduct(VectorUtils.getDirectionPoint(leftUpperPoint, midPoint), directionPoint) > 0) {
+                    currentChainPoint = leftUpperPoint;
+                } else {
+                    currentChainPoint = middlePerpendicular.getRightPoint();
+                }
             }
 
             boolean isLeftExcludedEdge = false;
@@ -452,7 +491,7 @@ public class Main extends Application {
                     }
                 }
 
-                upperCommonSupport.setLeftPoint(leftTwinEdge.getCell().getCenter());
+                commonSupport.setLeftPoint(leftTwinEdge.getCell().getCenter());
                 nextLeftEdge.setTwin(nextRightEdge);
                 currentChainPoint = leftPoint;
                 currentEdge = leftEdge;
@@ -610,7 +649,7 @@ public class Main extends Application {
                     }
                 }
 
-                upperCommonSupport.setRightPoint(rightTwinEdge.getCell().getCenter());
+                commonSupport.setRightPoint(rightTwinEdge.getCell().getCenter());
                 nextRightEdge.setTwin(nextLeftEdge);
                 currentChainPoint = rightPoint;
                 currentEdge = rightEdge;
@@ -620,59 +659,71 @@ public class Main extends Application {
 
         middlePerpendicular = getMiddlePerpendicular(lowerCommonSupport);
 
+        Edge leftEdge;
+        Edge rightEdge;
         Cell leftCell = leftDiagram.get(lowerCommonSupport.getLeftPoint());
         Cell rightCell = rightDiagram.get(lowerCommonSupport.getRightPoint());
+        Point directionPoint = getDirectionPoint(lowerCommonSupport, upperCommonSupport);
+        Point leftPoint = middlePerpendicular.getLeftPoint();
+        if (VectorUtils.dotProduct(VectorUtils.getDirectionPoint(leftPoint, lowerCommonSupport.getMidPoint()), directionPoint) > 0) {
+            leftEdge = new Edge(currentChainPoint, leftPoint, leftCell);
+            rightEdge = new Edge(currentChainPoint, leftPoint, rightCell);
+        } else {
+            Point rightPoint = middlePerpendicular.getRightPoint();
+            leftEdge = new Edge(currentChainPoint, rightPoint, leftCell);
+            rightEdge = new Edge(currentChainPoint, rightPoint, rightCell);
+        }
 
-        Edge leftEdge = new Edge(currentChainPoint, middlePerpendicular.getLeftPoint(), leftCell);
-        leftEdge.setInfiniteLeftEnd(false);
-        Edge rightEdge = new Edge(currentChainPoint, middlePerpendicular.getLeftPoint(), rightCell);
         rightEdge.setInfiniteLeftEnd(false);
-
+        leftEdge.setInfiniteLeftEnd(false);
         leftEdge.setTwin(rightEdge);
         rightEdge.setTwin(leftEdge);
 
         Edge boundary = leftCell.getBoundary();
-        Edge startEdge = boundary.getStartEdge();
-        Edge lastEdge = boundary.getLastEdge();
-        if (startEdge != null && isConnected(startEdge, leftEdge)) {
-            if (startEdge.getNext() == null) {
-                startEdge.setNext(leftEdge);
-                leftEdge.setPrev(startEdge);
-            } else if (startEdge.getPrev() == null) {
-                startEdge.setPrev(leftEdge);
-                leftEdge.setNext(startEdge);
-            }
-        } else if (lastEdge != null && isConnected(lastEdge, leftEdge)) {
-            if (lastEdge.getNext() == null) {
-                lastEdge.setNext(leftEdge);
-                leftEdge.setPrev(lastEdge);
-            } else if (lastEdge.getPrev() == null) {
-                lastEdge.setPrev(leftEdge);
-                leftEdge.setNext(lastEdge);
+        if (boundary != null) {
+            Edge startEdge = boundary.getStartEdge();
+            Edge lastEdge = boundary.getLastEdge();
+            if (startEdge != null && isConnected(startEdge, leftEdge)) {
+                if (startEdge.getNext() == null) {
+                    startEdge.setNext(leftEdge);
+                    leftEdge.setPrev(startEdge);
+                } else if (startEdge.getPrev() == null) {
+                    startEdge.setPrev(leftEdge);
+                    leftEdge.setNext(startEdge);
+                }
+            } else if (lastEdge != null && isConnected(lastEdge, leftEdge)) {
+                if (lastEdge.getNext() == null) {
+                    lastEdge.setNext(leftEdge);
+                    leftEdge.setPrev(lastEdge);
+                } else if (lastEdge.getPrev() == null) {
+                    lastEdge.setPrev(leftEdge);
+                    leftEdge.setNext(lastEdge);
+                }
             }
         }
 
         boundary = rightCell.getBoundary();
-        startEdge = boundary.getStartEdge();
-        lastEdge = boundary.getLastEdge();
-        if (startEdge != null && isConnected(startEdge, rightEdge)) {
-            if (startEdge.getPrev() == null) {
-                startEdge.setPrev(rightEdge);
-                rightEdge.setNext(startEdge);
-            } else if (startEdge.getNext() == null) {
-                startEdge.setNext(rightEdge);
-                rightEdge.setPrev(startEdge);
-            }
-        } else if (lastEdge != null && isConnected(lastEdge, rightEdge)) {
-            if (lastEdge.getPrev() == null) {
-                lastEdge.setPrev(rightEdge);
-                rightEdge.setNext(lastEdge);
-            } else if (lastEdge.getNext() == null) {
-                lastEdge.setNext(rightEdge);
-                rightEdge.setPrev(lastEdge);
+        if (boundary != null) {
+            Edge startEdge = boundary.getStartEdge();
+            Edge lastEdge = boundary.getLastEdge();
+            if (startEdge != null && isConnected(startEdge, rightEdge)) {
+                if (startEdge.getPrev() == null) {
+                    startEdge.setPrev(rightEdge);
+                    rightEdge.setNext(startEdge);
+                } else if (startEdge.getNext() == null) {
+                    startEdge.setNext(rightEdge);
+                    rightEdge.setPrev(startEdge);
+                }
+            } else if (lastEdge != null && isConnected(lastEdge, rightEdge)) {
+                if (lastEdge.getPrev() == null) {
+                    lastEdge.setPrev(rightEdge);
+                    rightEdge.setNext(lastEdge);
+                } else if (lastEdge.getNext() == null) {
+                    lastEdge.setNext(rightEdge);
+                    rightEdge.setPrev(lastEdge);
+                }
             }
         }
-
 
         Map<Point, Cell> diagram = new HashMap<>();
         diagram.putAll(leftDiagram);
@@ -840,7 +891,6 @@ public class Main extends Application {
             return new Line(new Point(((y + height) * directionPoint.getY()) / directionPoint.getX() + x, -height), new Point((-(height - y) * directionPoint.getY()) / directionPoint.getX() + x, height));
         }
     }
-
 
     private boolean isOnTheSameSide(Point firstPoint, Point secondPoint, Point midPoint) {
         return VectorUtils.dotProduct(VectorUtils.getDirectionPoint(midPoint, firstPoint), VectorUtils.getDirectionPoint(midPoint, secondPoint)) >= 0;

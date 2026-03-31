@@ -1,6 +1,7 @@
 package org.example.entity;
 
 import lombok.*;
+import org.example.utils.DeepCopyHelper;
 
 @Getter
 @Setter
@@ -14,10 +15,15 @@ public class Line {
     private boolean isInfiniteLeftEnd = false;
     private boolean isInfiniteRightEnd = false;
 
+    private static final DeepCopyHelper<Line> helper = new DeepCopyHelper<>();
+
+
     public Line(Point leftPoint, Point rightPoint) {
         this.leftPoint = leftPoint;
         this.rightPoint = rightPoint;
     }
+
+
 
     public Line(Edge edge) {
         this.leftPoint = edge.getLeftPoint();
@@ -46,5 +52,9 @@ public class Line {
 
     public Point getMidPoint() {
         return new Point((leftPoint.getX() + rightPoint.getX()) / 2, (leftPoint.getY() + rightPoint.getY()) / 2);
+    }
+
+    public Line deepCopy() {
+        return helper.copy(this);
     }
 }
