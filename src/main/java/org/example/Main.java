@@ -42,9 +42,8 @@ public class Main extends Application {
 
         points.forEach(p -> {
             Circle circle = new Circle(p.getX(), p.getY(), 2, Color.RED);
-//            Label label = new Label(+circle.getCenterX() + ", " + circle.getCenterY());
-//
-//            label.relocate(circle.getCenterX() + 1, circle.getCenterY() + 1);
+          //  Label label = new Label(+circle.getCenterX() + ", " + circle.getCenterY());
+           // label.relocate(circle.getCenterX() + 1, circle.getCenterY() + 1);
             pane.getChildren().addAll(circle);
         });
 
@@ -78,7 +77,7 @@ public class Main extends Application {
 
     public void drawVoronoyDiagram(List<Point> polygon) {
         log.info("Start drawing ");
-        buildVoronoyDiagram(polygon.stream().sorted(Comparator.comparingDouble(Point::getX)).toList()).values().stream().forEach(voronoyCell -> {
+        buildVoronoyDiagram(polygon.stream().sorted(Comparator.comparingDouble(Point::getX).thenComparingDouble(Point::getY)).toList()).values().stream().forEach(voronoyCell -> {
             Edge edge = voronoyCell.getBoundary();
             Edge nextEdge = voronoyCell.getBoundary();
             do {
@@ -242,8 +241,6 @@ public class Main extends Application {
                         directionPoint = VectorUtils.getDirectionPoint(intersectPoint, midPoint);
                     }
                 }
-            } else {
-
             }
         } else {
             Point lowerPoint = getPointOfIntersection(upperPerpendicular, secondLine);
