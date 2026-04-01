@@ -223,19 +223,19 @@ public class Main extends Application {
         return joinDiagrams(buildVoronoyDiagram(polygon.subList(0, polygon.size() / 2)), buildVoronoyDiagram(polygon.subList(polygon.size() / 2, polygon.size())));
     }
 
-    private Point getDirectionPoint(Line upperCommonSupport, Line lowerCommonSupport) {
+    private Point getDirectionPoint(Line firstLine, Line secondLine) {
         Point directionPoint = null;
-        Point midPoint = upperCommonSupport.getMidPoint();
-        Line lowerPerpendicular = getMiddlePerpendicular(lowerCommonSupport);
-        Line upperPerpendicular = getMiddlePerpendicular(upperCommonSupport);
-        Point currentPoint = getPointOfIntersection(upperCommonSupport, lowerCommonSupport);
+        Point midPoint = firstLine.getMidPoint();
+        Line lowerPerpendicular = getMiddlePerpendicular(secondLine);
+        Line upperPerpendicular = getMiddlePerpendicular(firstLine);
+        Point currentPoint = getPointOfIntersection(firstLine, secondLine);
         if (currentPoint != null) {
             Point intersectPoint = getPointOfIntersection(upperPerpendicular, lowerPerpendicular);
             if (intersectPoint != null) {
-                if (isPointInsideAngle(upperCommonSupport.getLeftPoint(), currentPoint, lowerCommonSupport.getLeftPoint(), intersectPoint) || isPointInsideAngle(upperCommonSupport.getRightPoint(), currentPoint, lowerCommonSupport.getRightPoint(), intersectPoint)) {
+                if (isPointInsideAngle(firstLine.getLeftPoint(), currentPoint, secondLine.getLeftPoint(), intersectPoint) || isPointInsideAngle(firstLine.getRightPoint(), currentPoint, secondLine.getRightPoint(), intersectPoint)) {
                     directionPoint = VectorUtils.getDirectionPoint(midPoint, intersectPoint);
                 } else {
-                    Point lowerPoint = getPointOfIntersection(upperPerpendicular, lowerCommonSupport);
+                    Point lowerPoint = getPointOfIntersection(upperPerpendicular, secondLine);
                     if (lowerPoint != null && isIntersected(lowerPoint, new Line(midPoint, intersectPoint))) {
                         directionPoint = VectorUtils.getDirectionPoint(midPoint, intersectPoint);
                     } else {
@@ -246,7 +246,7 @@ public class Main extends Application {
 
             }
         } else {
-            Point lowerPoint = getPointOfIntersection(upperPerpendicular, lowerCommonSupport);
+            Point lowerPoint = getPointOfIntersection(upperPerpendicular, secondLine);
             if (lowerPoint != null) {
                 directionPoint = VectorUtils.getDirectionPoint(midPoint, lowerPoint);
             }
