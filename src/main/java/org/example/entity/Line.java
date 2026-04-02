@@ -24,7 +24,6 @@ public class Line {
     }
 
 
-
     public Line(Edge edge) {
         this.leftPoint = edge.getLeftPoint();
         this.rightPoint = edge.getRightPoint();
@@ -32,20 +31,7 @@ public class Line {
         this.isInfiniteRightEnd = edge.isInfiniteRightEnd();
     }
 
-    public boolean is(Point point, CommonSupportType commonSupportType) {
-        switch (commonSupportType) {
-            case UPPER -> {
-                return point.getY() > getEquationOfLine(point.getX());
-            }
-            case LOWER -> {
-                return point.getY() < getEquationOfLine(point.getX());
-            }
-        }
-
-        return false;
-    }
-
-    public double getEquationOfLine(double x) {
+    public double getY(double x) {
         return ((rightPoint.getY() - leftPoint.getY()) * (x - leftPoint.getX())) / (rightPoint.getX() - leftPoint.getX()) + leftPoint.getY();
     }
 

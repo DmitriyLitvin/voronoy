@@ -3,7 +3,6 @@ package org.example;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
-import javafx.scene.control.Label;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
@@ -19,8 +18,6 @@ import java.util.*;
 import java.util.List;;
 
 import static java.lang.Math.*;
-import static org.example.entity.CommonSupportType.LOWER;
-import static org.example.entity.CommonSupportType.UPPER;
 import static org.example.utils.VectorUtils.crossProduct;
 
 @Slf4j
@@ -42,8 +39,8 @@ public class Main extends Application {
 
         points.forEach(p -> {
             Circle circle = new Circle(p.getX(), p.getY(), 2, Color.RED);
-          //  Label label = new Label(+circle.getCenterX() + ", " + circle.getCenterY());
-           // label.relocate(circle.getCenterX() + 1, circle.getCenterY() + 1);
+            //  Label label = new Label(+circle.getCenterX() + ", " + circle.getCenterY());
+            // label.relocate(circle.getCenterX() + 1, circle.getCenterY() + 1);
             pane.getChildren().addAll(circle);
         });
 
@@ -154,7 +151,7 @@ public class Main extends Application {
         return new HashSet<>(convexHull);
     }
 
-    private Line getCommonSupport(Set<Point> leftPolygon, Set<Point> rightPolygon, CommonSupportType commonSupportType) {
+    private Line getCommonSupport(Set<Point> leftPolygon, Set<Point> rightPolygon, boolean isUpper) {
         Point maxXpoint = leftPolygon.stream().max(Comparator.comparingDouble(Point::getX)).orElse(null);
         Point minXPoint = rightPolygon.stream().min(Comparator.comparingDouble(Point::getX)).orElse(null);
         Line line = new Line(maxXpoint, minXPoint);
@@ -172,15 +169,15 @@ public class Main extends Application {
                 if (rightConvexPolygonIterator.hasNext()) {
                     rightPoint = rightConvexPolygonIterator.next();
                 }
-                if (line.is(leftPoint, commonSupportType)) {
+                if (is(leftPoint, line, isUpper)) {
                     line.setLeftPoint(leftPoint);
-                    if (line.is(rightPoint, commonSupportType)) {
+                    if (is(rightPoint, line, isUpper)) {
                         line.setRightPoint(rightPoint);
                     }
 
-                } else if (line.is(rightPoint, commonSupportType)) {
+                } else if (is(rightPoint, line, isUpper)) {
                     line.setRightPoint(rightPoint);
-                    if (line.is(leftPoint, commonSupportType)) {
+                    if (is(leftPoint, line, isUpper)) {
                         line.setLeftPoint(leftPoint);
                     }
                 }
@@ -188,6 +185,17 @@ public class Main extends Application {
         }
 
         return line;
+    }
+
+
+    public boolean is(Point point, Line line, boolean isUpper) {
+        Point leftPoint = line.getLeftPoint();
+        Point rightPoint = line.getRightPoint();
+        if (isUpper) {
+            return VectorUtils.crossProduct(VectorUtils.getDirectionPoint(leftPoint, rightPoint), VectorUtils.getDirectionPoint(leftPoint, point)) > 0;
+        }
+
+        return VectorUtils.crossProduct(VectorUtils.getDirectionPoint(leftPoint, rightPoint), VectorUtils.getDirectionPoint(leftPoint, point)) < 0;
     }
 
     private Map<Point, Cell> buildVoronoyDiagram(List<Point> polygon) {
@@ -256,8 +264,8 @@ public class Main extends Application {
         Set<Point> leftPolygon = buildConvexHull(new ArrayList<>(leftDiagram.keySet()));
         Set<Point> rightPolygon = buildConvexHull(new ArrayList<>(rightDiagram.keySet()));
 
-        Line upperCommonSupport = getCommonSupport(leftPolygon, rightPolygon, UPPER);
-        Line lowerCommonSupport = getCommonSupport(leftPolygon, rightPolygon, LOWER);
+        Line upperCommonSupport = getCommonSupport(leftPolygon, rightPolygon, true);
+        Line lowerCommonSupport = getCommonSupport(leftPolygon, rightPolygon, false);
 
         Point currentChainPoint = null;
         Edge currentEdge = null;
@@ -907,9 +915,9 @@ public class Main extends Application {
         double forthDelta = secondLineRightPoint.getY() - secondLineLeftPoint.getY();
 
         if (firstDelta == 0) {
-            return new Point(firstLineLeftPoint.getX(), secondLine.getEquationOfLine(firstLineLeftPoint.getX()));
+            return new Point(firstLineLeftPoint.getX(), secondLine.getY(firstLineLeftPoint.getX()));
         } else if (thirdDelta == 0) {
-            return new Point(secondLineLeftPoint.getX(), firstLine.getEquationOfLine(secondLineLeftPoint.getX()));
+            return new Point(secondLineLeftPoint.getX(), firstLine.getY(secondLineLeftPoint.getX()));
         }
 
         double firstSlope = secondDelta / firstDelta;
@@ -920,7 +928,7 @@ public class Main extends Application {
         }
 
         double x = (secondLineLeftPoint.getY() - firstLineLeftPoint.getY() + firstLineLeftPoint.getX() * firstSlope - secondLineLeftPoint.getX() * secondSlope) / (firstSlope - secondSlope);
-        return new Point(x, firstLine.getEquationOfLine(x));
+        return new Point(x, firstLine.getY(x));
     }
 
 
