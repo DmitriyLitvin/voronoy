@@ -230,36 +230,6 @@ public class Main extends Application {
         return joinDiagrams(buildVoronoyDiagram(polygon.subList(0, polygon.size() / 2)), buildVoronoyDiagram(polygon.subList(polygon.size() / 2, polygon.size())));
     }
 
-    private Point getDirectionPoint(Line firstLine, Line secondLine) {
-        Point directionPoint = null;
-        Point midPoint = firstLine.getMidPoint();
-        Line lowerPerpendicular = getMiddlePerpendicular(secondLine);
-        Line upperPerpendicular = getMiddlePerpendicular(firstLine);
-        Point currentPoint = getPointOfIntersection(firstLine, secondLine);
-        if (currentPoint != null) {
-            Point intersectPoint = getPointOfIntersection(upperPerpendicular, lowerPerpendicular);
-            if (intersectPoint != null) {
-                if (isPointInsideAngle(firstLine.getLeftPoint(), currentPoint, secondLine.getLeftPoint(), intersectPoint) || isPointInsideAngle(firstLine.getRightPoint(), currentPoint, secondLine.getRightPoint(), intersectPoint)) {
-                    directionPoint = VectorUtils.getDirectionPoint(midPoint, intersectPoint);
-                } else {
-                    Point lowerPoint = getPointOfIntersection(upperPerpendicular, secondLine);
-                    if (lowerPoint != null && isIntersected(lowerPoint, new Line(midPoint, intersectPoint))) {
-                        directionPoint = VectorUtils.getDirectionPoint(midPoint, intersectPoint);
-                    } else {
-                        directionPoint = VectorUtils.getDirectionPoint(intersectPoint, midPoint);
-                    }
-                }
-            }
-        } else {
-            Point lowerPoint = getPointOfIntersection(upperPerpendicular, secondLine);
-            if (lowerPoint != null) {
-                directionPoint = VectorUtils.getDirectionPoint(midPoint, lowerPoint);
-            }
-        }
-
-        return directionPoint;
-    }
-
     private Map<Point, Cell> joinDiagrams(Map<Point, Cell> leftDiagram, Map<Point, Cell> rightDiagram) {
         Set<Point> leftPolygon = buildConvexHull(new ArrayList<>(leftDiagram.keySet()));
         Set<Point> rightPolygon = buildConvexHull(new ArrayList<>(rightDiagram.keySet()));
@@ -285,10 +255,9 @@ public class Main extends Application {
             boolean isInfiniteLeftEnd = false;
             if (currentChainPoint == null) {
                 isInfiniteLeftEnd = true;
-                Point leftUpperPoint = middlePerpendicular.getLeftPoint();
-                Point directionPoint = getDirectionPoint(commonSupport, lowerCommonSupport);
-                if (VectorUtils.dotProduct(VectorUtils.getDirectionPoint(leftUpperPoint, midPoint), directionPoint) > 0) {
-                    currentChainPoint = leftUpperPoint;
+                Point leftPoint = middlePerpendicular.getLeftPoint();
+                if (VectorUtils.crossProduct(VectorUtils.getDirectionPoint(upperCommonSupport.getLeftPoint(), upperCommonSupport.getRightPoint()), VectorUtils.getDirectionPoint(upperCommonSupport.getLeftPoint(), leftPoint)) > 0) {
+                    currentChainPoint = leftPoint;
                 } else {
                     currentChainPoint = middlePerpendicular.getRightPoint();
                 }
@@ -668,9 +637,9 @@ public class Main extends Application {
         Edge rightEdge;
         Cell leftCell = leftDiagram.get(lowerCommonSupport.getLeftPoint());
         Cell rightCell = rightDiagram.get(lowerCommonSupport.getRightPoint());
-        Point directionPoint = getDirectionPoint(lowerCommonSupport, upperCommonSupport);
         Point leftPoint = middlePerpendicular.getLeftPoint();
-        if (VectorUtils.dotProduct(VectorUtils.getDirectionPoint(leftPoint, lowerCommonSupport.getMidPoint()), directionPoint) > 0) {
+        assert currentChainPoint != null;
+        if (VectorUtils.crossProduct(VectorUtils.getDirectionPoint(lowerCommonSupport.getLeftPoint(), lowerCommonSupport.getRightPoint()), VectorUtils.getDirectionPoint(lowerCommonSupport.getLeftPoint(), leftPoint)) < 0) {
             leftEdge = new Edge(currentChainPoint, leftPoint, leftCell);
             rightEdge = new Edge(currentChainPoint, leftPoint, rightCell);
         } else {
