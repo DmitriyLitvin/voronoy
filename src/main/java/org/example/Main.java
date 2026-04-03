@@ -74,25 +74,29 @@ public class Main extends Application {
 
     public void drawVoronoyDiagram(List<Point> polygon) {
         log.info("Start drawing ");
-        buildVoronoyDiagram(polygon.stream().sorted(Comparator.comparingDouble(Point::getX).thenComparingDouble(Point::getY)).toList()).values().stream().forEach(voronoyCell -> {
+        buildVoronoyDiagram(polygon.stream().sorted(Comparator.comparingDouble(Point::getX).thenComparingDouble(Point::getY)).toList()).values().forEach(voronoyCell -> {
             Edge edge = voronoyCell.getBoundary();
             Edge nextEdge = voronoyCell.getBoundary();
-            do {
-                javafx.scene.shape.Line line = new javafx.scene.shape.Line(nextEdge.getLeftPoint().getX(), nextEdge.getLeftPoint().getY(), nextEdge.getRightPoint().getX(), nextEdge.getRightPoint().getY());
-                line.setStroke(Color.BLUE);
-                line.setStrokeWidth(1);
-                pane.getChildren().add(line);
-                nextEdge = nextEdge.getNext();
-            } while (nextEdge != null && !Objects.equals(new Line(edge), new Line(nextEdge)));
+            if (nextEdge != null) {
+                do {
+                    javafx.scene.shape.Line line = new javafx.scene.shape.Line(nextEdge.getLeftPoint().getX(), nextEdge.getLeftPoint().getY(), nextEdge.getRightPoint().getX(), nextEdge.getRightPoint().getY());
+                    line.setStroke(Color.BLUE);
+                    line.setStrokeWidth(1);
+                    pane.getChildren().add(line);
+                    nextEdge = nextEdge.getNext();
+                } while (nextEdge != null && !Objects.equals(new Line(edge), new Line(nextEdge)));
+            }
 
             Edge prevEdge = voronoyCell.getBoundary();
-            do {
-                javafx.scene.shape.Line line = new javafx.scene.shape.Line(prevEdge.getLeftPoint().getX(), prevEdge.getLeftPoint().getY(), prevEdge.getRightPoint().getX(), prevEdge.getRightPoint().getY());
-                line.setStroke(Color.BLUE);
-                line.setStrokeWidth(1);
-                pane.getChildren().add(line);
-                prevEdge = prevEdge.getPrev();
-            } while (prevEdge != null && !Objects.equals(new Line(edge), new Line(prevEdge)));
+            if (prevEdge != null) {
+                do {
+                    javafx.scene.shape.Line line = new javafx.scene.shape.Line(prevEdge.getLeftPoint().getX(), prevEdge.getLeftPoint().getY(), prevEdge.getRightPoint().getX(), prevEdge.getRightPoint().getY());
+                    line.setStroke(Color.BLUE);
+                    line.setStrokeWidth(1);
+                    pane.getChildren().add(line);
+                    prevEdge = prevEdge.getPrev();
+                } while (prevEdge != null && !Objects.equals(new Line(edge), new Line(prevEdge)));
+            }
         });
         log.info("End drawing");
     }
