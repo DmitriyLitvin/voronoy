@@ -3,6 +3,7 @@ package org.example;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
@@ -38,138 +39,18 @@ public class Main extends Application {
         pane.getChildren().add(button);
 
 
-//        points.add(new Point(119, 210));
-//        points.add(new Point(122, 233));
-//        points.add(new Point(123, 263));
-//        points.add(new Point(129, 246));
-//        points.add(new Point(138, 168));
-//        points.add(new Point(138, 254));
-//        points.add(new Point(139, 219));
-//        points.add(new Point(140, 267));
-//        points.add(new Point(141, 234));
-//        points.add(new Point(154, 290));
-//        points.add(new Point(163, 261));
-//        points.add(new Point(177, 277));
-//        points.add(new Point(179, 223));
-//        points.add(new Point(181, 259));
-//        points.add(new Point(182, 326));
-//        points.add(new Point(193, 259));
-//        points.add(new Point(196, 276));
-//        points.add(new Point(199, 228));
-//        points.add(new Point(222, 180));
-//        points.add(new Point(230, 241));
-//        points.add(new Point(231, 307));
-//        points.add(new Point(235, 249));
-//        points.add(new Point(243, 249));
-//        points.add(new Point(247, 260));
-//        points.add(new Point(248, 238));
-//        points.add(new Point(254, 353));
-//        points.add(new Point(268, 401));
-//        points.add(new Point(271, 253));
-//        points.add(new Point(272, 337));
-//        points.add(new Point(275, 647));
-//        points.add(new Point(283, 356));
-//        points.add(new Point(287, 292));
-//        points.add(new Point(296, 376));
-//        points.add(new Point(297, 330));
-//        points.add(new Point(304, 410));
-//        points.add(new Point(324, 420));
-//        points.add(new Point(326, 400));
-//        points.add(new Point(333, 364));
-//        points.add(new Point(334, 383));
-//        points.add(new Point(340, 374));
-//        points.add(new Point(343, 385));
-//        points.add(new Point(347, 374));
-//        points.add(new Point(352, 597));
-//        points.add(new Point(353, 362));
-//        points.add(new Point(356, 452));
-//        points.add(new Point(357, 385));
-//        points.add(new Point(363, 338));
-//        points.add(new Point(369, 614));
-//        points.add(new Point(369, 636));
-//        points.add(new Point(372, 342));
-//        points.add(new Point(373, 646));
-//        points.add(new Point(374, 358));
-//        points.add(new Point(377, 372));
-//        points.add(new Point(380, 341));
-//        points.add(new Point(380, 640));
-//        points.add(new Point(381, 325));
-//        points.add(new Point(382, 350));
-//        points.add(new Point(382, 670));
-//        points.add(new Point(382, 728));
-//        points.add(new Point(386, 652));
-//        points.add(new Point(390, 332));
-//        points.add(new Point(392, 468));
-//        points.add(new Point(392, 565));
-//        points.add(new Point(392, 633));
-//        points.add(new Point(392, 695));
-//        points.add(new Point(393, 358));
-//        points.add(new Point(402, 411));
-//        points.add(new Point(407, 521));
-//        points.add(new Point(412, 451));
-//        points.add(new Point(413, 674));
-//        points.add(new Point(420, 173));
-//        points.add(new Point(423, 289));
-//        points.add(new Point(426, 595));
-//        points.add(new Point(427, 259));
-//        points.add(new Point(436, 358));
-//        points.add(new Point(440, 726));
-//        points.add(new Point(445, 689));
-//        points.add(new Point(452, 395));
-//        points.add(new Point(461, 474));
-//        points.add(new Point(474, 353));
-//        points.add(new Point(550, 346));
-//        points.add(new Point(569, 481));
-//        points.add(new Point(583, 554));
-//        points.add(new Point(587, 502));
-//        points.add(new Point(588, 486));
-//        points.add(new Point(593, 523));
-//        points.add(new Point(596, 443));
-//        points.add(new Point(596, 497));
-//        points.add(new Point(596, 506));
-//        points.add(new Point(597, 513));
-//        points.add(new Point(598, 475));
-//        points.add(new Point(606, 519));
-//        points.add(new Point(606, 528));
-//        points.add(new Point(607, 504));
-//        points.add(new Point(619, 514));
-//        points.add(new Point(642, 544));
-//        points.add(new Point(653, 492));
-//        points.add(new Point(688, 632));
-//        points.add(new Point(693, 484));
-//        points.add(new Point(694, 602));
-//        points.add(new Point(714, 633));
-//        points.add(new Point(716, 554));
-//        points.add(new Point(717, 612));
-//        points.add(new Point(719, 628));
-//        points.add(new Point(722, 615));
-//        points.add(new Point(726, 584));
-//        points.add(new Point(727, 646));
-//        points.add(new Point(732, 697));
-//        points.add(new Point(737, 291));
-//        points.add(new Point(743, 278));
-//        points.add(new Point(743, 290));
-//        points.add(new Point(744, 261));
-//        points.add(new Point(749, 280));
-//        points.add(new Point(750, 254));
-//        points.add(new Point(751, 263));
-//        points.add(new Point(752, 222));
-//        points.add(new Point(754, 301));
-//        points.add(new Point(758, 257));
-//        points.add(new Point(758, 269));
-//        points.add(new Point(764, 246));
-//        points.add(new Point(766, 285));
-//        points.add(new Point(768, 593));
-//        points.add(new Point(784, 241));
-//        points.add(new Point(797, 416));
-//        points.add(new Point(857, 510));
-//        points.add(new Point(891, 302));
+//        points.add(new Point(376.0, 574.0));
+//        points.add(new Point(378.0, 606.0));
+//        points.add(new Point(380.0, 522.0));
+//        points.add(new Point(385.0, 550.0));
+//        points.add(new Point(390.0, 578.0));
+
 
         points.forEach(p -> {
             Circle circle = new Circle(p.getX(), p.getY(), 2, Color.RED);
-            //  Label label = new Label(+circle.getCenterX() + ", " + circle.getCenterY());
-            // label.relocate(circle.getCenterX() + 1, circle.getCenterY() + 1);
-            pane.getChildren().addAll(circle);
+            Label label = new Label(+circle.getCenterX() + ", " + circle.getCenterY());
+            label.relocate(circle.getCenterX() + 1, circle.getCenterY() + 1);
+            pane.getChildren().addAll(label, circle);
         });
 
         int width = 1500;
@@ -202,7 +83,7 @@ public class Main extends Application {
 
     public void drawVoronoyDiagram(Set<Point> polygon) {
         log.info("Start drawing ");
-        buildVoronoyDiagram(polygon.stream().sorted(Comparator.comparingDouble(Point::getX).thenComparingDouble(Point::getY)).toList()).values().forEach(voronoyCell -> {
+        buildVoronoyDiagram(polygon.stream().sorted(Comparator.comparingDouble(Point::getX).thenComparingDouble(Point::getY)).toList()).values().stream().forEach(voronoyCell -> {
             Edge edge = voronoyCell.getBoundary();
             Edge nextEdge = voronoyCell.getBoundary();
             if (nextEdge != null) {
@@ -977,8 +858,8 @@ public class Main extends Application {
     }
 
     private Line getMiddlePerpendicular(Line line) {
-        int height = 1_000_000;
-        int width = 1_000_000;
+        int height = 1_00_000;
+        int width = 1_00_000;
 
         Point point = line.getMidPoint();
         double x = point.getX();
@@ -1002,32 +883,32 @@ public class Main extends Application {
     }
 
     private Point getPointOfIntersection(Line firstLine, Line secondLine) {
-        Point firstLineLeftPoint = firstLine.getLeftPoint();
-        Point firstLineRightPoint = firstLine.getRightPoint();
+        Point p1 = firstLine.getLeftPoint();
+        Point p2 = firstLine.getRightPoint();
 
-        Point secondLineLeftPoint = secondLine.getLeftPoint();
-        Point secondLineRightPoint = secondLine.getRightPoint();
+        Point p3 = secondLine.getLeftPoint();
+        Point p4 = secondLine.getRightPoint();
 
-        double firstDelta = firstLineRightPoint.getX() - firstLineLeftPoint.getX();
-        double secondDelta = firstLineRightPoint.getY() - firstLineLeftPoint.getY();
+        double d1 = p2.getX() - p1.getX();
+        double d2 = p2.getY() - p1.getY();
 
-        double thirdDelta = secondLineRightPoint.getX() - secondLineLeftPoint.getX();
-        double forthDelta = secondLineRightPoint.getY() - secondLineLeftPoint.getY();
+        double d3 = p4.getX() - p3.getX();
+        double d4 = p4.getY() - p3.getY();
 
-        if (firstDelta == 0) {
-            return new Point(firstLineLeftPoint.getX(), secondLine.getY(firstLineLeftPoint.getX()));
-        } else if (thirdDelta == 0) {
-            return new Point(secondLineLeftPoint.getX(), firstLine.getY(secondLineLeftPoint.getX()));
+        if (d1 == 0) {
+            return new Point(p1.getX(), secondLine.getY(p1.getX()));
+        } else if (d3 == 0) {
+            return new Point(p3.getX(), firstLine.getY(p3.getX()));
         }
 
-        double firstSlope = secondDelta / firstDelta;
-        double secondSlope = forthDelta / thirdDelta;
+        double s1 = d2 / d1;
+        double s2 = d4 / d3;
 
-        if (secondDelta * thirdDelta - forthDelta * firstDelta == 0) {
+        if (d2 * d3 - d4 * d1 == 0) {
             return null;
         }
 
-        double x = (secondLineLeftPoint.getY() - firstLineLeftPoint.getY() + firstLineLeftPoint.getX() * firstSlope - secondLineLeftPoint.getX() * secondSlope) / (firstSlope - secondSlope);
+        double x = (p3.getY() - p1.getY() + p1.getX() * s1 - p3.getX() * s2) / (s1 - s2);
         return new Point(x, firstLine.getY(x));
     }
 
