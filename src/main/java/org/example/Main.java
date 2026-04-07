@@ -39,18 +39,13 @@ public class Main extends Application {
         pane.getChildren().add(button);
 
 
-//        points.add(new Point(376.0, 574.0));
-//        points.add(new Point(378.0, 606.0));
-//        points.add(new Point(380.0, 522.0));
-//        points.add(new Point(385.0, 550.0));
-//        points.add(new Point(390.0, 578.0));
 
 
         points.forEach(p -> {
             Circle circle = new Circle(p.getX(), p.getY(), 2, Color.RED);
             Label label = new Label(+circle.getCenterX() + ", " + circle.getCenterY());
             label.relocate(circle.getCenterX() + 1, circle.getCenterY() + 1);
-            pane.getChildren().addAll(label, circle);
+            //pane.getChildren().addAll(label, circle);
         });
 
         int width = 1500;
@@ -738,8 +733,8 @@ public class Main extends Application {
         return null;
     }
 
-    private boolean isConnected(Edge firstEdge, Edge secondEdge) {
-        return Objects.equals(firstEdge.getLeftPoint(), secondEdge.getRightPoint()) || Objects.equals(firstEdge.getRightPoint(), secondEdge.getLeftPoint()) || Objects.equals(firstEdge.getLeftPoint(), secondEdge.getLeftPoint()) || Objects.equals(firstEdge.getRightPoint(), secondEdge.getRightPoint());
+    private boolean isConnected(Edge e1, Edge e2) {
+        return Objects.equals(e1.getLeftPoint(), e2.getRightPoint()) || Objects.equals(e1.getRightPoint(), e2.getLeftPoint()) || Objects.equals(e1.getLeftPoint(), e2.getLeftPoint()) || Objects.equals(e1.getRightPoint(), e2.getRightPoint());
     }
 
     private boolean isOutsideCell(Edge currentEdge, Point currentPoint, Point intersectPoint) {
@@ -878,8 +873,8 @@ public class Main extends Application {
         }
     }
 
-    private boolean isOnTheSameSide(Point firstPoint, Point secondPoint, Point midPoint) {
-        return VectorUtils.dotProduct(VectorUtils.getDirectionPoint(midPoint, firstPoint), VectorUtils.getDirectionPoint(midPoint, secondPoint)) >= 0;
+    private boolean isOnTheSameSide(Point p1, Point p2, Point midPoint) {
+        return VectorUtils.dotProduct(VectorUtils.getDirectionPoint(midPoint, p1), VectorUtils.getDirectionPoint(midPoint, p2)) >= 0;
     }
 
     private Point getPointOfIntersection(Line firstLine, Line secondLine) {
