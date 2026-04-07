@@ -38,9 +38,6 @@ public class Main extends Application {
         borderPane.setBottom(button);
         pane.getChildren().add(button);
 
-
-
-
         points.forEach(p -> {
             Circle circle = new Circle(p.getX(), p.getY(), 2, Color.RED);
             Label label = new Label(+circle.getCenterX() + ", " + circle.getCenterY());
@@ -790,7 +787,7 @@ public class Main extends Application {
         }
     }
 
-    private Edge getClosestEdge(List<Edge> edges, Line middlePerpendicular, Edge currentEdge, Edge currentChainEdge, Point currentChainPoint) {
+    private Edge getClosestEdge(List<Edge> edges, Line middlePerpendicular, Edge currentEdge, Edge chainEdge, Point chainPoint) {
         if (edges == null || edges.isEmpty()) {
             return null;
         }
@@ -800,9 +797,9 @@ public class Main extends Application {
             Edge nextEdge = edge;
             double distance = 0;
             do {
-                if ((currentChainEdge == null || !Objects.equals(new Line(currentChainEdge), new Line(nextEdge))) && (currentEdge == null || !Objects.equals(new Line(currentEdge), new Line(nextEdge)))) {
+                if ((chainEdge == null || !Objects.equals(new Line(chainEdge), new Line(nextEdge))) && (currentEdge == null || !Objects.equals(new Line(currentEdge), new Line(nextEdge)))) {
                     Point intersectPoint = getPointOfIntersection(middlePerpendicular, new Line(nextEdge));
-                    if (intersectPoint != null && isIntersected(intersectPoint, new Line(nextEdge)) && isOutsideCell(currentEdge, currentChainPoint, intersectPoint)) {
+                    if (intersectPoint != null && isIntersected(intersectPoint, new Line(nextEdge)) && isOutsideCell(currentEdge, chainPoint, intersectPoint)) {
                         double currentDistance = VectorUtils.getLength(intersectPoint, middlePerpendicular.getRightPoint());
                         if (distance == 0 || currentDistance < distance) {
                             distance = currentDistance;
@@ -815,9 +812,9 @@ public class Main extends Application {
 
             Edge prevEdge = edge;
             do {
-                if ((currentChainEdge == null || !Objects.equals(new Line(currentChainEdge), new Line(prevEdge))) && (currentEdge == null || !Objects.equals(new Line(currentEdge), new Line(prevEdge)))) {
+                if ((chainEdge == null || !Objects.equals(new Line(chainEdge), new Line(prevEdge))) && (currentEdge == null || !Objects.equals(new Line(currentEdge), new Line(prevEdge)))) {
                     Point intersectPoint = getPointOfIntersection(middlePerpendicular, new Line(prevEdge));
-                    if (intersectPoint != null && isIntersected(intersectPoint, new Line(prevEdge)) && isOutsideCell(currentEdge, currentChainPoint, intersectPoint)) {
+                    if (intersectPoint != null && isIntersected(intersectPoint, new Line(prevEdge)) && isOutsideCell(currentEdge, chainPoint, intersectPoint)) {
                         double currentDistance = VectorUtils.getLength(intersectPoint, middlePerpendicular.getRightPoint());
                         if (distance == 0 || currentDistance < distance) {
                             distance = currentDistance;
@@ -877,12 +874,12 @@ public class Main extends Application {
         return VectorUtils.dotProduct(VectorUtils.getDirectionPoint(midPoint, p1), VectorUtils.getDirectionPoint(midPoint, p2)) >= 0;
     }
 
-    private Point getPointOfIntersection(Line firstLine, Line secondLine) {
-        Point p1 = firstLine.getLeftPoint();
-        Point p2 = firstLine.getRightPoint();
+    private Point getPointOfIntersection(Line l1, Line l2) {
+        Point p1 = l1.getLeftPoint();
+        Point p2 = l1.getRightPoint();
 
-        Point p3 = secondLine.getLeftPoint();
-        Point p4 = secondLine.getRightPoint();
+        Point p3 = l2.getLeftPoint();
+        Point p4 = l2.getRightPoint();
 
         double d1 = p2.getX() - p1.getX();
         double d2 = p2.getY() - p1.getY();
@@ -891,9 +888,9 @@ public class Main extends Application {
         double d4 = p4.getY() - p3.getY();
 
         if (d1 == 0) {
-            return new Point(p1.getX(), secondLine.getY(p1.getX()));
+            return new Point(p1.getX(), l2.getY(p1.getX()));
         } else if (d3 == 0) {
-            return new Point(p3.getX(), firstLine.getY(p3.getX()));
+            return new Point(p3.getX(), l1.getY(p3.getX()));
         }
 
         double s1 = d2 / d1;
@@ -904,7 +901,7 @@ public class Main extends Application {
         }
 
         double x = (p3.getY() - p1.getY() + p1.getX() * s1 - p3.getX() * s2) / (s1 - s2);
-        return new Point(x, firstLine.getY(x));
+        return new Point(x, l1.getY(x));
     }
 
 
