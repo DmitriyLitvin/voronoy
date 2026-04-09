@@ -325,12 +325,12 @@ public class Main extends Application {
 
             Edge leftExcludedEdge = getClosestEdge(leftCell == null ? null : excludedEdges.get(leftCell), middlePerpendic, currentEdge, chainEdge, chainPoint);
             if (leftExcludedEdge != null) {
-                Point leftIntersectPoint = getPointOfIntersection(middlePerpendic, new Line(leftExcludedEdge));
-                if (leftIntersectPoint != null) {
-                    double currentDistance = VectorUtils.getLength(leftIntersectPoint, chainPoint);
+                Point currentPoint = getPointOfIntersection(middlePerpendic, new Line(leftExcludedEdge));
+                if (currentPoint != null) {
+                    double currentDistance = VectorUtils.getLength(currentPoint, chainPoint);
                     if (currentDistance < leftDistance || leftEdge == null) {
                         leftDistance = currentDistance;
-                        leftPoint = leftIntersectPoint;
+                        leftPoint = currentPoint;
                         leftEdge = leftExcludedEdge;
                         isLeftExcludedEdge = true;
                     }
@@ -361,12 +361,12 @@ public class Main extends Application {
 
             Edge rightExcludedEdge = getClosestEdge(rightCell == null ? null : excludedEdges.get(rightCell), middlePerpendic, currentEdge, chainEdge, chainPoint);
             if (rightExcludedEdge != null) {
-                Point rightIntersectPoint = getPointOfIntersection(middlePerpendic, new Line(rightExcludedEdge));
-                if (rightIntersectPoint != null) {
-                    double currentDistance = VectorUtils.getLength(rightIntersectPoint, chainPoint);
+                Point currentPoint = getPointOfIntersection(middlePerpendic, new Line(rightExcludedEdge));
+                if (currentPoint != null) {
+                    double currentDistance = VectorUtils.getLength(currentPoint, chainPoint);
                     if (currentDistance < rightDistance || rightEdge == null) {
                         rightDistance = currentDistance;
-                        rightPoint = rightIntersectPoint;
+                        rightPoint = currentPoint;
                         rightEdge = rightExcludedEdge;
                         isRightExcludedEdge = true;
                     }
