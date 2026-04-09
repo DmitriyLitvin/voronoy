@@ -38,11 +38,22 @@ public class Main extends Application {
         borderPane.setBottom(button);
         pane.getChildren().add(button);
 
+//        points.add(new Point(410, 433));
+//        points.add(new Point(410, 498));
+//        points.add(new Point(410, 544));
+//        points.add(new Point(410, 633));
+//
+//        points.add(new Point(411, 562));
+//        points.add(new Point(412, 449));
+//        points.add(new Point(417, 425));
+//        points.add(new Point(420, 474));
+
+
         points.forEach(p -> {
             Circle circle = new Circle(p.getX(), p.getY(), 2, Color.RED);
             Label label = new Label(+circle.getCenterX() + ", " + circle.getCenterY());
             label.relocate(circle.getCenterX() + 1, circle.getCenterY() + 1);
-            //pane.getChildren().addAll(label, circle);
+            pane.getChildren().addAll(label, circle);
         });
 
         int width = 1500;
@@ -207,7 +218,7 @@ public class Main extends Application {
         if (polygon.size() == 1) {
             Map<Point, Cell> diagram = new HashMap<>();
             Point center = polygon.get(0);
-            diagram.put(center, new Cell(center, null));
+            diagram.put(center, new Cell(center, null, null));
             return diagram;
         } else if (polygon.size() == 2) {
             Map<Point, Cell> diagram = new HashMap<>();
@@ -221,8 +232,8 @@ public class Main extends Application {
             leftEdge.setTwin(rightEdge);
             rightEdge.setTwin(leftEdge);
 
-            Cell leftCell = new Cell(leftCenter, leftEdge);
-            Cell rightCell = new Cell(rightCenter, rightEdge);
+            Cell leftCell = new Cell(leftCenter, leftEdge, null);
+            Cell rightCell = new Cell(rightCenter, rightEdge, null);
 
             leftEdge.setCell(leftCell);
             rightEdge.setCell(rightCell);
@@ -249,6 +260,29 @@ public class Main extends Application {
         Map<Cell, List<Edge>> excludedEdges = new HashMap<>();
         Map<Cell, Edge> disjunctiveChain = new HashMap<>();
 
+        if (Objects.equals(upperCommonSupport, lowerCommonSupport)) {
+            Cell leftCell = leftDiagram.get(upperCommonSupport.getLeftPoint());
+            System.out.println(leftCell.getCenter());
+            Cell rightCell = rightDiagram.get(upperCommonSupport.getRightPoint());
+            System.out.println(rightCell.getCenter());
+
+            Line middlePerpendicular = getMiddlePerpendicular(new Line(leftCell.getCenter(), rightCell.getCenter()));
+            Edge leftEdge = new Edge(middlePerpendicular.getLeftPoint(), middlePerpendicular.getRightPoint(), leftCell);
+            Edge rightEdge = new Edge(middlePerpendicular.getLeftPoint(), middlePerpendicular.getRightPoint(), rightCell);
+
+            leftEdge.setTwin(rightEdge);
+            rightEdge.setTwin(leftEdge);
+
+            leftCell.setIdle(leftEdge);
+            rightCell.setIdle(rightEdge);
+
+            Map<Point, Cell> diagram = new HashMap<>();
+            diagram.putAll(leftDiagram);
+            diagram.putAll(rightDiagram);
+
+            return diagram;
+        }
+
         while (!Objects.equals(upperCommonSupport, lowerCommonSupport)) {
             Cell leftCell = leftDiagram.get(upperCommonSupport.getLeftPoint());
             Cell rightCell = rightDiagram.get(upperCommonSupport.getRightPoint());
@@ -270,13 +304,26 @@ public class Main extends Application {
             boolean isLeftExcludedEdge = false;
             double leftDistance = 0;
             Point leftPoint = null;
-            Edge leftExcludedEdge = getClosestEdge(leftCell == null ? null : excludedEdges.get(leftCell), middlePerpendic, currentEdge, chainEdge, chainPoint);
-            Edge leftEdge = getClosestEdge((leftCell == null || leftCell.getBoundary() == null) ? null : List.of(leftCell.getBoundary()), middlePerpendic, currentEdge, chainEdge, chainPoint);
+
+            List<Edge> leftEdges = new ArrayList<>();
+            if (leftCell != null) {
+                Edge boundary = leftCell.getBoundary();
+                if (boundary != null) {
+                    leftEdges.add(boundary);
+                }
+                Edge idle = leftCell.getIdle();
+                if (idle != null) {
+                    leftEdges.add(idle);
+                }
+            }
+            Edge leftEdge = getClosestEdge(leftEdges, middlePerpendic, currentEdge, chainEdge, chainPoint);
             if (leftEdge != null) {
                 leftPoint = getPointOfIntersection(middlePerpendic, new Line(leftEdge));
                 assert leftPoint != null;
                 leftDistance = VectorUtils.getLength(leftPoint, chainPoint);
             }
+
+            Edge leftExcludedEdge = getClosestEdge(leftCell == null ? null : excludedEdges.get(leftCell), middlePerpendic, currentEdge, chainEdge, chainPoint);
             if (leftExcludedEdge != null) {
                 Point leftIntersectPoint = getPointOfIntersection(middlePerpendic, new Line(leftExcludedEdge));
                 if (leftIntersectPoint != null) {
@@ -293,13 +340,26 @@ public class Main extends Application {
             boolean isRightExcludedEdge = false;
             double rightDistance = 0;
             Point rightPoint = null;
-            Edge rightExcludedEdge = getClosestEdge(rightCell == null ? null : excludedEdges.get(rightCell), middlePerpendic, currentEdge, chainEdge, chainPoint);
-            Edge rightEdge = getClosestEdge((rightCell == null || rightCell.getBoundary() == null) ? null : List.of(rightCell.getBoundary()), middlePerpendic, currentEdge, chainEdge, chainPoint);
+
+            List<Edge> rightEdges = new ArrayList<>();
+            if (rightCell != null) {
+                Edge boundary = rightCell.getBoundary();
+                if (boundary != null) {
+                    rightEdges.add(boundary);
+                }
+                Edge idle = rightCell.getIdle();
+                if (idle != null) {
+                    rightEdges.add(idle);
+                }
+            }
+            Edge rightEdge = getClosestEdge(rightEdges, middlePerpendic, currentEdge, chainEdge, chainPoint);
             if (rightEdge != null) {
                 rightPoint = getPointOfIntersection(middlePerpendic, new Line(rightEdge));
                 assert rightPoint != null;
                 rightDistance = VectorUtils.getLength(rightPoint, chainPoint);
             }
+
+            Edge rightExcludedEdge = getClosestEdge(rightCell == null ? null : excludedEdges.get(rightCell), middlePerpendic, currentEdge, chainEdge, chainPoint);
             if (rightExcludedEdge != null) {
                 Point rightIntersectPoint = getPointOfIntersection(middlePerpendic, new Line(rightExcludedEdge));
                 if (rightIntersectPoint != null) {
@@ -793,9 +853,9 @@ public class Main extends Application {
         }
 
         Edge intersectedEdge = null;
+        double distance = 0;
         for (Edge edge : edges) {
             Edge nextEdge = edge;
-            double distance = 0;
             do {
                 if ((chainEdge == null || !Objects.equals(new Line(chainEdge), new Line(nextEdge))) && (currentEdge == null || !Objects.equals(new Line(currentEdge), new Line(nextEdge)))) {
                     Point point = getPointOfIntersection(middlePerpendic, new Line(nextEdge));

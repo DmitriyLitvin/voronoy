@@ -10,8 +10,8 @@ import java.util.stream.Collectors;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@EqualsAndHashCode(exclude = "boundary")
 public class Cell {
     private Point center;
     private Edge boundary;
+    private Edge idle;
 }
