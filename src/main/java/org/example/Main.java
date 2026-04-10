@@ -15,6 +15,7 @@ import org.example.entity.*;
 import org.example.entity.Point;
 import org.example.utils.VectorUtils;
 
+import java.sql.SQLOutput;
 import java.util.*;
 import java.util.List;;
 
@@ -38,15 +39,15 @@ public class Main extends Application {
         borderPane.setBottom(button);
         pane.getChildren().add(button);
 
-//        points.add(new Point(410, 433));
-//        points.add(new Point(410, 498));
-//        points.add(new Point(410, 544));
-//        points.add(new Point(410, 633));
-//
-//        points.add(new Point(411, 562));
-//        points.add(new Point(412, 449));
-//        points.add(new Point(417, 425));
-//        points.add(new Point(420, 474));
+        points.add(new Point(410, 433));
+        points.add(new Point(410, 498));
+        points.add(new Point(410, 544));
+        points.add(new Point(410, 633));
+
+        points.add(new Point(411, 562));
+        points.add(new Point(412, 449));
+        points.add(new Point(417, 425));
+        points.add(new Point(420, 474));
 
 
         points.forEach(p -> {
@@ -86,7 +87,7 @@ public class Main extends Application {
 
     public void drawVoronoyDiagram(Set<Point> polygon) {
         log.info("Start drawing ");
-        buildVoronoyDiagram(polygon.stream().sorted(Comparator.comparingDouble(Point::getX).thenComparingDouble(Point::getY)).toList()).values().forEach(voronoyCell -> {
+        buildVoronoyDiagram(polygon.stream().sorted(Comparator.comparingDouble(Point::getX).thenComparingDouble(Point::getY)).toList()).values().stream().filter(a -> a.getCenter().equals(new Point(410, 498))).forEach(voronoyCell -> {
             Edge edge = voronoyCell.getBoundary();
             Edge nextEdge = voronoyCell.getBoundary();
             if (nextEdge != null) {
@@ -168,8 +169,8 @@ public class Main extends Application {
     }
 
     private Line getCommonSupport(Set<Point> leftPolygon, Set<Point> rightPolygon, boolean isUpper) {
-        Point maxXpoint = leftPolygon.stream().max(Comparator.comparingDouble(Point::getX)).orElse(null);
-        Point minXPoint = rightPolygon.stream().min(Comparator.comparingDouble(Point::getX)).orElse(null);
+        Point maxXpoint = leftPolygon.stream().max(Comparator.comparingDouble(Point::getX).thenComparing(Point::getY)).orElse(null);
+        Point minXPoint = rightPolygon.stream().min(Comparator.comparingDouble(Point::getX).thenComparing(Point::getY)).orElse(null);
         Line line = new Line(maxXpoint, minXPoint);
 
         for (int i = 0; i < 2; i++) {
@@ -387,7 +388,7 @@ public class Main extends Application {
                         leftTwinEdge.setRightPoint(leftPoint);
                         leftTwinEdge.setInfiniteRightEnd(false);
                         List<Edge> leftTwinExcludedEdges = excludedEdges.get(leftTwinCell);
-                        if (leftTwinExcludedEdges == null || leftTwinExcludedEdges.isEmpty()) {
+                        if (leftTwinExcludedEdges == null && leftTwinCell.getIdle() == null) {
                             leftTwinCell.setBoundary(leftTwinEdge);
                         }
                         if (erasedEdge != null) {
@@ -398,7 +399,7 @@ public class Main extends Application {
                         leftEdge.setRightPoint(leftPoint);
                         leftEdge.setInfiniteRightEnd(false);
                         List<Edge> leftExcludedEdges = excludedEdges.get(leftCell);
-                        if (leftExcludedEdges == null || leftExcludedEdges.isEmpty()) {
+                        if (leftExcludedEdges == null && leftCell.getIdle() == null) {
                             leftCell.setBoundary(leftEdge);
                         }
                         if (erasedEdge != null) {
@@ -411,7 +412,7 @@ public class Main extends Application {
                         leftTwinEdge.setLeftPoint(leftPoint);
                         leftTwinEdge.setInfiniteLeftEnd(false);
                         List<Edge> leftTwinExcludedEdges = excludedEdges.get(leftTwinCell);
-                        if (leftTwinExcludedEdges == null || leftTwinExcludedEdges.isEmpty()) {
+                        if (leftTwinExcludedEdges == null && leftTwinCell.getIdle() == null) {
                             leftTwinCell.setBoundary(leftTwinEdge);
                         }
                         if (erasedEdge != null) {
@@ -422,7 +423,7 @@ public class Main extends Application {
                         leftEdge.setLeftPoint(leftPoint);
                         leftEdge.setInfiniteLeftEnd(false);
                         List<Edge> leftExcludedEdges = excludedEdges.get(leftCell);
-                        if (leftExcludedEdges == null || leftExcludedEdges.isEmpty()) {
+                        if (leftExcludedEdges == null && leftCell.getIdle() == null) {
                             leftCell.setBoundary(leftEdge);
                         }
                         if (erasedEdge != null) {
@@ -436,7 +437,7 @@ public class Main extends Application {
                     leftTwinEdge.setRightPoint(leftPoint);
                     leftTwinEdge.setInfiniteRightEnd(false);
                     List<Edge> leftTwinExcludedEdges = excludedEdges.get(leftTwinCell);
-                    if (leftTwinExcludedEdges == null || leftTwinExcludedEdges.isEmpty()) {
+                    if (leftTwinExcludedEdges == null && leftTwinCell.getIdle() == null) {
                         leftTwinCell.setBoundary(leftTwinEdge);
                     }
                     if (erasedEdge != null) {
@@ -447,7 +448,7 @@ public class Main extends Application {
                     leftEdge.setRightPoint(leftPoint);
                     leftEdge.setInfiniteRightEnd(false);
                     List<Edge> leftExcludedEdges = excludedEdges.get(leftCell);
-                    if (leftExcludedEdges == null || leftExcludedEdges.isEmpty()) {
+                    if (leftExcludedEdges == null && leftCell.getIdle() == null) {
                         leftCell.setBoundary(leftEdge);
                     }
                     if (erasedEdge != null) {
@@ -460,7 +461,7 @@ public class Main extends Application {
                     leftTwinEdge.setLeftPoint(leftPoint);
                     leftTwinEdge.setInfiniteLeftEnd(false);
                     List<Edge> leftTwinExcludedEdges = excludedEdges.get(leftTwinCell);
-                    if (leftTwinExcludedEdges == null || leftTwinExcludedEdges.isEmpty()) {
+                    if (leftTwinExcludedEdges == null && leftTwinCell.getIdle() == null) {
                         leftTwinCell.setBoundary(leftTwinEdge);
                     }
                     if (erasedEdge != null) {
@@ -471,7 +472,7 @@ public class Main extends Application {
                     leftEdge.setLeftPoint(leftPoint);
                     leftEdge.setInfiniteLeftEnd(false);
                     List<Edge> leftExcludedEdges = excludedEdges.get(leftCell);
-                    if (leftExcludedEdges == null || leftExcludedEdges.isEmpty()) {
+                    if (leftExcludedEdges == null && leftCell.getIdle() == null) {
                         leftCell.setBoundary(leftEdge);
                     }
                     if (erasedEdge != null) {
@@ -488,7 +489,7 @@ public class Main extends Application {
                 Edge edge = disjunctiveChain.get(leftCell);
                 if (edge == null) {
                     Edge lastEdge = leftCell.getBoundary().getLastEdge();
-                    if (isLeftExcludedEdge && lastEdge != null && isConnected(lastEdge, nextLeftEdge)) {
+                    if ((isLeftExcludedEdge || leftCell.getIdle() != null)  && lastEdge != null && isConnected(lastEdge, nextLeftEdge)) {
                         nextLeftEdge.setPrev(lastEdge);
                         lastEdge.setNext(nextLeftEdge);
                     }
@@ -545,7 +546,7 @@ public class Main extends Application {
                         rightTwinEdge.setRightPoint(rightPoint);
                         rightTwinEdge.setInfiniteRightEnd(false);
                         List<Edge> rightTwinExcludedEdges = excludedEdges.get(rightTwinCell);
-                        if (rightTwinExcludedEdges == null || rightTwinExcludedEdges.isEmpty()) {
+                        if (rightTwinExcludedEdges == null && rightTwinCell.getIdle() == null) {
                             rightTwinCell.setBoundary(rightTwinEdge);
                         }
                         if (erasedEdge != null) {
@@ -556,7 +557,7 @@ public class Main extends Application {
                         rightEdge.setRightPoint(rightPoint);
                         rightEdge.setInfiniteRightEnd(false);
                         List<Edge> rightExcludedEdges = excludedEdges.get(rightCell);
-                        if (rightExcludedEdges == null || rightExcludedEdges.isEmpty()) {
+                        if (rightExcludedEdges == null && rightCell.getIdle() == null) {
                             rightCell.setBoundary(rightEdge);
                         }
                         if (erasedEdge != null) {
@@ -569,7 +570,7 @@ public class Main extends Application {
                         rightTwinEdge.setLeftPoint(rightPoint);
                         rightTwinEdge.setInfiniteLeftEnd(false);
                         List<Edge> rightTwinExcludedEdges = excludedEdges.get(rightTwinCell);
-                        if (rightTwinExcludedEdges == null || rightTwinExcludedEdges.isEmpty()) {
+                        if (rightTwinExcludedEdges == null && rightTwinCell.getIdle() == null) {
                             rightTwinCell.setBoundary(rightTwinEdge);
                         }
                         if (erasedEdge != null) {
@@ -580,7 +581,7 @@ public class Main extends Application {
                         rightEdge.setLeftPoint(rightPoint);
                         rightEdge.setInfiniteLeftEnd(false);
                         List<Edge> rightExcludedEdges = excludedEdges.get(rightCell);
-                        if (rightExcludedEdges == null || rightExcludedEdges.isEmpty()) {
+                        if (rightExcludedEdges == null && rightCell.getIdle() == null) {
                             rightCell.setBoundary(rightEdge);
                         }
                         if (erasedEdge != null) {
@@ -594,7 +595,7 @@ public class Main extends Application {
                     rightTwinEdge.setRightPoint(rightPoint);
                     rightTwinEdge.setInfiniteRightEnd(false);
                     List<Edge> rightTwinExcludedEdges = excludedEdges.get(rightTwinCell);
-                    if (rightTwinExcludedEdges == null || rightTwinExcludedEdges.isEmpty()) {
+                    if (rightTwinExcludedEdges == null && rightTwinCell.getIdle() == null) {
                         rightTwinCell.setBoundary(rightTwinEdge);
                     }
                     if (erasedEdge != null) {
@@ -605,7 +606,7 @@ public class Main extends Application {
                     rightEdge.setRightPoint(rightPoint);
                     rightEdge.setInfiniteRightEnd(false);
                     List<Edge> rightExcludedEdges = excludedEdges.get(rightCell);
-                    if (rightExcludedEdges == null || rightExcludedEdges.isEmpty()) {
+                    if (rightExcludedEdges == null && rightCell.getIdle() == null) {
                         rightCell.setBoundary(rightEdge);
                     }
                     if (erasedEdge != null) {
@@ -618,7 +619,7 @@ public class Main extends Application {
                     rightTwinEdge.setLeftPoint(rightPoint);
                     rightTwinEdge.setInfiniteLeftEnd(false);
                     List<Edge> rightTwinExcludedEdges = excludedEdges.get(rightTwinCell);
-                    if (rightTwinExcludedEdges == null || rightTwinExcludedEdges.isEmpty()) {
+                    if (rightTwinExcludedEdges == null && rightTwinCell.getIdle() == null) {
                         rightTwinCell.setBoundary(rightTwinEdge);
                     }
                     if (erasedEdge != null) {
@@ -629,7 +630,7 @@ public class Main extends Application {
                     rightEdge.setLeftPoint(rightPoint);
                     rightEdge.setInfiniteLeftEnd(false);
                     List<Edge> rightExcludedEdges = excludedEdges.get(rightCell);
-                    if (rightExcludedEdges == null || rightExcludedEdges.isEmpty()) {
+                    if (rightExcludedEdges == null && rightCell.getIdle() == null) {
                         rightCell.setBoundary(rightEdge);
                     }
                     if (erasedEdge != null) {
@@ -646,7 +647,7 @@ public class Main extends Application {
                 Edge edge = disjunctiveChain.get(rightCell);
                 if (edge == null) {
                     Edge startEdge = rightCell.getBoundary().getStartEdge();
-                    if (isRightExcludedEdge && startEdge != null && isConnected(startEdge, nextRightEdge)) {
+                    if ((isRightExcludedEdge || rightCell.getIdle() != null) && startEdge != null && isConnected(startEdge, nextRightEdge)) {
                         nextRightEdge.setNext(startEdge);
                         startEdge.setPrev(nextRightEdge);
                     }
