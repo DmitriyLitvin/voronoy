@@ -13,5 +13,4 @@ import java.util.stream.Collectors;
 public class Cell {
     private Point center;
     private Edge boundary;
-    private Edge idle;
 }
