@@ -24,10 +24,8 @@ import static org.example.utils.VectorUtils.crossProduct;
 
 @Slf4j
 public class Main extends Application {
-    final Pane pane = new Pane();
-    final BorderPane borderPane = new BorderPane();
-
-
+    private final Pane pane = new Pane();
+    private final BorderPane borderPane = new BorderPane();
 
     public void start(Stage stage) {
         final Set<Point> points = new LinkedHashSet<>();
