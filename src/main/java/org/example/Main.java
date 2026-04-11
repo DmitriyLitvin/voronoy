@@ -87,7 +87,7 @@ public class Main extends Application {
 
     public void drawVoronoyDiagram(Set<Point> polygon) {
         log.info("Start drawing ");
-        buildVoronoyDiagram(polygon.stream().sorted(Comparator.comparingDouble(Point::getX).thenComparingDouble(Point::getY)).toList()).values().stream().filter(a -> a.getCenter().equals(new Point(410, 498))).forEach(voronoyCell -> {
+        buildVoronoyDiagram(polygon.stream().sorted(Comparator.comparingDouble(Point::getX).thenComparingDouble(Point::getY)).toList()).values().stream().forEach(voronoyCell -> {
             Edge edge = voronoyCell.getBoundary();
             Edge nextEdge = voronoyCell.getBoundary();
             if (nextEdge != null) {
@@ -489,7 +489,7 @@ public class Main extends Application {
                 Edge edge = disjunctiveChain.get(leftCell);
                 if (edge == null) {
                     Edge lastEdge = leftCell.getBoundary().getLastEdge();
-                    if ((isLeftExcludedEdge || leftCell.getIdle() != null)  && lastEdge != null && isConnected(lastEdge, nextLeftEdge)) {
+                    if ((isLeftExcludedEdge || leftCell.getIdle() != null) && lastEdge != null && isConnected(lastEdge, nextLeftEdge)) {
                         nextLeftEdge.setPrev(lastEdge);
                         lastEdge.setNext(nextLeftEdge);
                     }
@@ -518,6 +518,14 @@ public class Main extends Application {
                                 nextRightEdge.setNext(startEdge);
                                 startEdge.setPrev(nextRightEdge);
                             } else {
+                                Edge idle = rightCell.getIdle();
+                                if (idle != null) {
+                                    startEdge = idle.getStartEdge();
+                                    if (startEdge != null && isConnected(startEdge, nextRightEdge)) {
+                                        nextRightEdge.setNext(startEdge);
+                                        startEdge.setPrev(nextRightEdge);
+                                    }
+                                }
                                 disjunctiveChain.put(rightCell, nextRightEdge);
                             }
                         }
@@ -676,6 +684,14 @@ public class Main extends Application {
                                 nextLeftEdge.setPrev(lastEdge);
                                 lastEdge.setNext(nextLeftEdge);
                             } else {
+                                Edge idle = leftCell.getIdle();
+                                if (idle != null) {
+                                    lastEdge = idle.getLastEdge();
+                                    if (lastEdge != null && isConnected(lastEdge, nextLeftEdge)) {
+                                        nextLeftEdge.setPrev(lastEdge);
+                                        lastEdge.setNext(nextLeftEdge);
+                                    }
+                                }
                                 disjunctiveChain.put(leftCell, nextLeftEdge);
                             }
                         }
