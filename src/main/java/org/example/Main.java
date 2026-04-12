@@ -46,7 +46,7 @@ public class Main extends Application {
         points.add(new Point(411, 562));
         points.add(new Point(412, 449));
         points.add(new Point(417, 425));
-        points.add(new Point(420, 474));
+        //points.add(new Point(420, 474));
 
 
         points.forEach(p -> {
@@ -86,7 +86,7 @@ public class Main extends Application {
 
     public void drawVoronoyDiagram(Set<Point> polygon) {
         log.info("Start drawing ");
-        buildVoronoyDiagram(polygon.stream().sorted(Comparator.comparingDouble(Point::getX).thenComparingDouble(Point::getY)).toList()).values().stream().forEach(voronoyCell -> {
+        buildVoronoyDiagram(polygon.stream().sorted(Comparator.comparingDouble(Point::getX).thenComparingDouble(Point::getY)).toList()).values().stream().filter(a -> a.getCenter().equals(new Point(410, 498))).forEach(voronoyCell -> {
             Edge edge = voronoyCell.getBoundary();
             Edge nextEdge = voronoyCell.getBoundary();
             if (nextEdge != null) {
@@ -516,17 +516,13 @@ public class Main extends Application {
                             if (startEdge != null && isConnected(startEdge, nextRightEdge)) {
                                 nextRightEdge.setNext(startEdge);
                                 startEdge.setPrev(nextRightEdge);
-                            } else {
-                                Edge idle = idleEdges.get(rightCell);
-                                if (idle != null) {
-                                    startEdge = idle.getStartEdge();
-                                    if (startEdge != null && isConnected(startEdge, nextRightEdge)) {
-                                        nextRightEdge.setNext(startEdge);
-                                        startEdge.setPrev(nextRightEdge);
-                                    }
-                                }
-                                disjunctiveChain.put(rightCell, nextRightEdge);
                             }
+                            startEdge = idleEdges.get(rightCell);
+                            if (startEdge != null && isConnected(startEdge, nextRightEdge)) {
+                                nextRightEdge.setNext(startEdge);
+                                startEdge.setPrev(nextRightEdge);
+                            }
+                            disjunctiveChain.put(rightCell, nextRightEdge);
                         }
                     } else {
                         Edge startEdge = edge.getStartEdge();
@@ -682,17 +678,13 @@ public class Main extends Application {
                             if (lastEdge != null && isConnected(lastEdge, nextLeftEdge)) {
                                 nextLeftEdge.setPrev(lastEdge);
                                 lastEdge.setNext(nextLeftEdge);
-                            } else {
-                                Edge idle = idleEdges.get(leftCell);
-                                if (idle != null) {
-                                    lastEdge = idle.getLastEdge();
-                                    if (lastEdge != null && isConnected(lastEdge, nextLeftEdge)) {
-                                        nextLeftEdge.setPrev(lastEdge);
-                                        lastEdge.setNext(nextLeftEdge);
-                                    }
-                                }
-                                disjunctiveChain.put(leftCell, nextLeftEdge);
                             }
+                            lastEdge = idleEdges.get(leftCell);
+                            if (lastEdge != null && isConnected(lastEdge, nextLeftEdge)) {
+                                nextLeftEdge.setPrev(lastEdge);
+                                lastEdge.setNext(nextLeftEdge);
+                            }
+                            disjunctiveChain.put(leftCell, nextLeftEdge);
                         }
                     } else {
                         Edge lastEdge = edge.getLastEdge();
