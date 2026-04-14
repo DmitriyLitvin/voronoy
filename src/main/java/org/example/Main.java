@@ -49,9 +49,6 @@ public class Main extends Application {
         points.add(new Point(401, 445));
 
 
-
-
-
         points.forEach(p -> {
             Circle circle = new Circle(p.getX(), p.getY(), 2, Color.RED);
             Label label = new Label(+circle.getCenterX() + ", " + circle.getCenterY());
@@ -89,7 +86,7 @@ public class Main extends Application {
 
     public void drawVoronoyDiagram(Set<Point> polygon) {
         log.info("Start drawing ");
-        buildVoronoyDiagram(polygon.stream().sorted(Comparator.comparingDouble(Point::getX).thenComparingDouble(Point::getY)).toList()).values().stream().forEach(voronoyCell -> {
+        buildVoronoyDiagram(polygon.stream().sorted(Comparator.comparingDouble(Point::getX).thenComparingDouble(Point::getY)).toList()).values().forEach(voronoyCell -> {
             Edge edge = voronoyCell.getBoundary();
             Edge nextEdge = voronoyCell.getBoundary();
             if (nextEdge != null) {
@@ -99,7 +96,7 @@ public class Main extends Application {
                     line.setStrokeWidth(1);
                     pane.getChildren().add(line);
                     nextEdge = nextEdge.getNext();
-                } while (nextEdge != null && !Objects.equals(new Line(edge), new Line(nextEdge)));
+                } while (nextEdge != null && !Objects.equals(edge, nextEdge));
             }
 
             Edge prevEdge = voronoyCell.getBoundary();
@@ -110,16 +107,9 @@ public class Main extends Application {
                     line.setStrokeWidth(1);
                     pane.getChildren().add(line);
                     prevEdge = prevEdge.getPrev();
-                } while (prevEdge != null && !Objects.equals(new Line(edge), new Line(prevEdge)));
+                } while (prevEdge != null && !Objects.equals(edge, prevEdge));
             }
         });
-
-        Point point = new Point(355.75962910150895, 499.04350927239284);
-
-        Circle circle = new Circle(point.getX(), point.getY(), 2, Color.BLUE);
-        Label label = new Label(+circle.getCenterX() + ", " + circle.getCenterY());
-        label.relocate(circle.getCenterX(), circle.getCenterY());
-        pane.getChildren().addAll(label, circle);
 
         log.info("End drawing");
     }
@@ -879,9 +869,9 @@ public class Main extends Application {
         for (Edge edge : edges) {
             Edge nextEdge = edge;
             do {
-                if ((chainEdge == null || !Objects.equals(new Line(chainEdge), new Line(nextEdge))) && (currentEdge == null || !Objects.equals(new Line(currentEdge), new Line(nextEdge)))) {
+                if ((chainEdge == null || !Objects.equals(chainEdge, nextEdge)) && (currentEdge == null || !Objects.equals(currentEdge, nextEdge))) {
                     Point point = getPointOfIntersection(middlePerpendic, new Line(nextEdge));
-                    if (point != null && isIntersected(point, new Line(nextEdge)) && isOutsideCell(currentEdge, chainPoint, point)) {
+                    if (point != null && isIntersected(point, nextEdge) && isOutsideCell(currentEdge, chainPoint, point)) {
                         double currentDistance = VectorUtils.getLength(point, middlePerpendic.getRightPoint());
                         if (distance == 0 || currentDistance < distance) {
                             distance = currentDistance;
@@ -890,13 +880,13 @@ public class Main extends Application {
                     }
                 }
                 nextEdge = nextEdge.getNext();
-            } while (nextEdge != null && !Objects.equals(new Line(edge), new Line(nextEdge)));
+            } while (nextEdge != null && !Objects.equals(edge, nextEdge));
 
             Edge prevEdge = edge;
             do {
-                if ((chainEdge == null || !Objects.equals(new Line(chainEdge), new Line(prevEdge))) && (currentEdge == null || !Objects.equals(new Line(currentEdge), new Line(prevEdge)))) {
+                if ((chainEdge == null || !Objects.equals(chainEdge, prevEdge)) && (currentEdge == null || !Objects.equals(currentEdge, prevEdge))) {
                     Point point = getPointOfIntersection(middlePerpendic, new Line(prevEdge));
-                    if (point != null && isIntersected(point, new Line(prevEdge)) && isOutsideCell(currentEdge, chainPoint, point)) {
+                    if (point != null && isIntersected(point, prevEdge) && isOutsideCell(currentEdge, chainPoint, point)) {
                         double currentDistance = VectorUtils.getLength(point, middlePerpendic.getRightPoint());
                         if (distance == 0 || currentDistance < distance) {
                             distance = currentDistance;
@@ -905,29 +895,29 @@ public class Main extends Application {
                     }
                 }
                 prevEdge = prevEdge.getPrev();
-            } while (prevEdge != null && !Objects.equals(new Line(edge), new Line(prevEdge)));
+            } while (prevEdge != null && !Objects.equals(edge, prevEdge));
         }
 
         return intersectedEdge;
     }
 
-    public boolean isIntersected(Point point, Line line) {
+    public boolean isIntersected(Point point, Edge edge) {
         if (point == null) {
             return false;
-        } else if (line.isInfiniteRightEnd() && line.isInfiniteLeftEnd()) {
+        } else if (edge.isInfiniteRightEnd() && edge.isInfiniteLeftEnd()) {
             return true;
-        } else if (!line.isInfiniteRightEnd() && !line.isInfiniteLeftEnd()) {
-            Point leftPoint = line.getLeftPoint();
-            Point rightPoint = line.getRightPoint();
+        } else if (!edge.isInfiniteRightEnd() && !edge.isInfiniteLeftEnd()) {
+            Point leftPoint = edge.getLeftPoint();
+            Point rightPoint = edge.getRightPoint();
             return VectorUtils.dotProduct(VectorUtils.getDirectionPoint(point, leftPoint), VectorUtils.getDirectionPoint(point, rightPoint)) <= 0;
-        } else if (line.isInfiniteLeftEnd()) {
-            Point rightPoint = line.getRightPoint();
-            Point leftPoint = line.getLeftPoint();
+        } else if (edge.isInfiniteLeftEnd()) {
+            Point rightPoint = edge.getRightPoint();
+            Point leftPoint = edge.getLeftPoint();
             return VectorUtils.dotProduct(VectorUtils.getDirectionPoint(point, rightPoint), VectorUtils.getDirectionPoint(leftPoint, rightPoint)) >= 0;
         }
 
-        Point leftPoint = line.getLeftPoint();
-        Point rightPoint = line.getRightPoint();
+        Point leftPoint = edge.getLeftPoint();
+        Point rightPoint = edge.getRightPoint();
         return VectorUtils.dotProduct(VectorUtils.getDirectionPoint(point, leftPoint), VectorUtils.getDirectionPoint(rightPoint, leftPoint)) >= 0;
     }
 

@@ -1,11 +1,6 @@
 package org.example.entity;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import org.example.utils.DeepCopyHelper;
-import org.example.utils.VectorUtils;
+import lombok.*;
 
 import java.util.Objects;
 
@@ -13,8 +8,11 @@ import java.util.Objects;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class Edge {
+    @EqualsAndHashCode.Include
     private Point leftPoint;
+    @EqualsAndHashCode.Include
     private Point rightPoint;
     private Edge next;
     private Edge prev;
