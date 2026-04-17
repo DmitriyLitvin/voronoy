@@ -13,4 +13,10 @@ import java.util.stream.Collectors;
 public class Cell {
     private Point center;
     private Edge boundary;
+
+    boolean isConnected() {
+        Edge startEdge = boundary.getStartEdge();
+        Edge lastEdge = boundary.getLastEdge();
+        return startEdge.getLeftPoint() == lastEdge.getRightPoint() || startEdge.getRightPoint() == lastEdge.getLeftPoint();
+    }
 }
