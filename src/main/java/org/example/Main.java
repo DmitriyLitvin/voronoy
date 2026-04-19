@@ -39,14 +39,14 @@ public class Main extends Application {
         pane.getChildren().add(button);
 
 
-        points.add(new Point(369, 451));
-        points.add(new Point(379, 459));
-        points.add(new Point(395, 457));
-        points.add(new Point(395, 627));
-        points.add(new Point(396, 633));
-        points.add(new Point(397, 478));
-        points.add(new Point(398, 518));
-        points.add(new Point(401, 445));
+//        points.add(new Point(369, 451));
+//        points.add(new Point(379, 459));
+//        points.add(new Point(395, 457));
+//        points.add(new Point(395, 627));
+//        points.add(new Point(396, 633));
+//        points.add(new Point(397, 478));
+//        points.add(new Point(398, 518));
+//        points.add(new Point(401, 445));
 
 
         points.forEach(p -> {
@@ -291,9 +291,9 @@ public class Main extends Application {
             middlePerpendic = getMiddlePerpendicular(upperCommonSupport);
             Point midPoint = upperCommonSupport.getMidPoint();
 
-            boolean isInfiniteLeftEnd = false;
+            boolean isInfinite = false;
             if (chainPoint == null) {
-                isInfiniteLeftEnd = true;
+                isInfinite = true;
                 Point leftPoint = middlePerpendic.getLeftPoint();
                 if (VectorUtils.crossProduct(VectorUtils.getDirectionPoint(upperCommonSupport.getLeftPoint(), upperCommonSupport.getRightPoint()), VectorUtils.getDirectionPoint(upperCommonSupport.getLeftPoint(), leftPoint)) > 0) {
                     chainPoint = leftPoint;
@@ -432,7 +432,7 @@ public class Main extends Application {
                 }
                 assert leftTwinEdge != null;
                 Edge nextLeftEdge = new Edge(chainPoint, leftPoint, leftCell);
-                nextLeftEdge.setInfiniteLeftEnd(isInfiniteLeftEnd);
+                nextLeftEdge.setInfiniteLeftEnd(isInfinite);
                 nextLeftEdge.setInfiniteRightEnd(false);
                 nextLeftEdge.setNext(leftEdge);
                 leftEdge.setPrev(nextLeftEdge);
@@ -453,7 +453,7 @@ public class Main extends Application {
                 }
 
                 Edge nextRightEdge = new Edge(chainPoint, leftPoint, rightCell);
-                nextRightEdge.setInfiniteLeftEnd(isInfiniteLeftEnd);
+                nextRightEdge.setInfiniteLeftEnd(isInfinite);
                 nextRightEdge.setInfiniteRightEnd(false);
                 nextRightEdge.setTwin(nextLeftEdge);
 
@@ -546,7 +546,7 @@ public class Main extends Application {
                 }
                 assert rightTwinEdge != null;
                 Edge nextRightEdge = new Edge(chainPoint, rightPoint, rightCell);
-                nextRightEdge.setInfiniteLeftEnd(isInfiniteLeftEnd);
+                nextRightEdge.setInfiniteLeftEnd(isInfinite);
                 nextRightEdge.setInfiniteRightEnd(false);
                 nextRightEdge.setPrev(rightEdge);
                 rightEdge.setNext(nextRightEdge);
@@ -567,7 +567,7 @@ public class Main extends Application {
                 }
 
                 Edge nextLeftEdge = new Edge(chainPoint, rightPoint, leftCell);
-                nextLeftEdge.setInfiniteLeftEnd(isInfiniteLeftEnd);
+                nextLeftEdge.setInfiniteLeftEnd(isInfinite);
                 nextLeftEdge.setInfiniteRightEnd(false);
                 nextLeftEdge.setTwin(nextRightEdge);
 
