@@ -24,8 +24,8 @@ public class Line {
     public Line(Edge edge) {
         this.leftPoint = edge.getLeftPoint();
         this.rightPoint = edge.getRightPoint();
-        this.isInfiniteLeftEnd = edge.isInfiniteLeftEnd();
-        this.isInfiniteRightEnd = edge.isInfiniteRightEnd();
+        this.isInfiniteLeftEnd = edge.isLeft();
+        this.isInfiniteRightEnd = edge.isRight();
     }
 
     public double getY(double x) {

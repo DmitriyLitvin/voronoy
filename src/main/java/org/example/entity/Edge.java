@@ -18,8 +18,8 @@ public class Edge {
     private Edge prev;
     private Edge twin;
     private Cell cell;
-    private boolean isInfiniteLeftEnd = true;
-    private boolean isInfiniteRightEnd = true;
+    private boolean isLeft = true;
+    private boolean isRight = true;
 
     public Edge(Point leftPoint, Point rightPoint, Cell cell) {
         this.leftPoint = leftPoint;
