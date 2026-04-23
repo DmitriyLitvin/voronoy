@@ -381,13 +381,6 @@ public class Main extends Application {
                 Edge leftTwinEdge = leftEdge.getTwin();
                 Edge nextLeftEdge;
                 Edge nextRightEdge;
-
-                Point a = null;
-                Point b = null;
-
-                boolean isLeft = false;
-                boolean isRight = false;
-                assert leftCell != null;
                 if (isOnTheSameSide(leftCell.getCenter(), leftEdge.getA(), midPoint)) {
                     Cell leftTwinCell = leftTwinEdge.getCell();
 
@@ -412,10 +405,6 @@ public class Main extends Application {
                     if (erasedEdge != null) {
                         excludedEdges.computeIfAbsent(leftCell, k -> new ArrayList<>()).add(erasedEdge);
                     }
-
-                    a = leftPoint;
-                    b = chainPoint;
-                    isRight = isInfinite;
                 } else if (isOnTheSameSide(leftCell.getCenter(), leftEdge.getB(), midPoint)) {
                     Cell leftTwinCell = leftTwinEdge.getCell();
 
@@ -440,14 +429,10 @@ public class Main extends Application {
                     if (erasedEdge != null) {
                         excludedEdges.computeIfAbsent(leftCell, k -> new ArrayList<>()).add(erasedEdge);
                     }
-
-                    a = chainPoint;
-                    b = leftPoint;
-                    isLeft = isInfinite;
                 }
-                nextLeftEdge = new Edge(a, b, leftCell);
-                nextLeftEdge.setLeft(isLeft);
-                nextLeftEdge.setRight(isRight);
+                nextLeftEdge = new Edge(chainPoint, leftPoint, leftCell);
+                nextLeftEdge.setLeft(isInfinite);
+                nextLeftEdge.setRight(true);
                 nextLeftEdge.setNext(leftEdge);
                 leftEdge.setPrev(nextLeftEdge);
 
@@ -467,9 +452,9 @@ public class Main extends Application {
                 }
 
 
-                nextRightEdge = new Edge(a, b, rightCell);
-                nextRightEdge.setLeft(isLeft);
-                nextRightEdge.setRight(isRight);
+                nextRightEdge = new Edge(chainPoint, leftPoint, rightCell);
+                nextRightEdge.setLeft(isInfinite);
+                nextRightEdge.setRight(true);
 
                 if (rightCell != null) {
                     edge = disjunctiveChain.get(rightCell);
@@ -510,11 +495,6 @@ public class Main extends Application {
                 Edge rightTwinEdge = rightEdge.getTwin();
                 Edge nextLeftEdge;
                 Edge nextRightEdge;
-                Point a = null;
-                Point b = null;
-
-                boolean isLeft = false;
-                boolean isRight = false;
                 assert rightCell != null;
                 if (isOnTheSameSide(rightCell.getCenter(), rightEdge.getA(), midPoint)) {
                     Cell rightTwinCell = rightTwinEdge.getCell();
@@ -541,9 +521,6 @@ public class Main extends Application {
                         excludedEdges.computeIfAbsent(rightCell, k -> new ArrayList<>()).add(erasedEdge);
                     }
 
-                    a = rightPoint;
-                    b = chainPoint;
-                    isRight = isInfinite;
                 } else if (isOnTheSameSide(rightCell.getCenter(), rightEdge.getB(), midPoint)) {
                     Cell rightTwinCell = rightTwinEdge.getCell();
 
@@ -568,15 +545,11 @@ public class Main extends Application {
                     if (erasedEdge != null) {
                         excludedEdges.computeIfAbsent(rightCell, k -> new ArrayList<>()).add(erasedEdge);
                     }
-
-                    a = chainPoint;
-                    b = rightPoint;
-                    isLeft = isInfinite;
                 }
                 assert rightTwinEdge != null;
-                nextRightEdge = new Edge(a, b, rightCell);
-                nextRightEdge.setLeft(isLeft);
-                nextRightEdge.setRight(isRight);
+                nextRightEdge = new Edge(rightPoint, chainPoint, rightCell);
+                nextRightEdge.setLeft(false);
+                nextRightEdge.setRight(isInfinite);
                 nextRightEdge.setPrev(rightEdge);
                 rightEdge.setNext(nextRightEdge);
 
@@ -595,9 +568,9 @@ public class Main extends Application {
                     }
                 }
 
-                nextLeftEdge = new Edge(a, b, leftCell);
-                nextLeftEdge.setLeft(isLeft);
-                nextLeftEdge.setRight(isRight);
+                nextLeftEdge = new Edge(rightPoint, chainPoint, leftCell);
+                nextLeftEdge.setLeft(false);
+                nextLeftEdge.setRight(isInfinite);
                 if (leftCell != null) {
                     edge = disjunctiveChain.get(leftCell);
                     if (edge == null) {
@@ -664,21 +637,11 @@ public class Main extends Application {
             Edge startEdge = boundary.getStartEdge();
             Edge lastEdge = boundary.getLastEdge();
             if (startEdge != null && isConnected(startEdge, leftEdge)) {
-                if (startEdge.getNext() == null) {
-                    startEdge.setNext(leftEdge);
-                    leftEdge.setPrev(startEdge);
-                } else if (startEdge.getPrev() == null) {
-                    startEdge.setPrev(leftEdge);
-                    leftEdge.setNext(startEdge);
-                }
+                startEdge.setNext(leftEdge);
+                leftEdge.setPrev(startEdge);
             } else if (lastEdge != null && isConnected(lastEdge, leftEdge)) {
-                if (lastEdge.getNext() == null) {
-                    lastEdge.setNext(leftEdge);
-                    leftEdge.setPrev(lastEdge);
-                } else if (lastEdge.getPrev() == null) {
-                    lastEdge.setPrev(leftEdge);
-                    leftEdge.setNext(lastEdge);
-                }
+                lastEdge.setNext(leftEdge);
+                leftEdge.setPrev(lastEdge);
             }
         }
 
@@ -687,21 +650,11 @@ public class Main extends Application {
             Edge startEdge = boundary.getStartEdge();
             Edge lastEdge = boundary.getLastEdge();
             if (startEdge != null && isConnected(startEdge, rightEdge)) {
-                if (startEdge.getPrev() == null) {
-                    startEdge.setPrev(rightEdge);
-                    rightEdge.setNext(startEdge);
-                } else if (startEdge.getNext() == null) {
-                    startEdge.setNext(rightEdge);
-                    rightEdge.setPrev(startEdge);
-                }
+                startEdge.setPrev(rightEdge);
+                rightEdge.setNext(startEdge);
             } else if (lastEdge != null && isConnected(lastEdge, rightEdge)) {
-                if (lastEdge.getPrev() == null) {
-                    lastEdge.setPrev(rightEdge);
-                    rightEdge.setNext(lastEdge);
-                } else if (lastEdge.getNext() == null) {
-                    lastEdge.setNext(rightEdge);
-                    rightEdge.setPrev(lastEdge);
-                }
+                lastEdge.setPrev(rightEdge);
+                rightEdge.setNext(lastEdge);
             }
         }
 
