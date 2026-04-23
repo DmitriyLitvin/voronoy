@@ -11,9 +11,9 @@ import java.util.Objects;
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class Edge {
     @EqualsAndHashCode.Include
-    private Point leftPoint;
+    private Point a;
     @EqualsAndHashCode.Include
-    private Point rightPoint;
+    private Point b;
     private Edge next;
     private Edge prev;
     private Edge twin;
@@ -21,15 +21,15 @@ public class Edge {
     private boolean isLeft = true;
     private boolean isRight = true;
 
-    public Edge(Point leftPoint, Point rightPoint, Cell cell) {
-        this.leftPoint = leftPoint;
-        this.rightPoint = rightPoint;
+    public Edge(Point a, Point b, Cell cell) {
+        this.a = a;
+        this.b = b;
         this.cell = cell;
     }
 
-    public Edge(Point leftPoint, Point rightPoint) {
-        this.leftPoint = leftPoint;
-        this.rightPoint = rightPoint;
+    public Edge(Point a, Point b) {
+        this.a = a;
+        this.b = b;
     }
 
     public Edge getStartEdge() {

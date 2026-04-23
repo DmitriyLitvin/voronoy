@@ -1,10 +1,6 @@
 package org.example.entity;
 
 import lombok.*;
-import org.example.utils.VectorUtils;
-
-import java.util.*;
-import java.util.stream.Collectors;
 
 @Getter
 @Setter
@@ -17,6 +13,6 @@ public class Cell {
     boolean isConnected() {
         Edge startEdge = boundary.getStartEdge();
         Edge lastEdge = boundary.getLastEdge();
-        return startEdge.getLeftPoint() == lastEdge.getRightPoint() || startEdge.getRightPoint() == lastEdge.getLeftPoint();
+        return startEdge.getA() == lastEdge.getB() || startEdge.getB() == lastEdge.getA();
     }
 }
