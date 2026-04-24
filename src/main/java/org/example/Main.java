@@ -432,7 +432,7 @@ public class Main extends Application {
                 }
                 nextLeftEdge = new Edge(chainPoint, leftPoint, leftCell);
                 nextLeftEdge.setLeft(isInfinite);
-                nextLeftEdge.setRight(true);
+                nextLeftEdge.setRight(false);
                 nextLeftEdge.setNext(leftEdge);
                 leftEdge.setPrev(nextLeftEdge);
 
@@ -454,7 +454,7 @@ public class Main extends Application {
 
                 nextRightEdge = new Edge(chainPoint, leftPoint, rightCell);
                 nextRightEdge.setLeft(isInfinite);
-                nextRightEdge.setRight(true);
+                nextRightEdge.setRight(false);
 
                 if (rightCell != null) {
                     edge = disjunctiveChain.get(rightCell);
