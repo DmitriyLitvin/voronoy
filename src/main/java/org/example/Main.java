@@ -763,7 +763,7 @@ public class Main extends Application {
         for (Edge edge : edges) {
             Edge nextEdge = edge;
             do {
-                if ((chainEdge == null || (!Objects.equals(chainEdge.getTwin(), nextEdge))) && (currentEdge == null || (!Objects.equals(currentEdge.getTwin(), nextEdge)))) {
+                if ((chainEdge == null || !Objects.equals(chainEdge.getTwin(), nextEdge)) && (currentEdge == null || !Objects.equals(currentEdge.getTwin(), nextEdge))) {
                     Vertex intersectVertex = getPointOfIntersection(middlePerpendicular, new Line(nextEdge));
                     if (intersectVertex != null && isIntersected(intersectVertex, nextEdge) && isOutsideCell(currentEdge, chainVertex, intersectVertex)) {
                         double currentDistance = VectorUtils.getLength(intersectVertex, middlePerpendicular.getB());
@@ -778,7 +778,7 @@ public class Main extends Application {
 
             Edge prevEdge = edge;
             do {
-                if ((chainEdge == null || (!Objects.equals(chainEdge.getTwin(), prevEdge))) && (currentEdge == null || (!Objects.equals(currentEdge.getTwin(), prevEdge)))) {
+                if ((chainEdge == null || !Objects.equals(chainEdge.getTwin(), prevEdge)) && (currentEdge == null || !Objects.equals(currentEdge.getTwin(), prevEdge))) {
                     Vertex intersectVertex = getPointOfIntersection(middlePerpendicular, new Line(prevEdge));
                     if (intersectVertex != null && isIntersected(intersectVertex, prevEdge) && isOutsideCell(currentEdge, chainVertex, intersectVertex)) {
                         double currentDistance = VectorUtils.getLength(intersectVertex, middlePerpendicular.getB());
