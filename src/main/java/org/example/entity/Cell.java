@@ -7,12 +7,16 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Cell {
-    private Point center;
+    private Vertex center;
     private Edge boundary;
 
-    boolean isConnected() {
+    public boolean isConnected() {
         Edge startEdge = boundary.getStartEdge();
         Edge lastEdge = boundary.getLastEdge();
-        return startEdge.getA() == lastEdge.getB() || startEdge.getB() == lastEdge.getA();
+        if (startEdge == null || lastEdge == null) {
+            return false;
+        }
+
+        return startEdge.getTwin().getVertex() == lastEdge.getVertex();
     }
 }

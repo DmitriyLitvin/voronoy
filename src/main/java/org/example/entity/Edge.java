@@ -11,26 +11,22 @@ import java.util.Objects;
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class Edge {
     @EqualsAndHashCode.Include
-    private Point a;
-    @EqualsAndHashCode.Include
-    private Point b;
+    private Vertex vertex;
     private Edge next;
     private Edge prev;
     private Edge twin;
     private Cell cell;
-    private boolean isLeft = true;
-    private boolean isRight = true;
+    private boolean isInfinite = true;
 
-    public Edge(Point a, Point b, Cell cell) {
-        this.a = a;
-        this.b = b;
+    public Edge(Vertex vertex) {
+        this.vertex = vertex;
+    }
+
+    public Edge(Vertex vertex, Cell cell) {
+        this.vertex = vertex;
         this.cell = cell;
     }
 
-    public Edge(Point a, Point b) {
-        this.a = a;
-        this.b = b;
-    }
 
     public Edge getStartEdge() {
         Edge prevEdge = this;

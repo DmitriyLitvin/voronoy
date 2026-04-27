@@ -5,35 +5,28 @@ import lombok.*;
 @Getter
 @Setter
 @NoArgsConstructor
-@AllArgsConstructor
 @EqualsAndHashCode
 @ToString
 public class Line {
-    private Point leftPoint;
-    private Point rightPoint;
-    private boolean isInfiniteLeftEnd = false;
-    private boolean isInfiniteRightEnd = false;
+    private Vertex a;
+    private Vertex b;
 
-
-    public Line(Point leftPoint, Point rightPoint) {
-        this.leftPoint = leftPoint;
-        this.rightPoint = rightPoint;
+    public Line(Vertex a, Vertex b) {
+        this.a = a;
+        this.b = b;
     }
 
-
     public Line(Edge edge) {
-        this.leftPoint = edge.getA();
-        this.rightPoint = edge.getB();
-        this.isInfiniteLeftEnd = edge.isLeft();
-        this.isInfiniteRightEnd = edge.isRight();
+        this.a = edge.getVertex();
+        this.b = edge.getTwin().getVertex();
     }
 
     public double getY(double x) {
-        return ((rightPoint.getY() - leftPoint.getY()) * (x - leftPoint.getX())) / (rightPoint.getX() - leftPoint.getX()) + leftPoint.getY();
+        return ((b.getY() - a.getY()) * (x - a.getX())) / (b.getX() - a.getX()) + a.getY();
     }
 
 
-    public Point getMidPoint() {
-        return new Point((leftPoint.getX() + rightPoint.getX()) / 2, (leftPoint.getY() + rightPoint.getY()) / 2);
+    public Vertex getMidVertex() {
+        return new Vertex((a.getX() + b.getX()) / 2, (a.getY() + b.getY()) / 2);
     }
 }
