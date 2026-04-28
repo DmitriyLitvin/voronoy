@@ -13,12 +13,15 @@ import javafx.stage.Stage;
 import lombok.extern.slf4j.Slf4j;
 import org.example.entity.*;
 import org.example.entity.Vertex;
+import org.example.utils.EdgeUtils;
 import org.example.utils.VectorUtils;
 
 import java.util.*;
 import java.util.List;;
 
 import static java.lang.Math.*;
+import static org.example.utils.EdgeUtils.isConnected;
+import static org.example.utils.EdgeUtils.isEquals;
 import static org.example.utils.VectorUtils.crossProduct;
 
 @Slf4j
@@ -38,29 +41,138 @@ public class Main extends Application {
         borderPane.setBottom(button);
         pane.getChildren().add(button);
 
-
-        vertices.add(new Vertex(242.0, 573.0));
-        vertices.add(new Vertex(400.0, 488.0));
-        vertices.add(new Vertex(433.0, 500.0));
-        vertices.add(new Vertex(454.0, 141.0));
-        vertices.add(new Vertex(466.0, 444.0));
-        vertices.add(new Vertex(467.0, 540.0));
-        vertices.add(new Vertex(481.0, 326.0));
-        vertices.add(new Vertex(762.0, 493.0));
-        vertices.add(new Vertex(974.0, 840.0));
-        vertices.add(new Vertex(1030.0, 426.0));
-        vertices.add(new Vertex(1113.0, 625.0));
-        vertices.add(new Vertex(1116.0, 553.0));
-        vertices.add(new Vertex(1119.0, 407.0));
-        vertices.add(new Vertex(1126.0, 327.0));
-        vertices.add(new Vertex(1142.0, 475.0));
-        vertices.add(new Vertex(1214.0, 482.0));
+        vertices.add(new Vertex(119, 210));
+        vertices.add(new Vertex(122, 233));
+        vertices.add(new Vertex(123, 263));
+        vertices.add(new Vertex(129, 246));
+        vertices.add(new Vertex(138, 168));
+        vertices.add(new Vertex(138, 254));
+        vertices.add(new Vertex(139, 219));
+        vertices.add(new Vertex(140, 267));
+        vertices.add(new Vertex(141, 234));
+        vertices.add(new Vertex(154, 290));
+        vertices.add(new Vertex(163, 261));
+        vertices.add(new Vertex(177, 277));
+        vertices.add(new Vertex(179, 223));
+        vertices.add(new Vertex(181, 259));
+        vertices.add(new Vertex(182, 326));
+        vertices.add(new Vertex(193, 259));
+        vertices.add(new Vertex(196, 276));
+        vertices.add(new Vertex(199, 228));
+        vertices.add(new Vertex(222, 180));
+        vertices.add(new Vertex(230, 241));
+        vertices.add(new Vertex(231, 307));
+        vertices.add(new Vertex(235, 249));
+        vertices.add(new Vertex(243, 249));
+        vertices.add(new Vertex(247, 260));
+        vertices.add(new Vertex(248, 238));
+        vertices.add(new Vertex(254, 353));
+        vertices.add(new Vertex(268, 401));
+        vertices.add(new Vertex(271, 253));
+        vertices.add(new Vertex(272, 337));
+        vertices.add(new Vertex(275, 647));
+        vertices.add(new Vertex(283, 356));
+        vertices.add(new Vertex(287, 292));
+        vertices.add(new Vertex(296, 376));
+        vertices.add(new Vertex(297, 330));
+        vertices.add(new Vertex(304, 410));
+        vertices.add(new Vertex(324, 420));
+        vertices.add(new Vertex(326, 400));
+        vertices.add(new Vertex(333, 364));
+        vertices.add(new Vertex(334, 383));
+        vertices.add(new Vertex(340, 374));
+        vertices.add(new Vertex(343, 385));
+        vertices.add(new Vertex(347, 374));
+        vertices.add(new Vertex(352, 597));
+        vertices.add(new Vertex(353, 362));
+        vertices.add(new Vertex(356, 452));
+        vertices.add(new Vertex(357, 385));
+        vertices.add(new Vertex(363, 338));
+        vertices.add(new Vertex(369, 614));
+        vertices.add(new Vertex(369, 636));
+        vertices.add(new Vertex(372, 342));
+        vertices.add(new Vertex(373, 646));
+        vertices.add(new Vertex(374, 358));
+        vertices.add(new Vertex(377, 372));
+        vertices.add(new Vertex(380, 341));
+        vertices.add(new Vertex(380, 640));
+        vertices.add(new Vertex(381, 325));
+        vertices.add(new Vertex(382, 350));
+        vertices.add(new Vertex(382, 670));
+        vertices.add(new Vertex(382, 728));
+        vertices.add(new Vertex(386, 652));
+        vertices.add(new Vertex(390, 332));
+        vertices.add(new Vertex(392, 468));
+        vertices.add(new Vertex(392, 565));
+        vertices.add(new Vertex(392, 633));
+        vertices.add(new Vertex(392, 695));
+        vertices.add(new Vertex(393, 358));
+        vertices.add(new Vertex(402, 411));
+        vertices.add(new Vertex(407, 521));
+        vertices.add(new Vertex(412, 451));
+        vertices.add(new Vertex(413, 674));
+        vertices.add(new Vertex(420, 173));
+        vertices.add(new Vertex(423, 289));
+        vertices.add(new Vertex(426, 595));
+        vertices.add(new Vertex(427, 259));
+        vertices.add(new Vertex(436, 358));
+        vertices.add(new Vertex(440, 726));
+        vertices.add(new Vertex(445, 689));
+        vertices.add(new Vertex(452, 395));
+        vertices.add(new Vertex(461, 474));
+        vertices.add(new Vertex(474, 353));
+        vertices.add(new Vertex(550, 346));
+        vertices.add(new Vertex(569, 481));
+        vertices.add(new Vertex(583, 554));
+        vertices.add(new Vertex(587, 502));
+        vertices.add(new Vertex(588, 486));
+        vertices.add(new Vertex(593, 523));
+        vertices.add(new Vertex(596, 443));
+        vertices.add(new Vertex(596, 497));
+        vertices.add(new Vertex(596, 506));
+        vertices.add(new Vertex(597, 513));
+        vertices.add(new Vertex(598, 475));
+        vertices.add(new Vertex(606, 519));
+        vertices.add(new Vertex(606, 528));
+        vertices.add(new Vertex(607, 504));
+        vertices.add(new Vertex(619, 514));
+        vertices.add(new Vertex(642, 544));
+        vertices.add(new Vertex(653, 492));
+        vertices.add(new Vertex(688, 632));
+        vertices.add(new Vertex(693, 484));
+        vertices.add(new Vertex(694, 602));
+        vertices.add(new Vertex(714, 633));
+        vertices.add(new Vertex(716, 554));
+        vertices.add(new Vertex(717, 612));
+        vertices.add(new Vertex(719, 628));
+        vertices.add(new Vertex(722, 615));
+        vertices.add(new Vertex(726, 584));
+        vertices.add(new Vertex(727, 646));
+        vertices.add(new Vertex(732, 697));
+        vertices.add(new Vertex(737, 291));
+        vertices.add(new Vertex(743, 278));
+        vertices.add(new Vertex(743, 290));
+        vertices.add(new Vertex(744, 261));
+        vertices.add(new Vertex(749, 280));
+        vertices.add(new Vertex(750, 254));
+        vertices.add(new Vertex(751, 263));
+        vertices.add(new Vertex(752, 222));
+        vertices.add(new Vertex(754, 301));
+        vertices.add(new Vertex(758, 257));
+        vertices.add(new Vertex(758, 269));
+        vertices.add(new Vertex(764, 246));
+        vertices.add(new Vertex(766, 285));
+        vertices.add(new Vertex(768, 593));
+        vertices.add(new Vertex(784, 241));
+        vertices.add(new Vertex(797, 416));
+        vertices.add(new Vertex(857, 510));
+        vertices.add(new Vertex(891, 302));
 
         vertices.forEach(p -> {
             Circle circle = new Circle(p.getX(), p.getY(), 2, Color.RED);
             Label label = new Label(+circle.getCenterX() + ", " + circle.getCenterY());
             label.relocate(circle.getCenterX(), circle.getCenterY());
-            pane.getChildren().addAll(label, circle);
+            pane.getChildren().addAll(circle);
         });
 
         int width = 1500;
@@ -93,7 +205,7 @@ public class Main extends Application {
 
     public void drawVoronoyDiagram(Set<Vertex> polygon) {
         log.info("Start drawing ");
-        buildVoronoyDiagram(polygon.stream().sorted(Comparator.comparingDouble(Vertex::getX).thenComparingDouble(Vertex::getY)).toList()).values().forEach(voronoyCell -> {
+        buildVoronoyDiagram(polygon.stream().sorted(Comparator.comparingDouble(Vertex::getX).thenComparingDouble(Vertex::getY)).toList()).values().stream().forEach(voronoyCell -> {
             Edge boundary = voronoyCell.getBoundary();
             Edge nextEdge = voronoyCell.getBoundary();
             if (nextEdge != null) {
@@ -105,7 +217,7 @@ public class Main extends Application {
                     line.setStrokeWidth(1);
                     pane.getChildren().add(line);
                     nextEdge = nextEdge.getNext();
-                } while (nextEdge != null && !Objects.equals(boundary, nextEdge));
+                } while (nextEdge != null && !isEquals(boundary, nextEdge));
             }
 
             Edge prevEdge = voronoyCell.getBoundary();
@@ -118,7 +230,7 @@ public class Main extends Application {
                     line.setStrokeWidth(1);
                     pane.getChildren().add(line);
                     prevEdge = prevEdge.getPrev();
-                } while (prevEdge != null && !Objects.equals(boundary, prevEdge));
+                } while (prevEdge != null && !isEquals(boundary, prevEdge));
             }
         });
 
@@ -268,7 +380,7 @@ public class Main extends Application {
         Vertex chainVertex = null;
         Edge currentEdge = null;
         Edge chainEdge = null;
-        Line middlePerpendic;
+        Line middlePerpendicular;
         Map<Cell, List<Edge>> excludedEdges = new HashMap<>();
         Map<Cell, Edge> disjunctiveChain = new HashMap<>();
 
@@ -276,7 +388,7 @@ public class Main extends Application {
             Cell leftCell = leftDiagram.get(upperCommonSupport.getA());
             Cell rightCell = rightDiagram.get(upperCommonSupport.getB());
 
-            Line middlePerpendicular = getMiddlePerpendicular(new Line(leftCell.getCenter(), rightCell.getCenter()));
+            middlePerpendicular = getMiddlePerpendicular(new Line(leftCell.getCenter(), rightCell.getCenter()));
             Edge leftEdge = new Edge(middlePerpendicular.getA(), leftCell);
             Edge rightEdge = new Edge(middlePerpendicular.getB(), rightCell);
 
@@ -297,17 +409,17 @@ public class Main extends Application {
             Cell leftCell = leftDiagram.get(upperCommonSupport.getA());
             Cell rightCell = rightDiagram.get(upperCommonSupport.getB());
 
-            middlePerpendic = getMiddlePerpendicular(upperCommonSupport);
+            middlePerpendicular = getMiddlePerpendicular(upperCommonSupport);
             Vertex midVertex = upperCommonSupport.getMidVertex();
 
             boolean isInfinite = false;
             if (chainVertex == null) {
                 isInfinite = true;
-                Vertex leftVertex = middlePerpendic.getA();
+                Vertex leftVertex = middlePerpendicular.getA();
                 if (crossProduct(VectorUtils.getDirectionPoint(upperCommonSupport.getA(), upperCommonSupport.getB()), VectorUtils.getDirectionPoint(upperCommonSupport.getA(), leftVertex)) > 0) {
                     chainVertex = leftVertex;
                 } else {
-                    chainVertex = middlePerpendic.getB();
+                    chainVertex = middlePerpendicular.getB();
                 }
             }
 
@@ -326,16 +438,16 @@ public class Main extends Application {
                     leftEdges.add(idle);
                 }
             }
-            Edge leftEdge = getClosestEdge(leftEdges, middlePerpendic, currentEdge, chainEdge, chainVertex);
+            Edge leftEdge = getClosestEdge(leftEdges, middlePerpendicular, currentEdge, chainEdge, chainVertex);
             if (leftEdge != null) {
-                leftVertex = getPointOfIntersection(middlePerpendic, new Line(leftEdge));
+                leftVertex = getPointOfIntersection(middlePerpendicular, new Line(leftEdge));
                 assert leftVertex != null;
                 leftDistance = VectorUtils.getLength(leftVertex, chainVertex);
             }
 
-            Edge leftExcludedEdge = getClosestEdge(leftCell == null ? null : excludedEdges.get(leftCell), middlePerpendic, currentEdge, chainEdge, chainVertex);
+            Edge leftExcludedEdge = getClosestEdge(leftCell == null ? null : excludedEdges.get(leftCell), middlePerpendicular, currentEdge, chainEdge, chainVertex);
             if (leftExcludedEdge != null) {
-                Vertex currentVertex = getPointOfIntersection(middlePerpendic, new Line(leftExcludedEdge));
+                Vertex currentVertex = getPointOfIntersection(middlePerpendicular, new Line(leftExcludedEdge));
                 if (currentVertex != null) {
                     double currentDistance = VectorUtils.getLength(currentVertex, chainVertex);
                     if (currentDistance < leftDistance || leftEdge == null) {
@@ -362,16 +474,16 @@ public class Main extends Application {
                     rightEdges.add(idle);
                 }
             }
-            Edge rightEdge = getClosestEdge(rightEdges, middlePerpendic, currentEdge, chainEdge, chainVertex);
+            Edge rightEdge = getClosestEdge(rightEdges, middlePerpendicular, currentEdge, chainEdge, chainVertex);
             if (rightEdge != null) {
-                rightVertex = getPointOfIntersection(middlePerpendic, new Line(rightEdge));
+                rightVertex = getPointOfIntersection(middlePerpendicular, new Line(rightEdge));
                 assert rightVertex != null;
                 rightDistance = VectorUtils.getLength(rightVertex, chainVertex);
             }
 
-            Edge rightExcludedEdge = getClosestEdge(rightCell == null ? null : excludedEdges.get(rightCell), middlePerpendic, currentEdge, chainEdge, chainVertex);
+            Edge rightExcludedEdge = getClosestEdge(rightCell == null ? null : excludedEdges.get(rightCell), middlePerpendicular, currentEdge, chainEdge, chainVertex);
             if (rightExcludedEdge != null) {
-                Vertex currentVertex = getPointOfIntersection(middlePerpendic, new Line(rightExcludedEdge));
+                Vertex currentVertex = getPointOfIntersection(middlePerpendicular, new Line(rightExcludedEdge));
                 if (currentVertex != null) {
                     double currentDistance = VectorUtils.getLength(currentVertex, chainVertex);
                     if (currentDistance < rightDistance || rightEdge == null) {
@@ -615,19 +727,19 @@ public class Main extends Application {
             }
         }
 
-        middlePerpendic = getMiddlePerpendicular(lowerCommonSupport);
+        middlePerpendicular = getMiddlePerpendicular(lowerCommonSupport);
 
         Edge leftEdge;
         Edge rightEdge;
         Cell leftCell = leftDiagram.get(lowerCommonSupport.getA());
         Cell rightCell = rightDiagram.get(lowerCommonSupport.getB());
-        Vertex leftVertex = middlePerpendic.getA();
+        Vertex leftVertex = middlePerpendicular.getA();
         assert chainVertex != null;
         if (crossProduct(VectorUtils.getDirectionPoint(lowerCommonSupport.getA(), lowerCommonSupport.getB()), VectorUtils.getDirectionPoint(lowerCommonSupport.getA(), leftVertex)) < 0) {
             leftEdge = new Edge(leftVertex, leftCell);
             rightEdge = new Edge(chainVertex, rightCell);
         } else {
-            Vertex rightVertex = middlePerpendic.getB();
+            Vertex rightVertex = middlePerpendicular.getB();
             leftEdge = new Edge(rightVertex, leftCell);
             rightEdge = new Edge(chainVertex, rightCell);
         }
@@ -690,9 +802,6 @@ public class Main extends Application {
         return null;
     }
 
-    private boolean isConnected(Edge e1, Edge e2) {
-        return Objects.equals(e1.getVertex(), e2.getTwin().getVertex()) || Objects.equals(e1.getTwin().getVertex(), e2.getVertex());
-    }
 
     private boolean isOutsideCell(Edge edge, Vertex v1, Vertex v2) {
         if (edge == null) {
@@ -763,7 +872,7 @@ public class Main extends Application {
         for (Edge edge : edges) {
             Edge nextEdge = edge;
             do {
-                if ((chainEdge == null || !Objects.equals(chainEdge.getTwin(), nextEdge)) && (currentEdge == null || !Objects.equals(currentEdge.getTwin(), nextEdge))) {
+                if ((chainEdge == null || !isEquals(chainEdge, nextEdge)) && (currentEdge == null || !isEquals(currentEdge, nextEdge))) {
                     Vertex intersectVertex = getPointOfIntersection(middlePerpendicular, new Line(nextEdge));
                     if (intersectVertex != null && isIntersected(intersectVertex, nextEdge) && isOutsideCell(currentEdge, chainVertex, intersectVertex)) {
                         double currentDistance = VectorUtils.getLength(intersectVertex, middlePerpendicular.getB());
@@ -774,11 +883,11 @@ public class Main extends Application {
                     }
                 }
                 nextEdge = nextEdge.getNext();
-            } while (nextEdge != null && !Objects.equals(edge, nextEdge));
+            } while (nextEdge != null && !EdgeUtils.isEquals(edge, nextEdge));
 
             Edge prevEdge = edge;
             do {
-                if ((chainEdge == null || !Objects.equals(chainEdge.getTwin(), prevEdge)) && (currentEdge == null || !Objects.equals(currentEdge.getTwin(), prevEdge))) {
+                if ((chainEdge == null || !isEquals(chainEdge, prevEdge)) && (currentEdge == null || !isEquals(currentEdge, prevEdge))) {
                     Vertex intersectVertex = getPointOfIntersection(middlePerpendicular, new Line(prevEdge));
                     if (intersectVertex != null && isIntersected(intersectVertex, prevEdge) && isOutsideCell(currentEdge, chainVertex, intersectVertex)) {
                         double currentDistance = VectorUtils.getLength(intersectVertex, middlePerpendicular.getB());
@@ -789,7 +898,7 @@ public class Main extends Application {
                     }
                 }
                 prevEdge = prevEdge.getPrev();
-            } while (prevEdge != null && !Objects.equals(edge, prevEdge));
+            } while (prevEdge != null && !EdgeUtils.isEquals(edge, prevEdge));
         }
 
         return intersectedEdge;
@@ -815,8 +924,8 @@ public class Main extends Application {
     }
 
     private Line getMiddlePerpendicular(Line line) {
-        int height = 1_00_000;
-        int width = 1_00_000;
+        int height = 1_000_000;
+        int width = 1_000_000;
 
         Vertex vertex = line.getMidVertex();
         double x = vertex.getX();

@@ -1,6 +1,7 @@
 package org.example.entity;
 
 import lombok.*;
+import org.example.utils.EdgeUtils;
 
 import java.util.Objects;
 
@@ -34,7 +35,7 @@ public class Edge {
             Edge currentEdge = prevEdge.getPrev();
             if (currentEdge == null) {
                 return prevEdge;
-            } else if (Objects.equals(new Line(this), new Line(currentEdge))) {
+            } else if (EdgeUtils.isEquals(this, currentEdge)) {
                 return null;
             }
             prevEdge = currentEdge;
@@ -47,7 +48,7 @@ public class Edge {
             Edge currentEdge = nextEdge.getNext();
             if (currentEdge == null) {
                 return nextEdge;
-            } else if (Objects.equals(new Line(this), new Line(currentEdge))) {
+            } else if (EdgeUtils.isEquals(this, currentEdge)) {
                 return null;
             }
             nextEdge = currentEdge;
