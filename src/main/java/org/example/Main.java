@@ -450,7 +450,7 @@ public class Main extends Application {
                 Edge edge = disjunctiveChain.get(leftCell);
                 if (edge == null) {
                     Edge lastEdge = leftCell.getBoundary().getLastEdge();
-                    if ((isLeftExcluded || idleEdges.get(leftCell) != null || leftCell.isConnected()) && lastEdge != null && isConnected(lastEdge, nextLeftEdge)) {
+                    if ((isLeftExcluded || idleEdges.get(leftCell) != null || leftCell.isClosed()) && lastEdge != null && isConnected(lastEdge, nextLeftEdge)) {
                         nextLeftEdge.setPrev(lastEdge);
                         lastEdge.setNext(nextLeftEdge);
                     }
@@ -563,7 +563,7 @@ public class Main extends Application {
                 Edge edge = disjunctiveChain.get(rightCell);
                 if (edge == null) {
                     Edge startEdge = rightCell.getBoundary().getStartEdge();
-                    if ((isRightExcluded || idleEdges.get(rightCell) != null || rightCell.isConnected()) && startEdge != null && isConnected(startEdge, nextRightEdge)) {
+                    if ((isRightExcluded || idleEdges.get(rightCell) != null || rightCell.isClosed()) && startEdge != null && isConnected(startEdge, nextRightEdge)) {
                         nextRightEdge.setNext(startEdge);
                         startEdge.setPrev(nextRightEdge);
                     }

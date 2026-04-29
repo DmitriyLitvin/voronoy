@@ -8,7 +8,7 @@ import java.util.Objects;
 public class EdgeUtils {
 
 
-    public  static boolean isEquals(Edge e1, Edge e2) {
+    public static boolean isEquals(Edge e1, Edge e2) {
         Vertex v1 = e1.getVertex();
         Vertex v2 = e1.getTwin().getVertex();
         Vertex v3 = e2.getVertex();
@@ -21,4 +21,19 @@ public class EdgeUtils {
         return Objects.equals(e1.getVertex(), e2.getTwin().getVertex()) || Objects.equals(e1.getTwin().getVertex(), e2.getVertex()) || Objects.equals(e1.getTwin().getVertex(), e2.getTwin().getVertex()) || Objects.equals(e1.getVertex(), e2.getVertex());
     }
 
+    public static Vertex getVertexOfTangency(Edge e1, Edge e2) {
+        Vertex v1 = e1.getVertex();
+        Vertex v2 = e1.getTwin().getVertex();
+        Vertex v3 = e2.getVertex();
+        Vertex v4 = e2.getTwin().getVertex();
+
+        if (Objects.equals(v1, v3) || Objects.equals(v1, v4)) {
+            return v1;
+        } else if (Objects.equals(v2, v3) || Objects.equals(v2, v4)) {
+            return v2;
+        }
+
+        return null;
+    }
 }
+
