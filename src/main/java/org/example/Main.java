@@ -725,15 +725,15 @@ public class Main extends Application {
         if (v2 == null) {
             return false;
         }
-        Vertex prevDirectionVertex = VectorUtils.getDirectionPoint(v2, v1);
-        Vertex currentDirectionVertex = VectorUtils.getDirectionPoint(v2, v4);
-        Vertex nextDirectionVertex = VectorUtils.getDirectionPoint(v2, v3);
+        Vertex directionVertex1 = VectorUtils.getDirectionPoint(v2, v1);
+        Vertex directionVertex2 = VectorUtils.getDirectionPoint(v2, v4);
+        Vertex directionVertex3 = VectorUtils.getDirectionPoint(v2, v3);
 
-        double crossProduct = crossProduct(prevDirectionVertex, nextDirectionVertex);
+        double crossProduct = crossProduct(directionVertex1, directionVertex3);
         if (crossProduct > 0) {
-            return crossProduct(prevDirectionVertex, currentDirectionVertex) > 0 && crossProduct(currentDirectionVertex, nextDirectionVertex) > 0;
+            return crossProduct(directionVertex1, directionVertex2) > 0 && crossProduct(directionVertex2, directionVertex3) > 0;
         } else {
-            return crossProduct(prevDirectionVertex, currentDirectionVertex) < 0 && crossProduct(currentDirectionVertex, nextDirectionVertex) < 0;
+            return crossProduct(directionVertex1, directionVertex2) < 0 && crossProduct(directionVertex2, directionVertex3) < 0;
         }
     }
 
