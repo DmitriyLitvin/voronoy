@@ -346,9 +346,9 @@ public class Main extends Application {
                 if (boundary != null) {
                     leftEdges.add(boundary);
                 }
-                Edge idle = idleEdges.get(leftCell);
-                if (idle != null) {
-                    leftEdges.add(idle);
+                Edge idleEdge = idleEdges.get(leftCell);
+                if (idleEdge != null) {
+                    leftEdges.add(idleEdge);
                 }
             }
             Edge leftEdge = getClosestEdge(leftEdges, middlePerpendicular, currentEdge, chainEdge, chainVertex);
@@ -382,9 +382,9 @@ public class Main extends Application {
                 if (boundary != null) {
                     rightEdges.add(boundary);
                 }
-                Edge idle = idleEdges.get(rightCell);
-                if (idle != null) {
-                    rightEdges.add(idle);
+                Edge idleEdge = idleEdges.get(rightCell);
+                if (idleEdge != null) {
+                    rightEdges.add(idleEdge);
                 }
             }
             Edge rightEdge = getClosestEdge(rightEdges, middlePerpendicular, currentEdge, chainEdge, chainVertex);
