@@ -3,8 +3,6 @@ package org.example.entity;
 import lombok.*;
 import org.example.utils.EdgeUtils;
 
-import java.util.Objects;
-
 @Getter
 @Setter
 @NoArgsConstructor
@@ -22,13 +20,13 @@ public class Edge {
 
     public Edge(Vertex vertex) {
         this.vertex = vertex;
-        this.edgeType = EdgeType.CREATED;
+        this.edgeType = EdgeType.NEW;
     }
 
     public Edge(Vertex vertex, Cell cell) {
         this.vertex = vertex;
         this.cell = cell;
-        this.edgeType = EdgeType.CREATED;
+        this.edgeType = EdgeType.NEW;
     }
 
 
