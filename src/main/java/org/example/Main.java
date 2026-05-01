@@ -41,17 +41,44 @@ public class Main extends Application {
         borderPane.setBottom(button);
         pane.getChildren().add(button);
 
+        vertices.add(new Vertex(445.0, 647.0));
+        vertices.add(new Vertex(447.0, 525.0));
+        vertices.add(new Vertex(448.0, 554.0));
+        vertices.add(new Vertex(452.0, 392.0));
+        vertices.add(new Vertex(458.0, 411.0));
+        vertices.add(new Vertex(460.0, 404.0));
+        vertices.add(new Vertex(463.0, 348.0));
+        vertices.add(new Vertex(465.0, 482.0));
+        vertices.add(new Vertex(466.0, 521.0));
+        vertices.add(new Vertex(468.0, 393.0));
+        vertices.add(new Vertex(473.0, 501.0));
+        vertices.add(new Vertex(475.0, 585.0));
+        vertices.add(new Vertex(477.0, 376.0));
+        vertices.add(new Vertex(477.0, 478.0));
+        vertices.add(new Vertex(479.0, 403.0));
+        vertices.add(new Vertex(479.0, 491.0));
+        vertices.add(new Vertex(479.0, 614.0));
 
 
+        vertices.add(new Vertex(484.0, 496.0));
+        vertices.add(new Vertex(487.0, 443.0));
+        vertices.add(new Vertex(487.0, 525.0));
+        vertices.add(new Vertex(493.0, 265.0));
+        vertices.add(new Vertex(494.0, 767.0));
+        vertices.add(new Vertex(498.0, 471.0));
+        vertices.add(new Vertex(501.0, 630.0));
+        vertices.add(new Vertex(507.0, 641.0));
+        vertices.add(new Vertex(514.0, 514.0));
+        vertices.add(new Vertex(516.0, 632.0));
+        vertices.add(new Vertex(516.0, 648.0));
+        vertices.add(new Vertex(517.0, 641.0));
+        vertices.add(new Vertex(529.0, 643.0));
+        vertices.add(new Vertex(530.0, 713.0));
+        vertices.add(new Vertex(532.0, 626.0));
+        vertices.add(new Vertex(558.0, 592.0));
+        vertices.add(new Vertex(602.0, 684.0));
+        vertices.add(new Vertex(638.0, 856.0));
 
-        vertices.add(new Vertex(369, 451));
-        vertices.add(new Vertex(379, 459));
-        vertices.add(new Vertex(395, 457));
-        vertices.add(new Vertex(395, 627));
-        vertices.add(new Vertex(396, 633));
-        vertices.add(new Vertex(397, 478));
-        vertices.add(new Vertex(398, 518));
-        vertices.add(new Vertex(401, 445));
 
         vertices.forEach(p -> {
             Circle circle = new Circle(p.getX(), p.getY(), 2, Color.RED);
@@ -89,7 +116,8 @@ public class Main extends Application {
     }
 
     public void drawVoronoyDiagram(Set<Vertex> polygon) {
-        log.info("Start drawing ");
+        System.out.println("Start drawing ");
+
         buildVoronoyDiagram(polygon.stream().sorted(Comparator.comparingDouble(Vertex::getX).thenComparingDouble(Vertex::getY)).toList()).values().forEach(voronoyCell -> {
             Edge boundary = voronoyCell.getBoundary();
             Edge nextEdge = voronoyCell.getBoundary();
@@ -119,7 +147,7 @@ public class Main extends Application {
             }
         });
 
-        log.info("End drawing");
+        System.out.println("End drawing");
     }
 
     private Set<Vertex> buildConvexHull(List<Vertex> vertices) {
@@ -450,9 +478,13 @@ public class Main extends Application {
                 Edge edge = disjunctiveChain.get(leftCell);
                 if (edge == null) {
                     Edge lastEdge = leftCell.getBoundary().getLastEdge();
-                    if ((isLeftExcluded || idleEdges.get(leftCell) != null || leftCell.isClosed()) && lastEdge != null && isConnected(lastEdge, nextLeftEdge)) {
+                    Edge idleEdge = idleEdges.get(leftCell);
+                    if ((isLeftExcluded || idleEdge != null || leftCell.isClosed()) && lastEdge != null && isConnected(lastEdge, nextLeftEdge)) {
                         nextLeftEdge.setPrev(lastEdge);
                         lastEdge.setNext(nextLeftEdge);
+                    }
+                    if (idleEdge != null) {
+                        idleEdges.remove(leftCell);
                     }
                 } else {
                     Edge lastEdge = edge.getLastEdge();
@@ -474,11 +506,6 @@ public class Main extends Application {
                                 nextRightEdge.setNext(startEdge);
                                 startEdge.setPrev(nextRightEdge);
                             } else {
-                                startEdge = idleEdges.get(rightCell);
-                                if (startEdge != null && isConnected(startEdge, nextRightEdge)) {
-                                    nextRightEdge.setNext(startEdge);
-                                    startEdge.setPrev(nextRightEdge);
-                                }
                                 disjunctiveChain.put(rightCell, nextRightEdge);
                             }
                         }
@@ -489,6 +516,13 @@ public class Main extends Application {
                             startEdge.setPrev(nextRightEdge);
                         }
                     }
+                }
+
+                Edge idleEdge = idleEdges.get(rightCell);
+                if (idleEdge != null && isConnected(idleEdge, nextRightEdge)) {
+                    nextRightEdge.setPrev(idleEdge);
+                    idleEdge.setNext(nextRightEdge);
+                    idleEdges.remove(rightCell);
                 }
 
                 upperCommonSupport.setA(leftTwinEdge.getCell().getCenter());
@@ -563,9 +597,13 @@ public class Main extends Application {
                 Edge edge = disjunctiveChain.get(rightCell);
                 if (edge == null) {
                     Edge startEdge = rightCell.getBoundary().getStartEdge();
-                    if ((isRightExcluded || idleEdges.get(rightCell) != null || rightCell.isClosed()) && startEdge != null && isConnected(startEdge, nextRightEdge)) {
+                    Edge idleEdge = idleEdges.get(rightCell);
+                    if ((isRightExcluded || idleEdge != null || rightCell.isClosed()) && startEdge != null && isConnected(startEdge, nextRightEdge)) {
                         nextRightEdge.setNext(startEdge);
                         startEdge.setPrev(nextRightEdge);
+                    }
+                    if (idleEdge != null) {
+                        idleEdges.remove(rightCell);
                     }
                 } else {
                     Edge startEdge = edge.getStartEdge();
@@ -587,12 +625,6 @@ public class Main extends Application {
                                 nextLeftEdge.setPrev(lastEdge);
                                 lastEdge.setNext(nextLeftEdge);
                             } else {
-                                lastEdge = idleEdges.get(leftCell);
-                                if (lastEdge != null && isConnected(lastEdge, nextLeftEdge)) {
-                                    nextLeftEdge.setPrev(lastEdge);
-                                    lastEdge.setNext(nextLeftEdge);
-                                }
-
                                 disjunctiveChain.put(leftCell, nextLeftEdge);
                             }
                         }
@@ -603,6 +635,13 @@ public class Main extends Application {
                             lastEdge.setNext(nextLeftEdge);
                         }
                     }
+                }
+
+                Edge idleEdge = idleEdges.get(leftCell);
+                if (idleEdge != null && isConnected(idleEdge, nextLeftEdge)) {
+                    nextLeftEdge.setNext(idleEdge);
+                    idleEdge.setPrev(nextLeftEdge);
+                    idleEdges.remove(leftCell);
                 }
 
                 upperCommonSupport.setB(rightTwinEdge.getCell().getCenter());
@@ -686,7 +725,6 @@ public class Main extends Application {
 
         return null;
     }
-
 
     private boolean isOutsideCell(Edge edge, Vertex v1, Vertex v2) {
         if (edge == null) {

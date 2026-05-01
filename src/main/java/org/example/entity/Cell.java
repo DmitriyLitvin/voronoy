@@ -17,6 +17,9 @@ public class Cell {
     public boolean isClosed() {
         Edge startEdge = boundary.getStartEdge();
         Edge lastEdge = boundary.getLastEdge();
+        if (boundary.getPrev() == null && boundary.getNext() == null) {
+            return false;
+        }
         if (startEdge == null || lastEdge == null) {
             return false;
         }
