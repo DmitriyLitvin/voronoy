@@ -394,7 +394,6 @@ public class Main extends Application {
                 Edge leftTwinEdge = leftEdge.getTwin();
                 Edge nextLeftEdge;
                 Edge nextRightEdge;
-                assert leftCell != null;
 
                 if (isOnTheSameSide(leftCell.getCenter(), leftEdge.getVertex(), midVertex)) {
                     Cell leftTwinCell = leftTwinEdge.getCell();
@@ -510,7 +509,7 @@ public class Main extends Application {
                 Edge rightTwinEdge = rightEdge.getTwin();
                 Edge nextLeftEdge;
                 Edge nextRightEdge;
-                assert rightCell != null;
+
                 if (isOnTheSameSide(rightCell.getCenter(), rightEdge.getVertex(), midVertex)) {
                     Cell rightTwinCell = rightTwinEdge.getCell();
                     Vertex vertex = rightEdge.getTwin().getVertex();
