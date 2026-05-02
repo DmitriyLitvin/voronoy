@@ -10,7 +10,9 @@ import static org.example.utils.EdgeUtils.getVertexOfTangency;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class Cell {
+    @EqualsAndHashCode.Include
     private Vertex center;
     private Edge boundary;
 
@@ -18,9 +20,6 @@ public class Cell {
         Edge startEdge = boundary.getStartEdge();
         Edge lastEdge = boundary.getLastEdge();
         if (boundary.getPrev() == null && boundary.getNext() == null) {
-            return false;
-        }
-        if (startEdge == null || lastEdge == null) {
             return false;
         }
 
