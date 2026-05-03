@@ -45,11 +45,18 @@ public class Main extends Application {
         pane.getChildren().add(button);
 
 
+//        vertices.add(new Vertex(479.0, 451.0));
+//        vertices.add(new Vertex(481.0, 468.0));
+//        vertices.add(new Vertex(488.0, 446.0));
+//        vertices.add(new Vertex(496.0, 449.0));
+//        vertices.add(new Vertex(498.0, 466.0));
+
+
         vertices.forEach(p -> {
             Circle circle = new Circle(p.getX(), p.getY(), 2, Color.RED);
             Label label = new Label(+circle.getCenterX() + ", " + circle.getCenterY());
             label.relocate(circle.getCenterX(), circle.getCenterY());
-            pane.getChildren().addAll(label, circle);
+            pane.getChildren().addAll(circle);
         });
 
         int width = 1500;
@@ -83,9 +90,9 @@ public class Main extends Application {
     public void drawVoronoyDiagram(Set<Vertex> polygon) {
         System.out.println("Start drawing ");
 
-        buildVoronoyDiagram(polygon.stream().sorted(Comparator.comparingDouble(Vertex::getX).thenComparingDouble(Vertex::getY)).toList()).values().stream().forEach(voronoyCell -> {
-            Edge boundary = voronoyCell.getBoundary();
-            Edge nextEdge = voronoyCell.getBoundary();
+        buildVoronoyDiagram(polygon.stream().sorted(Comparator.comparingDouble(Vertex::getX).thenComparingDouble(Vertex::getY)).toList()).values().forEach(cell -> {
+            Edge boundary = cell.getBoundary();
+            Edge nextEdge = cell.getBoundary();
             if (nextEdge != null) {
                 do {
                     Vertex vertex = nextEdge.getVertex();
@@ -98,7 +105,7 @@ public class Main extends Application {
                 } while (nextEdge != null && !isEquals(boundary, nextEdge));
             }
 
-            Edge prevEdge = voronoyCell.getBoundary();
+            Edge prevEdge = cell.getBoundary();
             if (prevEdge != null) {
                 do {
                     Vertex vertex = prevEdge.getVertex();
@@ -111,6 +118,68 @@ public class Main extends Application {
                 } while (prevEdge != null && !isEquals(boundary, prevEdge));
             }
         });
+
+//        List<Cell> cells = new ArrayList<>(buildVoronoyDiagram(polygon.stream().sorted(Comparator.comparingDouble(Vertex::getX).thenComparingDouble(Vertex::getY)).toList()).values());
+//
+//        Timeline timeline = new Timeline();
+//        timeline.setCycleCount(cells.size());
+//
+//        final int[] index = {0};
+//
+//        timeline.getKeyFrames().add(
+//                new KeyFrame(Duration.seconds(2), event -> {
+//                    pane.getChildren().removeIf(node -> node instanceof javafx.scene.shape.Line);
+//
+//                    Cell cell = cells.get(index[0]++);
+//                    Edge boundary = cell.getBoundary();
+//
+//                    Edge edge = boundary;
+//                    if (edge != null) {
+//                        do {
+//                            Vertex v1 = edge.getVertex();
+//                            Vertex v2 = edge.getTwin().getVertex();
+//
+//                            javafx.scene.shape.Line line =
+//                                    new javafx.scene.shape.Line(
+//                                            v1.getX(), v1.getY(),
+//                                            v2.getX(), v2.getY()
+//                                    );
+//
+//                            line.setStroke(Color.BLUE);
+//                            line.setStrokeWidth(1);
+//
+//                            pane.getChildren().add(line);
+//
+//                            edge = edge.getNext();
+//
+//                        } while (edge != null && !isEquals(boundary, edge));
+//
+//                        edge = boundary;
+//                        do {
+//                            Vertex v1 = edge.getVertex();
+//                            Vertex v2 = edge.getTwin().getVertex();
+//
+//                            javafx.scene.shape.Line line =
+//                                    new javafx.scene.shape.Line(
+//                                            v1.getX(), v1.getY(),
+//                                            v2.getX(), v2.getY()
+//                                    );
+//
+//                            line.setStroke(Color.BLUE);
+//                            line.setStrokeWidth(1);
+//
+//                            pane.getChildren().add(line);
+//
+//                            edge = edge.getPrev();
+//
+//                        } while (edge != null && !isEquals(boundary, edge));
+//                    } else {
+//                        System.out.println(cell.getCenter());
+//                    }
+//                })
+//        );
+//
+//        timeline.play();
 
         System.out.println("End drawing");
     }
@@ -262,19 +331,29 @@ public class Main extends Application {
         Map<Cell, List<Edge>> excludedEdges = new HashMap<>();
         Map<Cell, Edge> disjunctiveChain = new HashMap<>();
 
+
         if (Objects.equals(upperCommonSupport, lowerCommonSupport)) {
             Cell leftCell = leftDiagram.get(upperCommonSupport.getA());
             Cell rightCell = rightDiagram.get(upperCommonSupport.getB());
 
             middlePerpendicular = getMiddlePerpendicular(new Line(leftCell.getCenter(), rightCell.getCenter()));
             Edge leftEdge = new Edge(middlePerpendicular.getA(), leftCell);
+            if (leftCell.getBoundary() == null) {
+                leftCell.setBoundary(leftEdge);
+            } else {
+                idleEdges.put(leftCell, leftEdge);
+            }
+
             Edge rightEdge = new Edge(middlePerpendicular.getB(), rightCell);
+            if (rightCell.getBoundary() == null) {
+                rightCell.setBoundary(rightEdge);
+            } else {
+                idleEdges.put(rightCell, rightEdge);
+            }
 
             leftEdge.setTwin(rightEdge);
             rightEdge.setTwin(leftEdge);
 
-            idleEdges.put(leftCell, leftEdge);
-            idleEdges.put(rightCell, rightEdge);
 
             Map<Vertex, Cell> diagram = new HashMap<>();
             diagram.putAll(leftDiagram);
@@ -390,7 +469,7 @@ public class Main extends Application {
             if (rightEdge == null && leftEdge == null) {
                 System.out.println("couldn't find the closest edge");
                 break;
-            } else if ((leftEdge != null && rightEdge == null) || (leftEdge != null && leftDistance < rightDistance)) {
+            } else if (leftEdge != null && (rightEdge == null || leftDistance < rightDistance)) {
                 Edge leftTwinEdge = leftEdge.getTwin();
                 Edge nextLeftEdge;
                 Edge nextRightEdge;
@@ -442,6 +521,7 @@ public class Main extends Application {
                 nextLeftEdge.setInfinite(false);
                 nextLeftEdge.setNext(leftEdge);
                 leftEdge.setPrev(nextLeftEdge);
+
 
                 nextRightEdge = new Edge(chainVertex, rightCell);
                 nextRightEdge.setInfinite(isInfinite);
@@ -819,8 +899,8 @@ public class Main extends Application {
     }
 
     private Line getMiddlePerpendicular(Line line) {
-        int height = 1_000_000;
-        int width = 1_000_000;
+        int height = 1000000;
+        int width = 1000000;
 
         Vertex vertex = line.getMidVertex();
         double x = vertex.getX();
