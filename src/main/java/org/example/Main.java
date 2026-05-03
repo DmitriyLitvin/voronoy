@@ -47,7 +47,7 @@ public class Main extends Application {
 
         vertices.forEach(p -> {
             Circle circle = new Circle(p.getX(), p.getY(), 2, Color.RED);
-             Label label = new Label(+circle.getCenterX() + ", " + circle.getCenterY());
+            Label label = new Label(+circle.getCenterX() + ", " + circle.getCenterY());
             label.relocate(circle.getCenterX(), circle.getCenterY());
             pane.getChildren().addAll(label, circle);
         });
@@ -750,8 +750,7 @@ public class Main extends Application {
             return false;
         }
 
-        double crossProduct = crossProduct(VectorUtils.getDirectionPoint(v2, v1), VectorUtils.getDirectionPoint(v2, v3));
-        if (crossProduct > 0) {
+        if (crossProduct(VectorUtils.getDirectionPoint(v2, v1), VectorUtils.getDirectionPoint(v2, v3)) > 0) {
             return crossProduct(VectorUtils.getDirectionPoint(v2, v1), VectorUtils.getDirectionPoint(v2, v4)) > 0 && crossProduct(VectorUtils.getDirectionPoint(v2, v4), VectorUtils.getDirectionPoint(v2, v3)) > 0;
         } else {
             return crossProduct(VectorUtils.getDirectionPoint(v2, v1), VectorUtils.getDirectionPoint(v2, v4)) < 0 && crossProduct(VectorUtils.getDirectionPoint(v2, v4), VectorUtils.getDirectionPoint(v2, v3)) < 0;
