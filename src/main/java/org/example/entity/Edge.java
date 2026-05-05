@@ -16,17 +16,14 @@ public class Edge {
     private Edge twin;
     private Cell cell;
     private boolean isInfinite = true;
-    private EdgeType edgeType;
 
     public Edge(Vertex vertex) {
         this.vertex = vertex;
-        this.edgeType = EdgeType.NEW;
     }
 
     public Edge(Vertex vertex, Cell cell) {
         this.vertex = vertex;
         this.cell = cell;
-        this.edgeType = EdgeType.NEW;
     }
 
 

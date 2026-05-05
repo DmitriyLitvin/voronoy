@@ -45,13 +45,6 @@ public class Main extends Application {
         pane.getChildren().add(button);
 
 
-//        vertices.add(new Vertex(479.0, 451.0));
-//        vertices.add(new Vertex(481.0, 468.0));
-//        vertices.add(new Vertex(488.0, 446.0));
-//        vertices.add(new Vertex(496.0, 449.0));
-//        vertices.add(new Vertex(498.0, 466.0));
-
-
         vertices.forEach(p -> {
             Circle circle = new Circle(p.getX(), p.getY(), 2, Color.RED);
             Label label = new Label(+circle.getCenterX() + ", " + circle.getCenterY());
@@ -385,42 +378,30 @@ public class Main extends Application {
             double leftDistance = 0;
             Vertex leftVertex = null;
 
-            Edge leftEdge = null;
+            List<Edge> leftEdges = new ArrayList<>();
             if (leftCell != null) {
-                leftEdge = getClosestEdge(leftCell.getBoundary() == null ? null : List.of(leftCell.getBoundary()), middlePerpendicular, currentEdge, chainEdge, chainVertex);
-                if (leftEdge != null) {
-                    leftVertex = getPointOfIntersection(middlePerpendicular, new Line(leftEdge));
-                    assert leftVertex != null;
-                    leftDistance = VectorUtils.getLength(leftVertex, chainVertex);
+                Edge boundary = leftCell.getBoundary();
+                if (boundary != null) {
+                    leftEdges.add(boundary);
                 }
+                Edge idleEdge = idleEdges.get(leftCell);
+                if (idleEdge != null) {
+                    leftEdges.add(idleEdge);
+                }
+                List<Edge> leftExcludedEdges = excludedEdges.get(leftCell);
+                if (leftExcludedEdges != null) {
+                    leftEdges.addAll(leftExcludedEdges);
+                }
+            }
 
-                Edge leftExcludedEdge = getClosestEdge(excludedEdges.get(leftCell), middlePerpendicular, currentEdge, chainEdge, chainVertex);
-                if (leftExcludedEdge != null) {
-                    Vertex currentVertex = getPointOfIntersection(middlePerpendicular, new Line(leftExcludedEdge));
-                    if (currentVertex != null) {
-                        double currentDistance = VectorUtils.getLength(currentVertex, chainVertex);
-                        if (leftDistance == 0 || currentDistance < leftDistance) {
-                            leftDistance = currentDistance;
-                            leftVertex = currentVertex;
-                            leftEdge = leftExcludedEdge;
-                            isLeftExcluded = true;
-                        }
-                    }
-                }
+            Edge leftEdge = getClosestEdge(leftEdges, middlePerpendicular, currentEdge, chainEdge, chainVertex);
+            if (leftEdge != null) {
+                leftVertex = getPointOfIntersection(middlePerpendicular, new Line(leftEdge));
+                assert leftVertex != null;
+                leftDistance = VectorUtils.getLength(leftVertex, chainVertex);
 
-                Edge leftIdleEge = getClosestEdge(idleEdges.get(leftCell) == null ? null : List.of(idleEdges.get(leftCell)), middlePerpendicular, currentEdge, chainEdge, chainVertex);
-                if (leftIdleEge != null) {
-                    Vertex currentVertex = getPointOfIntersection(middlePerpendicular, new Line(leftIdleEge));
-                    if (currentVertex != null) {
-                        double currentDistance = VectorUtils.getLength(currentVertex, chainVertex);
-                        if (leftDistance == 0 || currentDistance < leftDistance) {
-                            leftDistance = currentDistance;
-                            leftVertex = currentVertex;
-                            leftEdge = leftIdleEge;
-                            isLeftIdle = true;
-                        }
-                    }
-                }
+                isLeftExcluded = excludedEdges.get(leftEdge.getCell()) != null;
+                isLeftIdle = idleEdges.get(leftEdge.getCell()) != null;
             }
 
             boolean isRightExcluded = false;
@@ -428,42 +409,30 @@ public class Main extends Application {
             double rightDistance = 0;
             Vertex rightVertex = null;
 
-            Edge rightEdge = null;
+            List<Edge> rightEdges = new ArrayList<>();
             if (rightCell != null) {
-                rightEdge = getClosestEdge(rightCell.getBoundary() == null ? null : List.of(rightCell.getBoundary()), middlePerpendicular, currentEdge, chainEdge, chainVertex);
-                if (rightEdge != null) {
-                    rightVertex = getPointOfIntersection(middlePerpendicular, new Line(rightEdge));
-                    assert rightVertex != null;
-                    rightDistance = VectorUtils.getLength(rightVertex, chainVertex);
+                Edge boundary = rightCell.getBoundary();
+                if (boundary != null) {
+                    rightEdges.add(boundary);
                 }
+                Edge idleEdge = idleEdges.get(rightCell);
+                if (idleEdge != null) {
+                    rightEdges.add(idleEdge);
+                }
+                List<Edge> rightExcludedEdges = excludedEdges.get(rightCell);
+                if (rightExcludedEdges != null) {
+                    rightEdges.addAll(rightExcludedEdges);
+                }
+            }
 
-                Edge rightExcludedEdge = getClosestEdge(excludedEdges.get(rightCell), middlePerpendicular, currentEdge, chainEdge, chainVertex);
-                if (rightExcludedEdge != null) {
-                    Vertex currentVertex = getPointOfIntersection(middlePerpendicular, new Line(rightExcludedEdge));
-                    if (currentVertex != null) {
-                        double currentDistance = VectorUtils.getLength(currentVertex, chainVertex);
-                        if (rightDistance == 0 || currentDistance < rightDistance) {
-                            rightDistance = currentDistance;
-                            rightVertex = currentVertex;
-                            rightEdge = rightExcludedEdge;
-                            isRightExcluded = true;
-                        }
-                    }
-                }
+            Edge rightEdge = getClosestEdge(rightEdges, middlePerpendicular, currentEdge, chainEdge, chainVertex);
+            if (rightEdge != null) {
+                rightVertex = getPointOfIntersection(middlePerpendicular, new Line(rightEdge));
+                assert rightVertex != null;
+                rightDistance = VectorUtils.getLength(rightVertex, chainVertex);
 
-                Edge rightIdleEge = getClosestEdge(idleEdges.get(rightCell) == null ? null : List.of(idleEdges.get(rightCell)), middlePerpendicular, currentEdge, chainEdge, chainVertex);
-                if (rightIdleEge != null) {
-                    Vertex currentVertex = getPointOfIntersection(middlePerpendicular, new Line(rightIdleEge));
-                    if (currentVertex != null) {
-                        double currentDistance = VectorUtils.getLength(currentVertex, chainVertex);
-                        if (rightDistance == 0 || currentDistance < rightDistance) {
-                            rightDistance = currentDistance;
-                            rightVertex = currentVertex;
-                            rightEdge = rightIdleEge;
-                            isRightIdle = true;
-                        }
-                    }
-                }
+                isRightExcluded = excludedEdges.get(rightEdge.getCell()) != null;
+                isRightIdle = idleEdges.get(rightEdge.getCell()) != null;
             }
 
             if (rightEdge == null && leftEdge == null) {
