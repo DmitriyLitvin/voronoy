@@ -380,18 +380,9 @@ public class Main extends Application {
 
             List<Edge> leftEdges = new ArrayList<>();
             if (leftCell != null) {
-                Edge boundary = leftCell.getBoundary();
-                if (boundary != null) {
-                    leftEdges.add(boundary);
-                }
-                Edge idleEdge = idleEdges.get(leftCell);
-                if (idleEdge != null) {
-                    leftEdges.add(idleEdge);
-                }
-                List<Edge> leftExcludedEdges = excludedEdges.get(leftCell);
-                if (leftExcludedEdges != null) {
-                    leftEdges.addAll(leftExcludedEdges);
-                }
+                Optional.ofNullable(leftCell.getBoundary()).ifPresent(leftEdges::add);
+                Optional.ofNullable(idleEdges.get(leftCell)).ifPresent(leftEdges::add);
+                Optional.ofNullable(excludedEdges.get(leftCell)).ifPresent(leftEdges::addAll);
             }
 
             Edge leftEdge = getClosestEdge(leftEdges, middlePerpendicular, currentEdge, chainEdge, chainVertex);
@@ -411,18 +402,9 @@ public class Main extends Application {
 
             List<Edge> rightEdges = new ArrayList<>();
             if (rightCell != null) {
-                Edge boundary = rightCell.getBoundary();
-                if (boundary != null) {
-                    rightEdges.add(boundary);
-                }
-                Edge idleEdge = idleEdges.get(rightCell);
-                if (idleEdge != null) {
-                    rightEdges.add(idleEdge);
-                }
-                List<Edge> rightExcludedEdges = excludedEdges.get(rightCell);
-                if (rightExcludedEdges != null) {
-                    rightEdges.addAll(rightExcludedEdges);
-                }
+                Optional.ofNullable(rightCell.getBoundary()).ifPresent(rightEdges::add);
+                Optional.ofNullable(idleEdges.get(rightCell)).ifPresent(rightEdges::add);
+                Optional.ofNullable(excludedEdges.get(rightCell)).ifPresent(rightEdges::addAll);
             }
 
             Edge rightEdge = getClosestEdge(rightEdges, middlePerpendicular, currentEdge, chainEdge, chainVertex);
