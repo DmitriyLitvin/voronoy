@@ -40,6 +40,9 @@ public class EdgeUtils {
         Vertex v1 = e.getVertex();
         Vertex v2 = e.getTwin().getVertex();
 
+        System.out.println(VectorUtils.getLength(v1, v));
+        System.out.println(VectorUtils.getLength(v2, v));
+
         if (Objects.equals(v1, v)) {
             return v2;
         } else if (Objects.equals(v2, v)) {

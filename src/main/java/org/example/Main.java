@@ -433,63 +433,50 @@ public class Main extends Application {
                 }
 
 
-                Vertex v = EdgeUtils.getVertexOfTangency(leftEdge, rightEdge);
-                Vertex leftVector = VectorUtils.getDirectionVector(v, Objects.requireNonNull(EdgeUtils.getOtherVertex(leftEdge, v)));
-                Vertex rightVector = VectorUtils.getDirectionVector(v, Objects.requireNonNull(EdgeUtils.getOtherVertex(rightEdge, v)));
-
-
-                double a1 = atan2(currentVector.getY(), currentVector.getX());
-                double a2 = atan2(leftVector.getY(), leftVector.getX());
-                double a3 = atan2(rightVector.getY(), rightVector.getX());
-
-
-                if (a2 > a1 && (a3 > a2 || a3 < a1)) {
-                    Edge leftTwinEdge = leftEdge.getTwin();
-                    assert leftCell != null;
-                    if (isOnTheSameSide(leftCell.getCenter(), leftEdge.getVertex(), midVertex)) {
-                        Cell leftTwinCell = leftTwinEdge.getCell();
-                        Vertex vertex = leftTwinEdge.getVertex();
-
-                        Edge erasedEdge = eraseEdges(leftTwinEdge, vertex);
-                        leftTwinEdge.setVertex(leftVertex);
-                        leftTwinEdge.setInfinite(false);
-                        if (excludedEdges.get(leftTwinCell) == null && idleEdges.get(leftTwinCell) == null) {
-                            leftTwinCell.setBoundary(leftTwinEdge);
-                        }
-                        if (erasedEdge != null) {
-                            excludedEdges.computeIfAbsent(leftTwinCell, k -> new ArrayList<>()).add(erasedEdge);
-                        }
-
-                        erasedEdge = eraseEdges(leftEdge, vertex);
-                        if (excludedEdges.get(leftCell) == null && idleEdges.get(leftCell) == null) {
-                            leftCell.setBoundary(leftEdge);
-                        }
-                        if (erasedEdge != null) {
-                            excludedEdges.computeIfAbsent(leftCell, k -> new ArrayList<>()).add(erasedEdge);
-                        }
-                    } else if (isOnTheSameSide(leftCell.getCenter(), leftEdge.getTwin().getVertex(), midVertex)) {
-                        Cell leftTwinCell = leftTwinEdge.getCell();
-                        Vertex vertex = leftEdge.getVertex();
-
-                        Edge erasedEdge = eraseEdges(leftTwinEdge, vertex);
-                        if (excludedEdges.get(leftTwinCell) == null && idleEdges.get(leftTwinCell) == null) {
-                            leftTwinCell.setBoundary(leftTwinEdge);
-                        }
-                        if (erasedEdge != null) {
-                            excludedEdges.computeIfAbsent(leftTwinCell, k -> new ArrayList<>()).add(erasedEdge);
-                        }
-
-                        erasedEdge = eraseEdges(leftEdge, vertex);
-                        leftEdge.setVertex(leftVertex);
-                        leftEdge.setInfinite(false);
-                        if (excludedEdges.get(leftCell) == null && idleEdges.get(leftCell) == null) {
-                            leftCell.setBoundary(leftEdge);
-                        }
-                        if (erasedEdge != null) {
-                            excludedEdges.computeIfAbsent(leftCell, k -> new ArrayList<>()).add(erasedEdge);
-                        }
-                    }
-
+//                Vertex leftVector = VectorUtils.getDirectionVector(leftVertex, Objects.requireNonNull(EdgeUtils.getOtherVertex(leftEdge, leftVertex)));
+//                Vertex rightVector = VectorUtils.getDirectionVector(rightVertex, Objects.requireNonNull(EdgeUtils.getOtherVertex(rightEdge, rightVertex)));
+//
+//
+//                double a1 = atan2(currentVector.getY(), currentVector.getX());
+//                double a2 = atan2(leftVector.getY(), leftVector.getX());
+//                double a3 = atan2(rightVector.getY(), rightVector.getX());
+//
+//                if (a2 > a1 && (a3 > a2 || a3 < a1)) {
+//                    Edge leftTwinEdge = leftEdge.getTwin();
+//                    assert leftCell != null;
+//                    if (isOnTheSameSide(leftCell.getCenter(), leftEdge.getVertex(), midVertex)) {
+//                        Cell leftTwinCell = leftTwinEdge.getCell();
+//                        Vertex vertex = leftTwinEdge.getVertex();
+//
+//                        eraseEdges(leftTwinEdge, vertex);
+//                        leftTwinEdge.setVertex(leftVertex);
+//                        leftTwinEdge.setInfinite(false);
+//                        if (excludedEdges.get(leftTwinCell) == null && idleEdges.get(leftTwinCell) == null) {
+//                            leftTwinCell.setBoundary(leftTwinEdge);
+//                        }
+//
+//                        eraseEdges(leftEdge, vertex);
+//                        if (excludedEdges.get(leftCell) == null && idleEdges.get(leftCell) == null) {
+//                            leftCell.setBoundary(leftEdge);
+//                        }
+//                    } else if (isOnTheSameSide(leftCell.getCenter(), leftEdge.getTwin().getVertex(), midVertex)) {
+//                        Cell leftTwinCell = leftTwinEdge.getCell();
+//                        Vertex vertex = leftEdge.getVertex();
+//
+//                        eraseEdges(leftTwinEdge, vertex);
+//                        if (excludedEdges.get(leftTwinCell) == null && idleEdges.get(leftTwinCell) == null) {
+//                            leftTwinCell.setBoundary(leftTwinEdge);
+//                        }
+//
+//
+//                        eraseEdges(leftEdge, vertex);
+//                        leftEdge.setVertex(leftVertex);
+//                        leftEdge.setInfinite(false);
+//                        if (excludedEdges.get(leftCell) == null && idleEdges.get(leftCell) == null) {
+//                            leftCell.setBoundary(leftEdge);
+//                        }
+//                    }
+//
 //                    Edge nextLeftEdge = new Edge(leftVertex, leftCell);
 //                    nextLeftEdge.setInfinite(false);
 //                    nextLeftEdge.setNext(leftEdge);
@@ -500,60 +487,46 @@ public class Main extends Application {
 //
 //                    nextRightEdge.setTwin(nextLeftEdge);
 //                    nextLeftEdge.setTwin(nextRightEdge);
-
-
-                    upperCommonSupport.setA(leftTwinEdge.getCell().getCenter());
-                    chainVertex = leftVertex;
-                    currentEdge = leftEdge;
-                } else if (a3 > a1 && (a2 > a3 || a2 < a1)) {
-                    Edge rightTwinEdge = rightEdge.getTwin();
-
-                    assert rightCell != null;
-                    if (isOnTheSameSide(rightCell.getCenter(), rightEdge.getVertex(), midVertex)) {
-                        Cell rightTwinCell = rightTwinEdge.getCell();
-                        Vertex vertex = rightEdge.getTwin().getVertex();
-
-                        Edge erasedEdge = eraseEdges(rightTwinEdge, vertex);
-                        rightTwinEdge.setVertex(rightVertex);
-                        rightTwinEdge.setInfinite(false);
-                        if (excludedEdges.get(rightTwinCell) == null && idleEdges.get(rightTwinCell) == null) {
-                            rightTwinCell.setBoundary(rightTwinEdge);
-                        }
-                        if (erasedEdge != null) {
-                            excludedEdges.computeIfAbsent(rightTwinCell, k -> new ArrayList<>()).add(erasedEdge);
-                        }
-
-                        erasedEdge = eraseEdges(rightEdge, vertex);
-                        if (excludedEdges.get(rightCell) == null && idleEdges.get(rightCell) == null) {
-                            rightCell.setBoundary(rightEdge);
-                        }
-                        if (erasedEdge != null) {
-                            excludedEdges.computeIfAbsent(rightCell, k -> new ArrayList<>()).add(erasedEdge);
-                        }
-
-                    } else if (isOnTheSameSide(rightCell.getCenter(), rightEdge.getTwin().getVertex(), midVertex)) {
-                        Cell rightTwinCell = rightTwinEdge.getCell();
-                        Vertex vertex = rightEdge.getVertex();
-
-                        Edge erasedEdge = eraseEdges(rightTwinEdge, vertex);
-                        if (excludedEdges.get(rightTwinCell) == null && idleEdges.get(rightTwinCell) == null) {
-                            rightTwinCell.setBoundary(rightTwinEdge);
-                        }
-                        if (erasedEdge != null) {
-                            excludedEdges.computeIfAbsent(rightTwinCell, k -> new ArrayList<>()).add(erasedEdge);
-                        }
-
-                        erasedEdge = eraseEdges(rightEdge, vertex);
-                        rightEdge.setVertex(rightVertex);
-                        rightEdge.setInfinite(false);
-                        if (excludedEdges.get(rightCell) == null && idleEdges.get(rightCell) == null) {
-                            rightCell.setBoundary(rightEdge);
-                        }
-                        if (erasedEdge != null) {
-                            excludedEdges.computeIfAbsent(rightCell, k -> new ArrayList<>()).add(erasedEdge);
-                        }
-                    }
-
+//
+//
+//                    upperCommonSupport.setA(leftTwinEdge.getCell().getCenter());
+//                    chainVertex = leftVertex;
+//                    currentEdge = leftEdge;
+//                } else if (a3 > a1 && (a2 > a3 || a2 < a1)) {
+//                    Edge rightTwinEdge = rightEdge.getTwin();
+//
+//                    assert rightCell != null;
+//                    if (isOnTheSameSide(rightCell.getCenter(), rightEdge.getVertex(), midVertex)) {
+//                        Cell rightTwinCell = rightTwinEdge.getCell();
+//                        Vertex vertex = rightEdge.getTwin().getVertex();
+//
+//                        eraseEdges(rightTwinEdge, vertex);
+//                        rightTwinEdge.setVertex(rightVertex);
+//                        rightTwinEdge.setInfinite(false);
+//                        if (excludedEdges.get(rightTwinCell) == null && idleEdges.get(rightTwinCell) == null) {
+//                            rightTwinCell.setBoundary(rightTwinEdge);
+//                        }
+//
+//                        eraseEdges(rightEdge, vertex);
+//                        if (excludedEdges.get(rightCell) == null && idleEdges.get(rightCell) == null) {
+//                            rightCell.setBoundary(rightEdge);
+//                        }
+//                    } else if (isOnTheSameSide(rightCell.getCenter(), rightEdge.getTwin().getVertex(), midVertex)) {
+//                        Cell rightTwinCell = rightTwinEdge.getCell();
+//                        Vertex vertex = rightEdge.getVertex();
+//
+//                         eraseEdges(rightTwinEdge, vertex);
+//                        if (excludedEdges.get(rightTwinCell) == null && idleEdges.get(rightTwinCell) == null) {
+//                            rightTwinCell.setBoundary(rightTwinEdge);
+//                        }
+//
+//                        rightEdge.setVertex(rightVertex);
+//                        rightEdge.setInfinite(false);
+//                        if (excludedEdges.get(rightCell) == null && idleEdges.get(rightCell) == null) {
+//                            rightCell.setBoundary(rightEdge);
+//                        }
+//                    }
+//
 //                    Edge nextRightEdge = new Edge(chainVertex, rightCell);
 //                    nextRightEdge.setInfinite(isInfinite);
 //                    nextRightEdge.setPrev(rightEdge);
@@ -564,12 +537,12 @@ public class Main extends Application {
 //
 //                    nextLeftEdge.setTwin(nextRightEdge);
 //                    nextRightEdge.setTwin(nextLeftEdge);
-
-
-                    upperCommonSupport.setB(rightTwinEdge.getCell().getCenter());
-                    chainVertex = rightVertex;
-                    currentEdge = rightEdge;
-                }
+//
+//
+//                    upperCommonSupport.setB(rightTwinEdge.getCell().getCenter());
+//                    chainVertex = rightVertex;
+//                    currentEdge = rightEdge;
+//                }
             } else if (leftEdge != null && (rightEdge == null || leftDistance < rightDistance)) {
                 Edge leftTwinEdge = leftEdge.getTwin();
                 Edge nextLeftEdge;
