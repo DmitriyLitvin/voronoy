@@ -35,5 +35,18 @@ public class EdgeUtils {
 
         return null;
     }
+
+    public static Vertex getOtherVertex(Edge e, Vertex v) {
+        Vertex leftVertex = e.getVertex();
+        Vertex rightVertex = e.getTwin().getVertex();
+
+        if (Objects.equals(leftVertex, v)) {
+            return rightVertex;
+        } else if (Objects.equals(rightVertex, v)) {
+            return leftVertex;
+        }
+
+        return null;
+    }
 }
 
