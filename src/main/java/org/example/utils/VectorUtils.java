@@ -18,7 +18,7 @@ public class VectorUtils {
         return v1.getX() * v2.getX() + v1.getY() * v2.getY();
     }
 
-    public static Vertex getDirectionVertex(Vertex v1, Vertex v2) {
+    public static Vertex getDirectionVector(Vertex v1, Vertex v2) {
         return new Vertex(v2.getX() - v1.getX(), v2.getY() - v1.getY());
     }
 

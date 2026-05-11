@@ -37,16 +37,23 @@ public class EdgeUtils {
     }
 
     public static Vertex getOtherVertex(Edge e, Vertex v) {
-        Vertex leftVertex = e.getVertex();
-        Vertex rightVertex = e.getTwin().getVertex();
+        Vertex v1 = e.getVertex();
+        Vertex v2 = e.getTwin().getVertex();
 
-        if (Objects.equals(leftVertex, v)) {
-            return rightVertex;
-        } else if (Objects.equals(rightVertex, v)) {
-            return leftVertex;
+        if (Objects.equals(v1, v)) {
+            return v2;
+        } else if (Objects.equals(v2, v)) {
+            return v1;
         }
 
         return null;
+    }
+
+    public static boolean contains(Edge e, Vertex v) {
+        double eps = 0.0000001;
+        Vertex v1 = e.getVertex();
+        Vertex v2 = e.getTwin().getVertex();
+        return Math.abs(VectorUtils.getLength(v, v1)) < eps || Math.abs(VectorUtils.getLength(v, v2)) < eps;
     }
 }
 
