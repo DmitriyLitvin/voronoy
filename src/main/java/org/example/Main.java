@@ -433,14 +433,6 @@ public class Main extends Application {
                 }
 
 
-//                Vertex leftVector = VectorUtils.getDirectionVector(leftVertex, Objects.requireNonNull(EdgeUtils.getOtherVertex(leftEdge, leftVertex)));
-//                Vertex rightVector = VectorUtils.getDirectionVector(rightVertex, Objects.requireNonNull(EdgeUtils.getOtherVertex(rightEdge, rightVertex)));
-//
-//
-//                double a1 = atan2(currentVector.getY(), currentVector.getX());
-//                double a2 = atan2(leftVector.getY(), leftVector.getX());
-//                double a3 = atan2(rightVector.getY(), rightVector.getX());
-//
 
             } else if (leftEdge != null && (rightEdge == null || leftDistance < rightDistance)) {
                 Edge leftTwinEdge = leftEdge.getTwin();
