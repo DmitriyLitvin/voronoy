@@ -40,9 +40,6 @@ public class EdgeUtils {
         Vertex v1 = e.getVertex();
         Vertex v2 = e.getTwin().getVertex();
 
-        System.out.println(VectorUtils.getLength(v1, v));
-        System.out.println(VectorUtils.getLength(v2, v));
-
         if (Objects.equals(v1, v)) {
             return v2;
         } else if (Objects.equals(v2, v)) {
@@ -50,13 +47,6 @@ public class EdgeUtils {
         }
 
         return null;
-    }
-
-    public static boolean contains(Edge e, Vertex v) {
-        double eps = 0.0000001;
-        Vertex v1 = e.getVertex();
-        Vertex v2 = e.getTwin().getVertex();
-        return Math.abs(VectorUtils.getLength(v, v1)) < eps || Math.abs(VectorUtils.getLength(v, v2)) < eps;
     }
 }
 

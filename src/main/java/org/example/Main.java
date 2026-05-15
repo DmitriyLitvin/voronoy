@@ -1,5 +1,7 @@
 package org.example;
 
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -10,6 +12,7 @@ import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.stage.Stage;
+import javafx.util.Duration;
 import lombok.extern.slf4j.Slf4j;
 import org.example.entity.*;
 import org.example.entity.Vertex;
@@ -175,7 +178,7 @@ public class Main extends Application {
 //                    }
 //                })
 //        );
-
+//
 //        timeline.play();
 
         System.out.println("End drawing");
@@ -427,12 +430,141 @@ public class Main extends Application {
                 break;
             }
 
-            if (leftEdge != null && rightEdge != null && Math.abs(leftDistance - rightDistance) < 0.001) {
-                if (currentVector == null || VectorUtils.getLength(chainVertex, leftVertex) > 0.001) {
-                    currentVector = VectorUtils.getDirectionVector(chainVertex, leftVertex);
-                }
-
-
+            if (leftEdge != null && rightEdge != null && (VectorUtils.getLength(chainVertex, leftVertex) < 0.01 || VectorUtils.getLength(chainVertex, rightVertex) < 0.01 || Math.abs(rightDistance - leftDistance) < 0.01)) {
+//                System.out.println("sircle");
+//                if (currentVector == null || VectorUtils.getLength(chainVertex, leftVertex) > 0.1) {
+//                    currentVector = VectorUtils.getDirectionVector(chainVertex, leftVertex);
+//                }
+//
+//                assert leftCell != null;
+//                Vertex v1;
+//                if (isOnTheSameSide(leftCell.getCenter(), leftEdge.getVertex(), midVertex)) {
+//                    v1 = leftEdge.getVertex();
+//                } else if (isOnTheSameSide(leftCell.getCenter(), leftEdge.getTwin().getVertex(), midVertex)) {
+//                    v1 = leftEdge.getTwin().getVertex();
+//                } else {
+//                    throw new RuntimeException();
+//                }
+//
+//                assert rightCell != null;
+//                Vertex v2;
+//                if (isOnTheSameSide(rightCell.getCenter(), rightEdge.getVertex(), midVertex)) {
+//                    v2 = rightEdge.getVertex();
+//                } else if (isOnTheSameSide(rightCell.getCenter(), rightEdge.getTwin().getVertex(), midVertex)) {
+//                    v2 = rightEdge.getTwin().getVertex();
+//                } else {
+//                    throw new RuntimeException();
+//                }
+//
+//                Vertex leftVector = VectorUtils.getDirectionVector(leftVertex, v1);
+//                Vertex rightVector = VectorUtils.getDirectionVector(rightVertex, v2);
+//
+//                double a1 = atan2(currentVector.getY(), currentVector.getX());
+//                double a2 = atan2(leftVector.getY(), leftVector.getX());
+//                double a3 = atan2(rightVector.getY(), rightVector.getX());
+//
+//                if (a2 > a1 && (a3 > a2 || a3 < a1)) {
+//                    Edge leftTwinEdge = leftEdge.getTwin();
+//                    if (isOnTheSameSide(leftCell.getCenter(), leftEdge.getVertex(), midVertex)) {
+//                        Cell leftTwinCell = leftTwinEdge.getCell();
+//                        Vertex vertex = leftTwinEdge.getVertex();
+//
+//                        eraseEdges(leftTwinEdge, vertex);
+//                        leftTwinEdge.setVertex(leftVertex);
+//                        leftTwinEdge.setInfinite(false);
+//                        if (excludedEdges.get(leftTwinCell) == null && idleEdges.get(leftTwinCell) == null) {
+//                            leftTwinCell.setBoundary(leftTwinEdge);
+//                        }
+//
+//                        eraseEdges(leftEdge, vertex);
+//                        if (excludedEdges.get(leftCell) == null && idleEdges.get(leftCell) == null) {
+//                            leftCell.setBoundary(leftEdge);
+//                        }
+//                    } else if (isOnTheSameSide(leftCell.getCenter(), leftEdge.getTwin().getVertex(), midVertex)) {
+//                        Cell leftTwinCell = leftTwinEdge.getCell();
+//                        Vertex vertex = leftEdge.getVertex();
+//
+//                        eraseEdges(leftTwinEdge, vertex);
+//                        if (excludedEdges.get(leftTwinCell) == null && idleEdges.get(leftTwinCell) == null) {
+//                            leftTwinCell.setBoundary(leftTwinEdge);
+//                        }
+//
+//                        eraseEdges(leftEdge, vertex);
+//                        leftEdge.setVertex(leftVertex);
+//                        leftEdge.setInfinite(false);
+//                        if (excludedEdges.get(leftCell) == null && idleEdges.get(leftCell) == null) {
+//                            leftCell.setBoundary(leftEdge);
+//                        }
+//                    }
+//
+//                    if (VectorUtils.getLength(chainVertex, leftVertex) > 0.1) {
+//                        Edge nextLeftEdge = new Edge(leftVertex, leftCell);
+//                        nextLeftEdge.setInfinite(false);
+//                        nextLeftEdge.setNext(leftEdge);
+//                        leftEdge.setPrev(nextLeftEdge);
+//
+//                        Edge nextRightEdge = new Edge(chainVertex, rightCell);
+//                        nextRightEdge.setInfinite(isInfinite);
+//
+//                        nextRightEdge.setTwin(nextLeftEdge);
+//                        nextLeftEdge.setTwin(nextRightEdge);
+//                    }
+//
+//                    chainVertex = leftVertex;
+//                    upperCommonSupport.setA(leftTwinEdge.getCell().getCenter());
+//                    currentEdge = leftEdge;
+//                } else if (a3 > a1 && (a2 > a3 || a2 < a1)) {
+//                    Edge rightTwinEdge = rightEdge.getTwin();
+//
+//                    if (isOnTheSameSide(rightCell.getCenter(), rightEdge.getVertex(), midVertex)) {
+//                        Cell rightTwinCell = rightTwinEdge.getCell();
+//                        Vertex vertex = rightEdge.getTwin().getVertex();
+//
+//                        eraseEdges(rightTwinEdge, vertex);
+//                        rightTwinEdge.setVertex(rightVertex);
+//                        rightTwinEdge.setInfinite(false);
+//                        if (excludedEdges.get(rightTwinCell) == null && idleEdges.get(rightTwinCell) == null) {
+//                            rightTwinCell.setBoundary(rightTwinEdge);
+//                        }
+//
+//                        eraseEdges(rightEdge, vertex);
+//                        if (excludedEdges.get(rightCell) == null && idleEdges.get(rightCell) == null) {
+//                            rightCell.setBoundary(rightEdge);
+//                        }
+//                    } else if (isOnTheSameSide(rightCell.getCenter(), rightEdge.getTwin().getVertex(), midVertex)) {
+//                        Cell rightTwinCell = rightTwinEdge.getCell();
+//                        Vertex vertex = rightEdge.getVertex();
+//
+//                        eraseEdges(rightTwinEdge, vertex);
+//                        if (excludedEdges.get(rightTwinCell) == null && idleEdges.get(rightTwinCell) == null) {
+//                            rightTwinCell.setBoundary(rightTwinEdge);
+//                        }
+//
+//                        eraseEdges(rightEdge, vertex);
+//                        rightEdge.setVertex(rightVertex);
+//                        rightEdge.setInfinite(false);
+//                        if (excludedEdges.get(rightCell) == null && idleEdges.get(rightCell) == null) {
+//                            rightCell.setBoundary(rightEdge);
+//                        }
+//                    }
+//
+//                    if (VectorUtils.getLength(chainVertex, rightVertex) > 0.1) {
+//                        Edge nextRightEdge = new Edge(chainVertex, rightCell);
+//                        nextRightEdge.setInfinite(isInfinite);
+//                        nextRightEdge.setPrev(rightEdge);
+//                        rightEdge.setNext(nextRightEdge);
+//
+//                        Edge nextLeftEdge = new Edge(rightVertex, leftCell);
+//                        nextLeftEdge.setInfinite(false);
+//
+//                        nextLeftEdge.setTwin(nextRightEdge);
+//                        nextRightEdge.setTwin(nextLeftEdge);
+//                    }
+//
+//                    chainVertex = rightVertex;
+//                    upperCommonSupport.setB(rightTwinEdge.getCell().getCenter());
+//                    currentEdge = rightEdge;
+//                }
 
             } else if (leftEdge != null && (rightEdge == null || leftDistance < rightDistance)) {
                 Edge leftTwinEdge = leftEdge.getTwin();
@@ -729,18 +861,18 @@ public class Main extends Application {
         return diagram;
     }
 
-    private Edge eraseEdges(Edge edge, Vertex vertex) {
-        Edge nextEdge = edge.getNext();
-        if (nextEdge != null && (Objects.equals(vertex, nextEdge.getVertex()) || Objects.equals(vertex, nextEdge.getTwin().getVertex()))) {
-            edge.setNext(null);
+    private Edge eraseEdges(Edge e, Vertex v) {
+        Edge nextEdge = e.getNext();
+        if (nextEdge != null && (Objects.equals(v, nextEdge.getVertex()) || Objects.equals(v, nextEdge.getTwin().getVertex()))) {
+            e.setNext(null);
             nextEdge.setPrev(null);
 
             return nextEdge;
         }
 
-        Edge prevEdge = edge.getPrev();
-        if (prevEdge != null && (Objects.equals(vertex, prevEdge.getVertex()) || Objects.equals(vertex, prevEdge.getTwin().getVertex()))) {
-            edge.setPrev(null);
+        Edge prevEdge = e.getPrev();
+        if (prevEdge != null && (Objects.equals(v, prevEdge.getVertex()) || Objects.equals(v, prevEdge.getTwin().getVertex()))) {
+            e.setPrev(null);
             prevEdge.setNext(null);
 
             return prevEdge;
@@ -749,27 +881,27 @@ public class Main extends Application {
         return null;
     }
 
-    private boolean isOutsideCell(Edge edge, Vertex v1, Vertex v2) {
-        if (edge == null) {
+    private boolean isOutsideCell(Edge e, Vertex v1, Vertex v2) {
+        if (e == null) {
             return true;
         }
-        Edge prevEdge = edge.getPrev();
-        Edge nextEdge = edge.getNext();
+        Edge prevEdge = e.getPrev();
+        Edge nextEdge = e.getNext();
 
-        Vertex nextVertex = null;
+        Vertex v3 = null;
         if (prevEdge != null) {
-            nextVertex = EdgeUtils.getOtherVertex(prevEdge, v1);
+            v3 = EdgeUtils.getOtherVertex(prevEdge, v1);
         }
-        if (nextEdge != null && nextVertex == null) {
-            nextVertex = EdgeUtils.getOtherVertex(nextEdge, v1);
+        if (nextEdge != null && v3 == null) {
+            v3 = EdgeUtils.getOtherVertex(nextEdge, v1);
         }
 
-        Vertex prevVertex = EdgeUtils.getOtherVertex(edge, v1);
-        if (nextVertex == null || prevVertex == null) {
+        Vertex v4 = EdgeUtils.getOtherVertex(e, v1);
+        if (v3 == null || v4 == null) {
             return true;
         }
 
-        return !isPointInsideAngle(prevVertex, v1, nextVertex, v2);
+        return !isPointInsideAngle(v4, v1, v3, v2);
     }
 
     private boolean isPointInsideAngle(Vertex v1, Vertex v2, Vertex v3, Vertex v4) {
@@ -829,29 +961,29 @@ public class Main extends Application {
     public boolean isIntersected(Vertex vertex, Edge edge) {
         boolean isInfinite = edge.isInfinite();
         boolean isTwinInfinite = edge.getTwin().isInfinite();
-        Vertex a = edge.getVertex();
-        Vertex b = edge.getTwin().getVertex();
+        Vertex v1 = edge.getVertex();
+        Vertex v2 = edge.getTwin().getVertex();
 
         if (vertex == null) {
             return false;
         } else if (isInfinite && isTwinInfinite) {
             return true;
         } else if (!isInfinite && !isTwinInfinite) {
-            return VectorUtils.dotProduct(VectorUtils.getDirectionVector(vertex, a), VectorUtils.getDirectionVector(vertex, b)) <= 0;
+            return VectorUtils.dotProduct(VectorUtils.getDirectionVector(vertex, v1), VectorUtils.getDirectionVector(vertex, v2)) <= 0.1;
         } else if (isInfinite) {
-            return VectorUtils.dotProduct(VectorUtils.getDirectionVector(vertex, b), VectorUtils.getDirectionVector(a, b)) >= 0;
+            return VectorUtils.dotProduct(VectorUtils.getDirectionVector(vertex, v2), VectorUtils.getDirectionVector(v1, v2)) >= -0.1;
         }
 
-        return VectorUtils.dotProduct(VectorUtils.getDirectionVector(vertex, a), VectorUtils.getDirectionVector(b, a)) >= 0;
+        return VectorUtils.dotProduct(VectorUtils.getDirectionVector(vertex, v1), VectorUtils.getDirectionVector(v2, v1)) >= -0.1;
     }
 
     private Line getMiddlePerpendicular(Line line) {
-        int height = 1000000;
-        int width = 1000000;
+        int height = 100000;
+        int width = 100000;
 
-        Vertex vertex = line.getMidVertex();
-        double x = vertex.getX();
-        double y = vertex.getY();
+        Vertex v1 = line.getMidVertex();
+        double x = v1.getX();
+        double y = v1.getY();
 
         Vertex vector = VectorUtils.getDirectionVector(line.getA(), line.getB());
         if (VectorUtils.dotProduct(vector, new Vertex(1, 0)) == 0) {
