@@ -209,13 +209,13 @@ public class Main extends Application {
         convexHull.push(vertex);
 
         sortedVertices.forEach(v -> {
-            Vertex vertex1 = convexHull.get(convexHull.size() - 2);
-            double x1 = vertex1.getX();
-            double y1 = vertex1.getY();
+            Vertex v1 = convexHull.get(convexHull.size() - 2);
+            double x1 = v1.getX();
+            double y1 = v1.getY();
 
-            Vertex vertex2 = convexHull.peek();
-            double x2 = vertex2.getX();
-            double y2 = vertex2.getY();
+            Vertex v2 = convexHull.peek();
+            double x2 = v2.getX();
+            double y2 = v2.getY();
 
             double x3 = v.getX();
             double y3 = v.getY();
@@ -223,13 +223,13 @@ public class Main extends Application {
             while (convexHull.size() > 2 && (x2 - x1) * (y3 - y2) - (y2 - y1) * (x3 - x2) < 0) {
                 convexHull.pop();
 
-                vertex1 = convexHull.get(convexHull.size() - 2);
-                x1 = vertex1.getX();
-                y1 = vertex1.getY();
+                v1 = convexHull.get(convexHull.size() - 2);
+                x1 = v1.getX();
+                y1 = v1.getY();
 
-                vertex2 = convexHull.peek();
-                x2 = vertex2.getX();
-                y2 = vertex2.getY();
+                v2 = convexHull.peek();
+                x2 = v2.getX();
+                y2 = v2.getY();
             }
 
             convexHull.push(v);
@@ -239,16 +239,16 @@ public class Main extends Application {
     }
 
     private Line getCommonSupport(Set<Vertex> leftPolygon, Set<Vertex> rightPolygon, boolean isUpper) {
-        Vertex maxXpoint = leftPolygon.stream().max(Comparator.comparingDouble(Vertex::getX).thenComparing(Vertex::getY)).orElse(null);
-        Vertex minXVertex = rightPolygon.stream().min(Comparator.comparingDouble(Vertex::getX).thenComparing(Vertex::getY)).orElse(null);
-        Line line = new Line(maxXpoint, minXVertex);
+        Vertex maxVertex = leftPolygon.stream().max(Comparator.comparingDouble(Vertex::getX).thenComparing(Vertex::getY)).orElse(null);
+        Vertex minVertex = rightPolygon.stream().min(Comparator.comparingDouble(Vertex::getX).thenComparing(Vertex::getY)).orElse(null);
+        Line line = new Line(maxVertex, minVertex);
 
         for (int i = 0; i < 2; i++) {
-            Vertex leftVertex = maxXpoint;
-            Vertex rightVertex = minXVertex;
+            Vertex leftVertex = maxVertex;
+            Vertex rightVertex = minVertex;
 
-            Iterator<Vertex> leftConvexPolygonIterator = leftPolygon.stream().filter(p -> !p.equals(maxXpoint)).iterator();
-            Iterator<Vertex> rightConvexPolygonIterator = rightPolygon.stream().filter(p -> !p.equals(minXVertex)).iterator();
+            Iterator<Vertex> leftConvexPolygonIterator = leftPolygon.stream().filter(p -> !p.equals(maxVertex)).iterator();
+            Iterator<Vertex> rightConvexPolygonIterator = rightPolygon.stream().filter(p -> !p.equals(minVertex)).iterator();
             while (leftConvexPolygonIterator.hasNext() || rightConvexPolygonIterator.hasNext()) {
                 if (leftConvexPolygonIterator.hasNext()) {
                     leftVertex = leftConvexPolygonIterator.next();
@@ -978,8 +978,8 @@ public class Main extends Application {
     }
 
     private Line getMiddlePerpendicular(Line l) {
-        int height = 100000;
-        int width = 100000;
+        double height = 1000000;
+        double width = 1000000;
 
         Vertex v1 = l.getMidVertex();
         double x = v1.getX();
