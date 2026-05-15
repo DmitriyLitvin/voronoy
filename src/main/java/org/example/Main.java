@@ -275,14 +275,14 @@ public class Main extends Application {
     }
 
 
-    public boolean is(Vertex vertex, Line line, boolean isUpper) {
-        Vertex leftVertex = line.getA();
-        Vertex rightVertex = line.getB();
+    public boolean is(Vertex v, Line l, boolean isUpper) {
+        Vertex v1 = l.getA();
+        Vertex v2 = l.getB();
         if (isUpper) {
-            return crossProduct(VectorUtils.getDirectionVector(leftVertex, rightVertex), VectorUtils.getDirectionVector(leftVertex, vertex)) > 0;
+            return crossProduct(VectorUtils.getDirectionVector(v1, v2), VectorUtils.getDirectionVector(v1, v)) > 0;
         }
 
-        return crossProduct(VectorUtils.getDirectionVector(leftVertex, rightVertex), VectorUtils.getDirectionVector(leftVertex, vertex)) < 0;
+        return crossProduct(VectorUtils.getDirectionVector(v1, v2), VectorUtils.getDirectionVector(v1, v)) < 0;
     }
 
     private Map<Vertex, Cell> buildVoronoyDiagram(List<Vertex> polygon) {
@@ -958,34 +958,34 @@ public class Main extends Application {
         return intersectedEdge;
     }
 
-    public boolean isIntersected(Vertex vertex, Edge edge) {
-        boolean isInfinite = edge.isInfinite();
-        boolean isTwinInfinite = edge.getTwin().isInfinite();
-        Vertex v1 = edge.getVertex();
-        Vertex v2 = edge.getTwin().getVertex();
+    public boolean isIntersected(Vertex v, Edge e) {
+        boolean isInfinite = e.isInfinite();
+        boolean isTwinInfinite = e.getTwin().isInfinite();
+        Vertex v1 = e.getVertex();
+        Vertex v2 = e.getTwin().getVertex();
 
-        if (vertex == null) {
+        if (v == null) {
             return false;
         } else if (isInfinite && isTwinInfinite) {
             return true;
         } else if (!isInfinite && !isTwinInfinite) {
-            return VectorUtils.dotProduct(VectorUtils.getDirectionVector(vertex, v1), VectorUtils.getDirectionVector(vertex, v2)) <= 0.1;
+            return VectorUtils.dotProduct(VectorUtils.getDirectionVector(v, v1), VectorUtils.getDirectionVector(v, v2)) <= 0.1;
         } else if (isInfinite) {
-            return VectorUtils.dotProduct(VectorUtils.getDirectionVector(vertex, v2), VectorUtils.getDirectionVector(v1, v2)) >= -0.1;
+            return VectorUtils.dotProduct(VectorUtils.getDirectionVector(v, v2), VectorUtils.getDirectionVector(v1, v2)) >= -0.1;
         }
 
-        return VectorUtils.dotProduct(VectorUtils.getDirectionVector(vertex, v1), VectorUtils.getDirectionVector(v2, v1)) >= -0.1;
+        return VectorUtils.dotProduct(VectorUtils.getDirectionVector(v, v1), VectorUtils.getDirectionVector(v2, v1)) >= -0.1;
     }
 
-    private Line getMiddlePerpendicular(Line line) {
+    private Line getMiddlePerpendicular(Line l) {
         int height = 100000;
         int width = 100000;
 
-        Vertex v1 = line.getMidVertex();
+        Vertex v1 = l.getMidVertex();
         double x = v1.getX();
         double y = v1.getY();
 
-        Vertex vector = VectorUtils.getDirectionVector(line.getA(), line.getB());
+        Vertex vector = VectorUtils.getDirectionVector(l.getA(), l.getB());
         if (VectorUtils.dotProduct(vector, new Vertex(1, 0)) == 0) {
             return new Line(new Vertex(-width, y), new Vertex(width, y));
         } else if (VectorUtils.dotProduct(vector, new Vertex(0, 1)) == 0) {
@@ -998,8 +998,8 @@ public class Main extends Application {
         }
     }
 
-    private boolean isOnTheSameSide(Vertex p1, Vertex p2, Vertex midVertex) {
-        return VectorUtils.dotProduct(VectorUtils.getDirectionVector(midVertex, p1), VectorUtils.getDirectionVector(midVertex, p2)) >= 0;
+    private boolean isOnTheSameSide(Vertex v1, Vertex v2, Vertex v3) {
+        return VectorUtils.dotProduct(VectorUtils.getDirectionVector(v3, v1), VectorUtils.getDirectionVector(v3, v2)) >= 0;
     }
 
     private Vertex getPointOfIntersection(Line l1, Line l2) {
