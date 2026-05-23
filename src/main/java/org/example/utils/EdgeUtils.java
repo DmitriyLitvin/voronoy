@@ -18,7 +18,7 @@ public class EdgeUtils {
     }
 
     public static boolean isConnected(Edge e1, Edge e2) {
-        return Objects.equals(e1.getVertex(), e2.getTwin().getVertex()) || Objects.equals(e1.getTwin().getVertex(), e2.getVertex()) || Objects.equals(e1.getTwin().getVertex(), e2.getTwin().getVertex()) || Objects.equals(e1.getVertex(), e2.getVertex());
+        return Objects.equals(e1.getVertex(), e2.getTwin().getVertex()) || Objects.equals(e1.getTwin().getVertex(), e2.getVertex());
     }
 
     public static Vertex getVertexOfTangency(Edge e1, Edge e2) {
