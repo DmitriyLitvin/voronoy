@@ -15,14 +15,4 @@ public class Cell {
     @EqualsAndHashCode.Include
     private Vertex center;
     private Edge boundary;
-
-    public boolean isClosed() {
-        Edge startEdge = boundary.getStartEdge();
-        Edge lastEdge = boundary.getLastEdge();
-        if (boundary.getPrev() == null && boundary.getNext() == null) {
-            return false;
-        }
-
-        return Objects.equals(Objects.equals(getVertexOfTangency(startEdge, startEdge.getNext()), startEdge.getVertex()) ? startEdge.getTwin().getVertex() : startEdge.getVertex(), Objects.equals(getVertexOfTangency(lastEdge, lastEdge.getPrev()), lastEdge.getVertex()) ? lastEdge.getTwin().getVertex() : lastEdge.getVertex());
-    }
 }
