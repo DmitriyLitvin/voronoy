@@ -43,15 +43,33 @@ public class Main extends Application {
         borderPane.setBottom(button);
         pane.getChildren().add(button);
 
-       // vertices.add(new Vertex(541.0, 322.0));
-        vertices.add(new Vertex(651.0, 156.0));
-        vertices.add(new Vertex(686.0, 277.0));
-        vertices.add(new Vertex(705.0, 395.0));
-        vertices.add(new Vertex(738.0, 474.0));
-        vertices.add(new Vertex(762.0, 195.0));
-        vertices.add(new Vertex(783.0, 306.0));
-        vertices.add(new Vertex(883.0, 406.0));
-        vertices.add(new Vertex(911.0, 339.0));
+
+//        vertices.add(new Vertex(651.0, 156.0));
+//        vertices.add(new Vertex(686.0, 277.0));
+//        vertices.add(new Vertex(705.0, 395.0));
+//        vertices.add(new Vertex(738.0, 474.0));
+//        vertices.add(new Vertex(762.0, 195.0));
+//        vertices.add(new Vertex(783.0, 306.0));
+//        vertices.add(new Vertex(883.0, 406.0));
+//        vertices.add(new Vertex(911.0, 339.0));
+
+//        vertices.add(new Vertex(494.0, 400.0));
+//        vertices.add(new Vertex(577.0, 206.0));
+//        vertices.add(new Vertex(596.0, 658.0));
+//        vertices.add(new Vertex(609.0, 380.0));
+//        vertices.add(new Vertex(734.0, 316.0));
+//        vertices.add(new Vertex(783.0, 505.0));
+//        vertices.add(new Vertex(397.0, 701.0));
+//        vertices.add(new Vertex(933.0, 849.0));
+
+        vertices.add(new Vertex(540.0, 382.0));
+        vertices.add(new Vertex(567.0, 505.0));
+        vertices.add(new Vertex(583.0, 559.0));
+        vertices.add(new Vertex(610.0, 290.0));
+        vertices.add(new Vertex(634.0, 391.0));
+        vertices.add(new Vertex(654.0, 485.0));
+        vertices.add(new Vertex(674.0, 332.0));
+        vertices.add(new Vertex(706.0, 430.0));
 
 
         vertices.forEach(p -> {
@@ -91,35 +109,6 @@ public class Main extends Application {
 
     public void drawVoronoyDiagram(Set<Vertex> polygon) {
         System.out.println("Start drawing ");
-
-//        buildVoronoyDiagram(polygon.stream().sorted(Comparator.comparingDouble(Vertex::getX).thenComparingDouble(Vertex::getY)).toList()).values().forEach(cell -> {
-//            Edge boundary = cell.getBoundary();
-//            Edge nextEdge = cell.getBoundary();
-//            if (nextEdge != null) {
-//                do {
-//                    Vertex vertex = nextEdge.getVertex();
-//                    Vertex twinVertex = nextEdge.getTwin().getVertex();
-//                    javafx.scene.shape.Line line = new javafx.scene.shape.Line(vertex.getX(), vertex.getY(), twinVertex.getX(), twinVertex.getY());
-//                    line.setStroke(Color.BLUE);
-//                    line.setStrokeWidth(1);
-//                    pane.getChildren().add(line);
-//                    nextEdge = nextEdge.getNext();
-//                } while (nextEdge != null && !isEquals(boundary, nextEdge));
-//            }
-//
-//            Edge prevEdge = cell.getBoundary();
-//            if (prevEdge != null) {
-//                do {
-//                    Vertex vertex = prevEdge.getVertex();
-//                    Vertex twinVertex = prevEdge.getTwin().getVertex();
-//                    javafx.scene.shape.Line line = new javafx.scene.shape.Line(vertex.getX(), vertex.getY(), twinVertex.getX(), twinVertex.getY());
-//                    line.setStroke(Color.BLUE);
-//                    line.setStrokeWidth(1);
-//                    pane.getChildren().add(line);
-//                    prevEdge = prevEdge.getPrev();
-//                } while (prevEdge != null && !isEquals(boundary, prevEdge));
-//            }
-//        });
 
         List<Cell> cells = new ArrayList<>(buildVoronoyDiagram(polygon.stream().sorted(Comparator.comparingDouble(Vertex::getX).thenComparingDouble(Vertex::getY)).toList()).values());
 
@@ -480,7 +469,7 @@ public class Main extends Application {
                         nextLeftEdge.setPrev(lastEdge);
                         lastEdge.setNext(nextLeftEdge);
                     } else {
-                        System.out.println("1");
+                        excludedEdges.computeIfAbsent(leftCell, k -> new ArrayList<>()).add(nextLeftEdge);
                     }
                 }
 
@@ -494,7 +483,7 @@ public class Main extends Application {
                             nextRightEdge.setNext(startEdge);
                             startEdge.setPrev(nextRightEdge);
                         } else {
-                            System.out.println("2");
+                            excludedEdges.computeIfAbsent(rightCell, k -> new ArrayList<>()).add(nextRightEdge);
                         }
                     }
                 }
@@ -566,6 +555,7 @@ public class Main extends Application {
                         startEdge.setPrev(nextRightEdge);
                     } else {
                         System.out.println("3");
+                        excludedEdges.computeIfAbsent(rightCell, k -> new ArrayList<>()).add(nextRightEdge);
                     }
                 }
 
@@ -580,6 +570,7 @@ public class Main extends Application {
                             lastEdge.setNext(nextLeftEdge);
                         } else {
                             System.out.println("4");
+                            excludedEdges.computeIfAbsent(leftCell, k -> new ArrayList<>()).add(nextLeftEdge);
                         }
                     }
                 }
@@ -591,7 +582,16 @@ public class Main extends Application {
             }
         }
 
-        buildChain(disjunctiveChain, leftDiagram);
+        disjunctiveChain.values()
+                .forEach(e -> buildChain(e, leftDiagram));
+
+        excludedEdges.values()
+                .stream()
+                .flatMap(Collection::stream)
+                .forEach(e -> {
+                    buildChain(e, leftDiagram);
+                });
+
 
         middlePerpendicular = getMiddlePerpendicular(lowerCommonSupport);
 
@@ -610,6 +610,7 @@ public class Main extends Application {
             rightEdge = new Edge(chainVertex, rightCell);
         }
 
+
         rightEdge.setInfinite(false);
         leftEdge.setInfinite(false);
         leftEdge.setTwin(rightEdge);
@@ -621,16 +622,14 @@ public class Main extends Application {
             Edge lastEdge = boundary.getLastEdge();
 
             if (isIdle(boundary)) {
-                leftEdge.setNext(startEdge);
-                startEdge.setPrev(leftEdge);
-            } else if (startEdge != null && isConnected(startEdge, leftEdge)) {
-                startEdge.setPrev(leftEdge);
-                leftEdge.setNext(startEdge);
+                connectEdges(leftEdge, startEdge);
             } else if (lastEdge != null && isConnected(lastEdge, leftEdge)) {
                 lastEdge.setNext(leftEdge);
                 leftEdge.setPrev(lastEdge);
+            } else if (startEdge != null && isConnected(startEdge, leftEdge)) {
+                startEdge.setPrev(leftEdge);
+                leftEdge.setNext(startEdge);
             } else {
-                System.out.println(leftDiagram.size());
                 System.out.println("5");
             }
         }
@@ -641,16 +640,14 @@ public class Main extends Application {
             Edge lastEdge = boundary.getLastEdge();
 
             if (isIdle(boundary)) {
-                rightEdge.setPrev(lastEdge);
-                lastEdge.setNext(rightEdge);
-            } else if (lastEdge != null && isConnected(lastEdge, rightEdge)) {
-                lastEdge.setNext(rightEdge);
-                rightEdge.setPrev(lastEdge);
+                connectEdges(rightEdge, lastEdge);
             } else if (startEdge != null && isConnected(startEdge, rightEdge)) {
                 startEdge.setPrev(rightEdge);
                 rightEdge.setNext(startEdge);
+            } else if (lastEdge != null && isConnected(lastEdge, rightEdge)) {
+                lastEdge.setNext(rightEdge);
+                rightEdge.setPrev(lastEdge);
             } else {
-                System.out.println(rightDiagram.size());
                 System.out.println("6");
             }
         }
@@ -685,15 +682,13 @@ public class Main extends Application {
         return null;
     }
 
-    private void buildChain(Map<Cell, Edge> disjunctiveChain, Map<Vertex, Cell> leftDiagram) {
-        for (Map.Entry<Cell, Edge> entry : disjunctiveChain.entrySet()) {
-            Cell key = entry.getKey();
-            Vertex center = key.getCenter();
-            Edge chain = entry.getValue();
-            Edge boundary = key.getBoundary();
-            Edge firstChainEdge = chain.getStartEdge();
-            Edge lastChainEdge = chain.getLastEdge();
-
+    private void buildChain(Edge e, Map<Vertex, Cell> leftDiagram) {
+        Cell cell = e.getCell();
+        Vertex center = cell.getCenter();
+        Edge boundary = cell.getBoundary();
+        Edge firstChainEdge = e.getStartEdge();
+        Edge lastChainEdge = e.getLastEdge();
+        if (firstChainEdge != null && lastChainEdge != null) {
             Vertex firstVertex;
             Vertex lastVertex;
 
@@ -717,39 +712,41 @@ public class Main extends Application {
 
             if (firstEdge != null) {
                 if (isIdle(firstEdge) && isIdle(firstChainEdge)) {
-                    if (leftDiagram.get(center) != null) {
-                        firstChainEdge.setNext(firstEdge);
-                        firstEdge.setPrev(firstChainEdge);
-                    } else {
-                        firstEdge.setNext(firstChainEdge);
-                        firstChainEdge.setPrev(firstEdge);
-                    }
-                } else if (firstEdge.getNext() == null) {
+                    connectEdges(firstChainEdge, firstEdge);
+                } else if (firstEdge.getNext() == null && isConnected(firstEdge, firstChainEdge)) {
                     firstEdge.setNext(firstChainEdge);
                     firstChainEdge.setPrev(firstEdge);
-                } else if (firstEdge.getPrev() == null) {
+                } else if (firstEdge.getPrev() == null && isConnected(firstEdge, lastChainEdge)) {
                     firstEdge.setPrev(lastChainEdge);
                     lastChainEdge.setNext(firstEdge);
+                } else {
+                    System.out.println("endge is not connected");
                 }
             }
 
             if (lastEdge != null) {
                 if (isIdle(lastEdge) && isIdle(lastChainEdge)) {
-                    if (leftDiagram.get(center) != null) {
-                        lastChainEdge.setPrev(lastEdge);
-                        lastEdge.setNext(lastChainEdge);
-                    } else {
-                        lastEdge.setPrev(lastChainEdge);
-                        lastChainEdge.setNext(lastEdge);
-                    }
-                } else if (lastEdge.getPrev() == null) {
+                    connectEdges(lastChainEdge, lastEdge);
+                } else if (lastEdge.getPrev() == null && isConnected(lastEdge, lastChainEdge)) {
                     lastEdge.setPrev(lastChainEdge);
                     lastChainEdge.setNext(lastEdge);
-                } else if (lastEdge.getNext() == null) {
+                } else if (lastEdge.getNext() == null && isConnected(lastEdge, firstChainEdge)) {
                     lastEdge.setNext(firstChainEdge);
                     firstChainEdge.setPrev(lastEdge);
+                } else {
+                    System.out.println("edge is not connected");
                 }
             }
+        }
+    }
+
+    private void connectEdges(Edge e1, Edge e2) {
+        if (Objects.equals(e1.getTwin().getVertex(), e2.getVertex())) {
+            e1.setPrev(e2);
+            e2.setNext(e1);
+        } else if (Objects.equals(e1.getVertex(), e2.getTwin().getVertex())) {
+            e1.setNext(e2);
+            e2.setPrev(e1);
         }
     }
 
