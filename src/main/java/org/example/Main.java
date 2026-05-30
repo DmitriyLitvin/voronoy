@@ -43,33 +43,40 @@ public class Main extends Application {
         borderPane.setBottom(button);
         pane.getChildren().add(button);
 
-
-//        vertices.add(new Vertex(651.0, 156.0));
-//        vertices.add(new Vertex(686.0, 277.0));
-//        vertices.add(new Vertex(705.0, 395.0));
-//        vertices.add(new Vertex(738.0, 474.0));
-//        vertices.add(new Vertex(762.0, 195.0));
-//        vertices.add(new Vertex(783.0, 306.0));
-//        vertices.add(new Vertex(883.0, 406.0));
-//        vertices.add(new Vertex(911.0, 339.0));
-
+//        vertices.add(new Vertex(397.0, 701.0));
 //        vertices.add(new Vertex(494.0, 400.0));
+//        vertices.add(new Vertex(540.0, 382.0));
+//        vertices.add(new Vertex(567.0, 505.0));
 //        vertices.add(new Vertex(577.0, 206.0));
+//        vertices.add(new Vertex(583.0, 559.0));
 //        vertices.add(new Vertex(596.0, 658.0));
 //        vertices.add(new Vertex(609.0, 380.0));
-//        vertices.add(new Vertex(734.0, 316.0));
+//        vertices.add(new Vertex(610.0, 290.0));
+//        vertices.add(new Vertex(634.0, 391.0));
+//        vertices.add(new Vertex(651.0, 156.0));
+//        vertices.add(new Vertex(654.0, 485.0));
+//        vertices.add(new Vertex(674.0, 332.0));
+//        vertices.add(new Vertex(686.0, 277.0));
+//        vertices.add(new Vertex(700.0, 743.0));
+//        vertices.add(new Vertex(705.0, 395.0));
 //        vertices.add(new Vertex(783.0, 505.0));
-//        vertices.add(new Vertex(397.0, 701.0));
+//        vertices.add(new Vertex(802.0, 737.0));
+//        vertices.add(new Vertex(836.0, 658.0));
+//        vertices.add(new Vertex(866.0, 792.0));
+//        vertices.add(new Vertex(883.0, 406.0));
+//        vertices.add(new Vertex(911.0, 339.0));
 //        vertices.add(new Vertex(933.0, 849.0));
+//        vertices.add(new Vertex(938.0, 672.0));
+//        vertices.add(new Vertex(738.0, 474.0));
+//        vertices.add(new Vertex(762.0, 195.0));
+//        vertices.add(new Vertex(773.0, 670.0));
+//        vertices.add(new Vertex(783.0, 306.0));
 
-        vertices.add(new Vertex(540.0, 382.0));
-        vertices.add(new Vertex(567.0, 505.0));
-        vertices.add(new Vertex(583.0, 559.0));
-        vertices.add(new Vertex(610.0, 290.0));
-        vertices.add(new Vertex(634.0, 391.0));
-        vertices.add(new Vertex(654.0, 485.0));
-        vertices.add(new Vertex(674.0, 332.0));
+
         vertices.add(new Vertex(706.0, 430.0));
+        vertices.add(new Vertex(720.0, 597.0));
+        vertices.add(new Vertex(734.0, 316.0));
+        vertices.add(new Vertex(734.0, 825.0));
 
 
         vertices.forEach(p -> {
@@ -406,6 +413,7 @@ public class Main extends Application {
                 rightDistance = VectorUtils.getLength(rightVertex, chainVertex);
             }
 
+            System.out.println(rightDistance - leftDistance);
             if (rightEdge == null && leftEdge == null) {
                 throw new RuntimeException("couldn't find the closest edge");
             } else if (leftEdge != null && (rightEdge == null || leftDistance < rightDistance)) {
@@ -492,7 +500,7 @@ public class Main extends Application {
                 chainVertex = leftVertex;
                 currentEdge = leftEdge;
                 chainEdge = nextLeftEdge;
-            } else if (leftEdge == null || leftDistance >= rightDistance) {
+            } else if (leftEdge == null || leftDistance > rightDistance) {
                 Edge rightTwinEdge = rightEdge.getTwin();
                 Edge nextLeftEdge;
                 Edge nextRightEdge;
@@ -554,7 +562,6 @@ public class Main extends Application {
                         nextRightEdge.setNext(startEdge);
                         startEdge.setPrev(nextRightEdge);
                     } else {
-                        System.out.println("3");
                         excludedEdges.computeIfAbsent(rightCell, k -> new ArrayList<>()).add(nextRightEdge);
                     }
                 }
@@ -569,7 +576,6 @@ public class Main extends Application {
                             nextLeftEdge.setPrev(lastEdge);
                             lastEdge.setNext(nextLeftEdge);
                         } else {
-                            System.out.println("4");
                             excludedEdges.computeIfAbsent(leftCell, k -> new ArrayList<>()).add(nextLeftEdge);
                         }
                     }
@@ -583,14 +589,12 @@ public class Main extends Application {
         }
 
         disjunctiveChain.values()
-                .forEach(e -> buildChain(e, leftDiagram));
+                .forEach(this::buildChain);
 
         excludedEdges.values()
                 .stream()
                 .flatMap(Collection::stream)
-                .forEach(e -> {
-                    buildChain(e, leftDiagram);
-                });
+                .forEach(this::buildChain);
 
 
         middlePerpendicular = getMiddlePerpendicular(lowerCommonSupport);
@@ -629,8 +633,6 @@ public class Main extends Application {
             } else if (startEdge != null && isConnected(startEdge, leftEdge)) {
                 startEdge.setPrev(leftEdge);
                 leftEdge.setNext(startEdge);
-            } else {
-                System.out.println("5");
             }
         }
 
@@ -647,16 +649,12 @@ public class Main extends Application {
             } else if (lastEdge != null && isConnected(lastEdge, rightEdge)) {
                 lastEdge.setNext(rightEdge);
                 rightEdge.setPrev(lastEdge);
-            } else {
-                System.out.println("6");
             }
         }
 
         Map<Vertex, Cell> diagram = new HashMap<>();
         diagram.putAll(leftDiagram);
         diagram.putAll(rightDiagram);
-
-        System.out.println("ee: " + excludedEdges.size());
 
         return diagram;
     }
@@ -682,9 +680,8 @@ public class Main extends Application {
         return null;
     }
 
-    private void buildChain(Edge e, Map<Vertex, Cell> leftDiagram) {
+    private void buildChain(Edge e) {
         Cell cell = e.getCell();
-        Vertex center = cell.getCenter();
         Edge boundary = cell.getBoundary();
         Edge firstChainEdge = e.getStartEdge();
         Edge lastChainEdge = e.getLastEdge();
@@ -720,7 +717,18 @@ public class Main extends Application {
                     firstEdge.setPrev(lastChainEdge);
                     lastChainEdge.setNext(firstEdge);
                 } else {
-                    System.out.println("endge is not connected");
+                    System.out.println(isConnected(firstEdge, firstChainEdge));
+                    System.out.println(isConnected(firstEdge, lastChainEdge));
+
+                    System.out.println(firstEdge.getVertex() + " " + firstEdge.getTwin().getVertex());
+                    System.out.println(firstChainEdge.getVertex() + " " + firstChainEdge.getTwin().getVertex());
+
+                    System.out.println(firstEdge.getVertex() + " " + firstEdge.getTwin().getVertex());
+                    System.out.println(lastChainEdge.getVertex() + " " + lastChainEdge.getTwin().getVertex());
+
+                    System.out.println(firstEdge.getCell().getCenter());
+                    System.out.println(firstChainEdge.getCell().getCenter());
+                    System.out.println("edge is not connected");
                 }
             }
 
@@ -734,6 +742,15 @@ public class Main extends Application {
                     lastEdge.setNext(firstChainEdge);
                     firstChainEdge.setPrev(lastEdge);
                 } else {
+                    System.out.println(lastEdge.getVertex() + " " + lastEdge.getTwin().getVertex());
+                    System.out.println(lastChainEdge.getVertex() + " " + lastChainEdge.getTwin().getVertex());
+
+                    System.out.println(lastEdge.getVertex() + " " + lastEdge.getTwin().getVertex());
+                    System.out.println(firstChainEdge.getVertex() + " " + firstChainEdge.getTwin().getVertex());
+
+
+                    System.out.println(isConnected(lastEdge, lastChainEdge));
+                    System.out.println(isConnected(lastEdge, firstChainEdge));
                     System.out.println("edge is not connected");
                 }
             }
