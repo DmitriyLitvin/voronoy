@@ -700,8 +700,8 @@ public class Main extends Application {
                     System.out.println(firstEdge.getVertex() + " " + firstEdge.getTwin().getVertex());
                     System.out.println(lastChainEdge.getVertex() + " " + lastChainEdge.getTwin().getVertex());
 
-                    System.out.println(firstEdge.getCell().getCenter());
-                    System.out.println(firstChainEdge.getCell().getCenter());
+                    System.out.println(isConnected(firstEdge, firstChainEdge));
+                    System.out.println(isConnected(firstEdge, lastChainEdge));
                     System.out.println("edge is not connected");
                 }
             }
@@ -721,7 +721,6 @@ public class Main extends Application {
 
                     System.out.println(lastEdge.getVertex() + " " + lastEdge.getTwin().getVertex());
                     System.out.println(firstChainEdge.getVertex() + " " + firstChainEdge.getTwin().getVertex());
-
 
                     System.out.println(isConnected(lastEdge, lastChainEdge));
                     System.out.println(isConnected(lastEdge, firstChainEdge));
