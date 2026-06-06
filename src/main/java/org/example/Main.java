@@ -21,6 +21,7 @@ import org.example.utils.VectorUtils;
 
 import java.util.*;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static java.lang.Math.*;
 import static org.example.utils.EdgeUtils.*;
@@ -43,7 +44,6 @@ public class Main extends Application {
         borderPane.setBottom(button);
         pane.getChildren().add(button);
 
-
         vertices.add(new Vertex(657.0, 579.0));
         vertices.add(new Vertex(667.0, 390.0));
         vertices.add(new Vertex(671.0, 659.0));
@@ -52,6 +52,7 @@ public class Main extends Application {
         vertices.add(new Vertex(728.0, 586.0));
         vertices.add(new Vertex(735.0, 361.0));
         vertices.add(new Vertex(845.0, 575.0));
+
 
         vertices.forEach(p -> {
             Circle circle = new Circle(p.getX(), p.getY(), 2, Color.RED);
@@ -405,7 +406,7 @@ public class Main extends Application {
                         leftTwinCell.setBoundary(leftTwinEdge);
                     }
                     if (erasedEdge != null) {
-                        excludedEdges.computeIfAbsent(leftTwinCell, k -> new ArrayList<>()).add(erasedEdge.getLastEdge());
+                        excludedEdges.computeIfAbsent(leftTwinCell, k -> new ArrayList<>()).add(erasedEdge);
                     }
 
                     eraseEdges(leftEdge, vertex);
@@ -424,7 +425,7 @@ public class Main extends Application {
                         leftTwinCell.setBoundary(leftTwinEdge);
                     }
                     if (erasedEdge != null) {
-                        excludedEdges.computeIfAbsent(leftTwinCell, k -> new ArrayList<>()).add(erasedEdge.getLastEdge());
+                        excludedEdges.computeIfAbsent(leftTwinCell, k -> new ArrayList<>()).add(erasedEdge);
                     }
 
                     eraseEdges(leftEdge, vertex);
@@ -490,7 +491,7 @@ public class Main extends Application {
                         rightTwinCell.setBoundary(rightTwinEdge);
                     }
                     if (erasedEdge != null) {
-                        excludedEdges.computeIfAbsent(rightTwinCell, k -> new ArrayList<>()).add(erasedEdge.getLastEdge());
+                        excludedEdges.computeIfAbsent(rightTwinCell, k -> new ArrayList<>()).add(erasedEdge);
                     }
 
                     eraseEdges(rightEdge, vertex);
@@ -509,7 +510,7 @@ public class Main extends Application {
                         rightTwinCell.setBoundary(rightTwinEdge);
                     }
                     if (erasedEdge != null) {
-                        excludedEdges.computeIfAbsent(rightTwinCell, k -> new ArrayList<>()).add(erasedEdge.getLastEdge());
+                        excludedEdges.computeIfAbsent(rightTwinCell, k -> new ArrayList<>()).add(erasedEdge);
                     }
 
                     eraseEdges(rightEdge, vertex);
@@ -564,14 +565,26 @@ public class Main extends Application {
             }
         }
 
-        disjunctiveChain.values()
-                .forEach(this::buildChain);
+        disjunctiveChain.forEach(this::buildChain);
 
-        excludedEdges.values()
-                .stream()
-                .flatMap(Collection::stream)
-                .forEach(this::buildChain);
 
+        for (Map.Entry<Cell, List<Edge>> entry : excludedEdges.entrySet()) {
+            Cell cell = entry.getKey();
+            List<Edge> edges = entry.getValue();
+
+            while (!edges.isEmpty()) {
+                Set<Edge> edgesToDelete = new HashSet<>();
+                for (Edge edge : edges) {
+                    if (buildChain(cell, edge)) {
+                        edgesToDelete.add(edge);
+                    }
+                }
+                if (edgesToDelete.isEmpty()) {
+                    break;
+                }
+                edges.removeIf(edgesToDelete::contains);
+            }
+        }
 
         middlePerpendicular = getMiddlePerpendicular(lowerCommonSupport);
 
@@ -656,11 +669,12 @@ public class Main extends Application {
         return null;
     }
 
-    private void buildChain(Edge e) {
-        Cell cell = e.getCell();
+    private boolean buildChain(Cell cell, Edge e) {
         Edge boundary = cell.getBoundary();
         Edge firstChainEdge = e.getStartEdge();
         Edge lastChainEdge = e.getLastEdge();
+
+        boolean isConnected = false;
         if (firstChainEdge != null && lastChainEdge != null) {
             Vertex firstVertex;
             Vertex lastVertex;
@@ -685,13 +699,17 @@ public class Main extends Application {
 
             if (firstEdge != null) {
                 if (isIdle(firstEdge) && isIdle(firstChainEdge)) {
-                    connectEdges(firstChainEdge, firstEdge);
+                    isConnected = connectEdges(firstChainEdge, firstEdge);
                 } else if (firstEdge.getNext() == null && isConnected(firstEdge, firstChainEdge)) {
                     firstEdge.setNext(firstChainEdge);
                     firstChainEdge.setPrev(firstEdge);
+
+                    isConnected = true;
                 } else if (firstEdge.getPrev() == null && isConnected(firstEdge, lastChainEdge)) {
                     firstEdge.setPrev(lastChainEdge);
                     lastChainEdge.setNext(firstEdge);
+
+                    isConnected = true;
                 } else {
                     System.out.println(isConnected(firstEdge, firstChainEdge));
                     System.out.println(isConnected(firstEdge, lastChainEdge));
@@ -710,13 +728,17 @@ public class Main extends Application {
 
             if (lastEdge != null) {
                 if (isIdle(lastEdge) && isIdle(lastChainEdge)) {
-                    connectEdges(lastChainEdge, lastEdge);
+                    isConnected = connectEdges(lastChainEdge, lastEdge);
                 } else if (lastEdge.getPrev() == null && isConnected(lastEdge, lastChainEdge)) {
                     lastEdge.setPrev(lastChainEdge);
                     lastChainEdge.setNext(lastEdge);
+
+                    isConnected = true;
                 } else if (lastEdge.getNext() == null && isConnected(lastEdge, firstChainEdge)) {
                     lastEdge.setNext(firstChainEdge);
                     firstChainEdge.setPrev(lastEdge);
+
+                    isConnected = true;
                 } else {
                     System.out.println(lastEdge.getVertex() + " " + lastEdge.getTwin().getVertex());
                     System.out.println(lastChainEdge.getVertex() + " " + lastChainEdge.getTwin().getVertex());
@@ -730,16 +752,24 @@ public class Main extends Application {
                 }
             }
         }
+
+        return isConnected;
     }
 
-    private void connectEdges(Edge e1, Edge e2) {
+    private boolean connectEdges(Edge e1, Edge e2) {
         if (Objects.equals(e1.getTwin().getVertex(), e2.getVertex())) {
             e1.setPrev(e2);
             e2.setNext(e1);
+
+            return true;
         } else if (Objects.equals(e1.getVertex(), e2.getTwin().getVertex())) {
             e1.setNext(e2);
             e2.setPrev(e1);
+
+            return true;
         }
+
+        return false;
     }
 
     private boolean isIdle(Edge e) {
