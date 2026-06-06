@@ -490,7 +490,7 @@ public class Main extends Application {
                         rightTwinCell.setBoundary(rightTwinEdge);
                     }
                     if (erasedEdge != null) {
-                        excludedEdges.computeIfAbsent(rightTwinCell, k -> new ArrayList<>()).add(erasedEdge.getStartEdge());
+                        excludedEdges.computeIfAbsent(rightTwinCell, k -> new ArrayList<>()).add(erasedEdge.getLastEdge());
                     }
 
                     eraseEdges(rightEdge, vertex);
@@ -509,7 +509,7 @@ public class Main extends Application {
                         rightTwinCell.setBoundary(rightTwinEdge);
                     }
                     if (erasedEdge != null) {
-                        excludedEdges.computeIfAbsent(rightTwinCell, k -> new ArrayList<>()).add(erasedEdge.getStartEdge());
+                        excludedEdges.computeIfAbsent(rightTwinCell, k -> new ArrayList<>()).add(erasedEdge.getLastEdge());
                     }
 
                     eraseEdges(rightEdge, vertex);
