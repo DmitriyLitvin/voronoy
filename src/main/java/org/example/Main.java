@@ -21,7 +21,6 @@ import org.example.utils.VectorUtils;
 
 import java.util.*;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static java.lang.Math.*;
 import static org.example.utils.EdgeUtils.*;
@@ -44,14 +43,14 @@ public class Main extends Application {
         borderPane.setBottom(button);
         pane.getChildren().add(button);
 
-        vertices.add(new Vertex(438.0, 702.0));
-        vertices.add(new Vertex(469.0, 406.0));
-        vertices.add(new Vertex(523.0, 626.0));
-        vertices.add(new Vertex(575.0, 109.0));
-        vertices.add(new Vertex(589.0, 753.0));
-        vertices.add(new Vertex(629.0, 646.0));
-        vertices.add(new Vertex(661.0, 335.0));
-        vertices.add(new Vertex(666.0, 180.0));
+//        vertices.add(new Vertex(438.0, 702.0));
+//        vertices.add(new Vertex(469.0, 406.0));
+//        vertices.add(new Vertex(523.0, 626.0));
+//        vertices.add(new Vertex(575.0, 109.0));
+//        vertices.add(new Vertex(589.0, 753.0));
+//        vertices.add(new Vertex(629.0, 646.0));
+//        vertices.add(new Vertex(661.0, 335.0));
+//        vertices.add(new Vertex(666.0, 180.0));
 
 //        vertices.add(new Vertex(672.0, 707.0));
 //        vertices.add(new Vertex(690.0, 497.0));
@@ -574,18 +573,25 @@ public class Main extends Application {
             }
         }
 
-        disjunctiveChain.forEach(this::buildChain);
+        disjunctiveChain.forEach(this::addEdge);
 
         for (Map.Entry<Cell, List<Edge>> entry : excludedEdges.entrySet()) {
             Cell cell = entry.getKey();
             List<Edge> edges = entry.getValue();
 
-            boolean changed;
-            do {
-                int size = edges.size();
-                edges.removeIf(edge -> buildChain(cell, edge));
-                changed = edges.size() != size;
-            } while (changed && !edges.isEmpty());
+            while (!edges.isEmpty()) {
+                Set<Edge> edgesToDelete = new HashSet<>();
+                for (Edge edge : edges) {
+                    if (isConnected(cell, edge)) {
+                        addEdge(cell, edge);
+                        edgesToDelete.add(edge);
+                    }
+                }
+                if (edgesToDelete.isEmpty()) {
+                    break;
+                }
+                edges.removeIf(edgesToDelete::contains);
+            }
         }
 
         middlePerpendicular = getMiddlePerpendicular(lowerCommonSupport);
@@ -650,33 +656,12 @@ public class Main extends Application {
         return diagram;
     }
 
-    private Vertex getVertex(Edge e) {
-        if (e.getNext() != null) {
-            Edge nextEdge = e.getNext();
-            if (contains(nextEdge, e.getVertex())) {
-                return e.getTwin().getVertex();
-            } else if (contains(nextEdge, e.getTwin().getVertex())) {
-                return e.getVertex();
-            }
-        }
-        if (e.getPrev() != null) {
-            Edge prevEdge = e.getPrev();
-            if (contains(prevEdge, e.getVertex())) {
-                return e.getTwin().getVertex();
-            } else if (contains(prevEdge, e.getTwin().getVertex())) {
-                return e.getVertex();
-            }
-        }
 
-        return null;
-    }
-
-    private boolean buildChain(Cell cell, Edge e) {
+    private void addEdge(Cell cell, Edge e) {
         Edge boundary = cell.getBoundary();
         Edge firstChainEdge = e.getStartEdge();
         Edge lastChainEdge = e.getLastEdge();
 
-        boolean isConnected = false;
         if (firstChainEdge != null && lastChainEdge != null) {
             Vertex firstVertex;
             Vertex lastVertex;
@@ -701,27 +686,14 @@ public class Main extends Application {
 
             if (firstEdge != null) {
                 if (isIdle(firstEdge) && isIdle(firstChainEdge)) {
-                    isConnected = connectEdges(firstChainEdge, firstEdge);
+                    connectEdges(firstChainEdge, firstEdge);
                 } else if (firstEdge.getNext() == null && isConnected(firstEdge, firstChainEdge)) {
                     firstEdge.setNext(firstChainEdge);
                     firstChainEdge.setPrev(firstEdge);
-
-                    isConnected = true;
                 } else if (firstEdge.getPrev() == null && isConnected(firstEdge, lastChainEdge)) {
                     firstEdge.setPrev(lastChainEdge);
                     lastChainEdge.setNext(firstEdge);
-
-                    isConnected = true;
                 } else {
-                    System.out.println(isConnected(firstEdge, firstChainEdge));
-                    System.out.println(isConnected(firstEdge, lastChainEdge));
-
-                    System.out.println(firstEdge.getVertex() + " " + firstEdge.getTwin().getVertex());
-                    System.out.println(firstChainEdge.getVertex() + " " + firstChainEdge.getTwin().getVertex());
-
-                    System.out.println(firstEdge.getVertex() + " " + firstEdge.getTwin().getVertex());
-                    System.out.println(lastChainEdge.getVertex() + " " + lastChainEdge.getTwin().getVertex());
-
                     System.out.println(isConnected(firstEdge, firstChainEdge));
                     System.out.println(isConnected(firstEdge, lastChainEdge));
                     System.out.println("edge is not connected");
@@ -730,98 +702,37 @@ public class Main extends Application {
 
             if (lastEdge != null) {
                 if (isIdle(lastEdge) && isIdle(lastChainEdge)) {
-                    isConnected = connectEdges(lastChainEdge, lastEdge);
+                    connectEdges(lastChainEdge, lastEdge);
                 } else if (lastEdge.getPrev() == null && isConnected(lastEdge, lastChainEdge)) {
                     lastEdge.setPrev(lastChainEdge);
                     lastChainEdge.setNext(lastEdge);
-
-                    isConnected = true;
                 } else if (lastEdge.getNext() == null && isConnected(lastEdge, firstChainEdge)) {
                     lastEdge.setNext(firstChainEdge);
                     firstChainEdge.setPrev(lastEdge);
-
-                    isConnected = true;
                 } else {
-                    System.out.println(lastEdge.getVertex() + " " + lastEdge.getTwin().getVertex());
-                    System.out.println(lastChainEdge.getVertex() + " " + lastChainEdge.getTwin().getVertex());
-
-                    System.out.println(lastEdge.getVertex() + " " + lastEdge.getTwin().getVertex());
-                    System.out.println(firstChainEdge.getVertex() + " " + firstChainEdge.getTwin().getVertex());
-
                     System.out.println(isConnected(lastEdge, lastChainEdge));
                     System.out.println(isConnected(lastEdge, firstChainEdge));
                     System.out.println("edge is not connected");
                 }
             }
         }
-
-        return isConnected;
     }
 
-    private boolean connectEdges(Edge e1, Edge e2) {
+    private void connectEdges(Edge e1, Edge e2) {
         if (Objects.equals(e1.getTwin().getVertex(), e2.getVertex())) {
             e1.setPrev(e2);
             e2.setNext(e1);
-
-            return true;
         } else if (Objects.equals(e1.getVertex(), e2.getTwin().getVertex())) {
             e1.setNext(e2);
             e2.setPrev(e1);
-
-            return true;
         }
-
-        return false;
     }
 
     private boolean isIdle(Edge e) {
         return e.getPrev() == null && e.getNext() == null;
     }
 
-    private Edge getConnectedEdge(Edge boundary, Vertex v) {
-        Edge startEdge = boundary.getStartEdge();
-        Edge lastEdge = boundary.getLastEdge();
-        if (startEdge == null || lastEdge == null) {
-            return null;
-        }
 
-        if (contains(startEdge, v)) {
-            return startEdge;
-        } else if (contains(lastEdge, v)) {
-            return lastEdge;
-        }
-
-        return null;
-    }
-
-    private boolean contains(Edge edge, Vertex v) {
-        return Objects.equals(v, edge.getVertex()) || Objects.equals(v, edge.getTwin().getVertex());
-    }
-
-
-    private Edge eraseEdges(Edge e, Vertex v) {
-        Edge nextEdge = e.getNext();
-        if (nextEdge != null && contains(nextEdge, v)) {
-            e.setNext(null);
-            nextEdge.setPrev(null);
-
-            if (!e.getCell().isClosed()) {
-                return nextEdge;
-            }
-        }
-
-        Edge prevEdge = e.getPrev();
-        if (prevEdge != null && contains(prevEdge, v)) {
-            e.setPrev(null);
-            prevEdge.setNext(null);
-
-            if (!e.getCell().isClosed()) {
-                return prevEdge;
-            }
-        }
-
-        return null;
-    }
 
     private boolean isOutsideCell(Edge e1, Edge e2, Vertex v) {
         if (e1 == null || e2 == null) {
