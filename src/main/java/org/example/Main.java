@@ -44,14 +44,23 @@ public class Main extends Application {
         borderPane.setBottom(button);
         pane.getChildren().add(button);
 
-        vertices.add(new Vertex(657.0, 579.0));
-        vertices.add(new Vertex(667.0, 390.0));
-        vertices.add(new Vertex(671.0, 659.0));
-        vertices.add(new Vertex(692.0, 530.0));
-        vertices.add(new Vertex(699.0, 257.0));
-        vertices.add(new Vertex(728.0, 586.0));
-        vertices.add(new Vertex(735.0, 361.0));
-        vertices.add(new Vertex(845.0, 575.0));
+        vertices.add(new Vertex(438.0, 702.0));
+        vertices.add(new Vertex(469.0, 406.0));
+        vertices.add(new Vertex(523.0, 626.0));
+        vertices.add(new Vertex(575.0, 109.0));
+        vertices.add(new Vertex(589.0, 753.0));
+        vertices.add(new Vertex(629.0, 646.0));
+        vertices.add(new Vertex(661.0, 335.0));
+        vertices.add(new Vertex(666.0, 180.0));
+
+//        vertices.add(new Vertex(672.0, 707.0));
+//        vertices.add(new Vertex(690.0, 497.0));
+//        vertices.add(new Vertex(702.0, 534.0));
+//        vertices.add(new Vertex(743.0, 347.0));
+//        vertices.add(new Vertex(748.0, 565.0));
+//        vertices.add(new Vertex(755.0, 459.0));
+//        vertices.add(new Vertex(835.0, 494.0));
+//        vertices.add(new Vertex(845.0, 433.0));
 
 
         vertices.forEach(p -> {
@@ -567,23 +576,16 @@ public class Main extends Application {
 
         disjunctiveChain.forEach(this::buildChain);
 
-
         for (Map.Entry<Cell, List<Edge>> entry : excludedEdges.entrySet()) {
             Cell cell = entry.getKey();
             List<Edge> edges = entry.getValue();
 
-            while (!edges.isEmpty()) {
-                Set<Edge> edgesToDelete = new HashSet<>();
-                for (Edge edge : edges) {
-                    if (buildChain(cell, edge)) {
-                        edgesToDelete.add(edge);
-                    }
-                }
-                if (edgesToDelete.isEmpty()) {
-                    break;
-                }
-                edges.removeIf(edgesToDelete::contains);
-            }
+            boolean changed;
+            do {
+                int size = edges.size();
+                edges.removeIf(edge -> buildChain(cell, edge));
+                changed = edges.size() != size;
+            } while (changed && !edges.isEmpty());
         }
 
         middlePerpendicular = getMiddlePerpendicular(lowerCommonSupport);
