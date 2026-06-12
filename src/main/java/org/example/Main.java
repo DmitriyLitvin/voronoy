@@ -21,6 +21,7 @@ import org.example.utils.VectorUtils;
 
 import java.util.*;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static java.lang.Math.*;
 import static org.example.utils.EdgeUtils.*;
@@ -579,7 +580,8 @@ public class Main extends Application {
             Cell cell = entry.getKey();
             List<Edge> edges = entry.getValue();
 
-            while (!edges.isEmpty()) {
+            int size;
+            do {
                 Set<Edge> edgesToDelete = new HashSet<>();
                 for (Edge edge : edges) {
                     if (isConnected(cell, edge)) {
@@ -587,11 +589,10 @@ public class Main extends Application {
                         edgesToDelete.add(edge);
                     }
                 }
-                if (edgesToDelete.isEmpty()) {
-                    break;
-                }
+
+                size = edges.size();
                 edges.removeIf(edgesToDelete::contains);
-            }
+            } while (size != edges.size() && !edges.isEmpty());
         }
 
         middlePerpendicular = getMiddlePerpendicular(lowerCommonSupport);
@@ -731,7 +732,6 @@ public class Main extends Application {
     private boolean isIdle(Edge e) {
         return e.getPrev() == null && e.getNext() == null;
     }
-
 
 
     private boolean isOutsideCell(Edge e1, Edge e2, Vertex v) {
