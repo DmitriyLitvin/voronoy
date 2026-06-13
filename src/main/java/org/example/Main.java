@@ -827,16 +827,16 @@ public class Main extends Application {
         double x = v1.getX();
         double y = v1.getY();
 
-        Vertex vector = VectorUtils.getDirectionVector(l.getA(), l.getB());
-        if (VectorUtils.dotProduct(vector, new Vertex(1, 0)) == 0) {
+        Vertex v2 = VectorUtils.getDirectionVector(l.getA(), l.getB());
+        if (VectorUtils.dotProduct(v2, new Vertex(1, 0)) == 0) {
             return new Line(new Vertex(width, y), new Vertex(-width, y));
-        } else if (VectorUtils.dotProduct(vector, new Vertex(0, 1)) == 0) {
+        } else if (VectorUtils.dotProduct(v2, new Vertex(0, 1)) == 0) {
             return new Line(new Vertex(x, -height), new Vertex(x, height));
         } else {
-            if (vector.getX() == 0) {
+            if (v2.getX() == 0) {
                 return new Line(new Vertex(x, -height), new Vertex(x, height));
             }
-            return new Line(new Vertex(((y + height) * vector.getY()) / vector.getX() + x, -height), new Vertex((-(height - y) * vector.getY()) / vector.getX() + x, height));
+            return new Line(new Vertex(((y + height) * v2.getY()) / v2.getX() + x, -height), new Vertex((-(height - y) * v2.getY()) / v2.getX() + x, height));
         }
     }
 
