@@ -21,7 +21,6 @@ import org.example.utils.VectorUtils;
 
 import java.util.*;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static java.lang.Math.*;
 import static org.example.utils.EdgeUtils.*;
@@ -278,7 +277,7 @@ public class Main extends Application {
             Vertex leftCenter = polygon.get(0);
             Vertex rightCenter = polygon.get(1);
 
-            Line middlePerpendicular = getMiddlePerpendicular(new Line(leftCenter, rightCenter));
+            Line middlePerpendicular = getPerpendicular(new Line(leftCenter, rightCenter));
             Edge leftEdge = new Edge(middlePerpendicular.getA());
             Edge rightEdge = new Edge(middlePerpendicular.getB());
 
@@ -309,7 +308,7 @@ public class Main extends Application {
         Vertex chainVertex = null;
         Edge currentEdge = null;
         Edge chainEdge = null;
-        Line middlePerpendicular;
+        Line perpendicular;
         Map<Cell, List<Edge>> excludedEdges = new HashMap<>();
         Map<Cell, Edge> disjunctiveChain = new HashMap<>();
 
@@ -318,15 +317,15 @@ public class Main extends Application {
             Cell leftCell = leftDiagram.get(upperCommonSupport.getA());
             Cell rightCell = rightDiagram.get(upperCommonSupport.getB());
 
-            middlePerpendicular = getMiddlePerpendicular(new Line(leftCell.getCenter(), rightCell.getCenter()));
-            Edge leftEdge = new Edge(middlePerpendicular.getA(), leftCell);
+            perpendicular = getPerpendicular(new Line(leftCell.getCenter(), rightCell.getCenter()));
+            Edge leftEdge = new Edge(perpendicular.getA(), leftCell);
             if (leftCell.getBoundary() == null) {
                 leftCell.setBoundary(leftEdge);
             } else {
                 idleEdges.put(leftCell, leftEdge);
             }
 
-            Edge rightEdge = new Edge(middlePerpendicular.getB(), rightCell);
+            Edge rightEdge = new Edge(perpendicular.getB(), rightCell);
             if (rightCell.getBoundary() == null) {
                 rightCell.setBoundary(rightEdge);
             } else {
@@ -348,17 +347,17 @@ public class Main extends Application {
             Cell leftCell = leftDiagram.get(upperCommonSupport.getA());
             Cell rightCell = rightDiagram.get(upperCommonSupport.getB());
 
-            middlePerpendicular = getMiddlePerpendicular(upperCommonSupport);
+            perpendicular = getPerpendicular(upperCommonSupport);
             Vertex midVertex = upperCommonSupport.getMidVertex();
 
             boolean isInfinite = false;
             if (chainVertex == null) {
                 isInfinite = true;
-                Vertex leftVertex = middlePerpendicular.getA();
+                Vertex leftVertex = perpendicular.getA();
                 if (crossProduct(VectorUtils.getDirectionVector(upperCommonSupport.getA(), upperCommonSupport.getB()), VectorUtils.getDirectionVector(upperCommonSupport.getA(), leftVertex)) > 0) {
                     chainVertex = leftVertex;
                 } else {
-                    chainVertex = middlePerpendicular.getB();
+                    chainVertex = perpendicular.getB();
                 }
             }
 
@@ -372,9 +371,9 @@ public class Main extends Application {
                 Optional.ofNullable(excludedEdges.get(leftCell)).ifPresent(leftEdges::addAll);
             }
 
-            Edge leftEdge = getClosestEdge(leftEdges, middlePerpendicular, currentEdge, chainEdge, chainVertex);
+            Edge leftEdge = getClosestEdge(leftEdges, perpendicular, currentEdge, chainEdge, chainVertex);
             if (leftEdge != null) {
-                leftVertex = getPointOfIntersection(middlePerpendicular, new Line(leftEdge));
+                leftVertex = getPointOfIntersection(perpendicular, new Line(leftEdge));
                 assert leftVertex != null;
                 leftDistance = VectorUtils.getLength(leftVertex, chainVertex);
             }
@@ -390,9 +389,9 @@ public class Main extends Application {
                 Optional.ofNullable(excludedEdges.get(rightCell)).ifPresent(rightEdges::addAll);
             }
 
-            Edge rightEdge = getClosestEdge(rightEdges, middlePerpendicular, currentEdge, chainEdge, chainVertex);
+            Edge rightEdge = getClosestEdge(rightEdges, perpendicular, currentEdge, chainEdge, chainVertex);
             if (rightEdge != null) {
-                rightVertex = getPointOfIntersection(middlePerpendicular, new Line(rightEdge));
+                rightVertex = getPointOfIntersection(perpendicular, new Line(rightEdge));
                 assert rightVertex != null;
                 rightDistance = VectorUtils.getLength(rightVertex, chainVertex);
             }
@@ -595,19 +594,19 @@ public class Main extends Application {
             } while (size != edges.size() && !edges.isEmpty());
         }
 
-        middlePerpendicular = getMiddlePerpendicular(lowerCommonSupport);
+        perpendicular = getPerpendicular(lowerCommonSupport);
 
         Edge leftEdge;
         Edge rightEdge;
         Cell leftCell = leftDiagram.get(lowerCommonSupport.getA());
         Cell rightCell = rightDiagram.get(lowerCommonSupport.getB());
-        Vertex leftVertex = middlePerpendicular.getA();
+        Vertex leftVertex = perpendicular.getA();
         assert chainVertex != null;
         if (crossProduct(VectorUtils.getDirectionVector(lowerCommonSupport.getA(), lowerCommonSupport.getB()), VectorUtils.getDirectionVector(lowerCommonSupport.getA(), leftVertex)) < 0) {
             leftEdge = new Edge(leftVertex, leftCell);
             rightEdge = new Edge(chainVertex, rightCell);
         } else {
-            Vertex rightVertex = middlePerpendicular.getB();
+            Vertex rightVertex = perpendicular.getB();
             leftEdge = new Edge(rightVertex, leftCell);
             rightEdge = new Edge(chainVertex, rightCell);
         }
@@ -658,8 +657,8 @@ public class Main extends Application {
     }
 
 
-    private void addEdge(Cell cell, Edge e) {
-        Edge boundary = cell.getBoundary();
+    private void addEdge(Cell c, Edge e) {
+        Edge boundary = c.getBoundary();
         Edge firstChainEdge = e.getStartEdge();
         Edge lastChainEdge = e.getLastEdge();
 
@@ -759,7 +758,7 @@ public class Main extends Application {
         }
     }
 
-    private Edge getClosestEdge(List<Edge> edges, Line middlePerpendicular, Edge currentEdge, Edge chainEdge, Vertex chainVertex) {
+    private Edge getClosestEdge(List<Edge> edges, Line perpendicular, Edge currentEdge, Edge chainEdge, Vertex chainVertex) {
         if (edges == null || edges.isEmpty()) {
             return null;
         }
@@ -770,7 +769,7 @@ public class Main extends Application {
             Edge nextEdge = edge;
             do {
                 if ((chainEdge == null || !isEquals(chainEdge, nextEdge)) && (currentEdge == null || !isEquals(currentEdge, nextEdge))) {
-                    Vertex intersectVertex = getPointOfIntersection(middlePerpendicular, new Line(nextEdge));
+                    Vertex intersectVertex = getPointOfIntersection(perpendicular, new Line(nextEdge));
                     if (intersectVertex != null && isIntersected(intersectVertex, nextEdge) && isOutsideCell(currentEdge, chainEdge, intersectVertex)) {
                         double currentDistance = VectorUtils.getLength(intersectVertex, chainVertex);
                         if (distance == 0 || currentDistance < distance) {
@@ -785,7 +784,7 @@ public class Main extends Application {
             Edge prevEdge = edge;
             do {
                 if ((chainEdge == null || !isEquals(chainEdge, prevEdge)) && (currentEdge == null || !isEquals(currentEdge, prevEdge))) {
-                    Vertex intersectVertex = getPointOfIntersection(middlePerpendicular, new Line(prevEdge));
+                    Vertex intersectVertex = getPointOfIntersection(perpendicular, new Line(prevEdge));
                     if (intersectVertex != null && isIntersected(intersectVertex, prevEdge) && isOutsideCell(currentEdge, chainEdge, intersectVertex)) {
                         double currentDistance = VectorUtils.getLength(intersectVertex, chainVertex);
                         if (distance == 0 || currentDistance < distance) {
@@ -820,7 +819,7 @@ public class Main extends Application {
         return VectorUtils.dotProduct(VectorUtils.getDirectionVector(v, v1), VectorUtils.getDirectionVector(v2, v1)) > 0;
     }
 
-    private Line getMiddlePerpendicular(Line l) {
+    private Line getPerpendicular(Line l) {
         double height = 1000000;
         double width = 1000000;
 
