@@ -15,8 +15,7 @@ import javafx.stage.Stage;
 import javafx.util.Duration;
 import lombok.extern.slf4j.Slf4j;
 import org.example.entity.*;
-import org.example.entity.Vertex;
-import org.example.utils.EdgeUtils;
+import org.example.entity.Point;
 import org.example.utils.VectorUtils;
 
 import java.util.*;
@@ -24,6 +23,7 @@ import java.util.List;
 
 import static java.lang.Math.*;
 import static org.example.utils.EdgeUtils.*;
+import static org.example.utils.LineUtils.*;
 import static org.example.utils.VectorUtils.crossProduct;
 
 @Slf4j
@@ -33,7 +33,7 @@ public class Main extends Application {
     private final Map<Cell, Edge> idleEdges = new HashMap<>();
 
     public void start(Stage stage) {
-        final Set<Vertex> vertices = new LinkedHashSet<>();
+        final Set<Point> vertices = new LinkedHashSet<>();
 
         borderPane.setCenter(pane);
 
@@ -43,23 +43,23 @@ public class Main extends Application {
         borderPane.setBottom(button);
         pane.getChildren().add(button);
 
-//        vertices.add(new Vertex(438.0, 702.0));
-//        vertices.add(new Vertex(469.0, 406.0));
-//        vertices.add(new Vertex(523.0, 626.0));
-//        vertices.add(new Vertex(575.0, 109.0));
-//        vertices.add(new Vertex(589.0, 753.0));
-//        vertices.add(new Vertex(629.0, 646.0));
-//        vertices.add(new Vertex(661.0, 335.0));
-//        vertices.add(new Vertex(666.0, 180.0));
+        vertices.add(new Point(438.0, 702.0));
+        vertices.add(new Point(469.0, 406.0));
+        vertices.add(new Point(523.0, 626.0));
+        vertices.add(new Point(575.0, 109.0));
+        vertices.add(new Point(589.0, 753.0));
+        vertices.add(new Point(629.0, 646.0));
+        vertices.add(new Point(661.0, 335.0));
+        vertices.add(new Point(666.0, 180.0));
 
-//        vertices.add(new Vertex(672.0, 707.0));
-//        vertices.add(new Vertex(690.0, 497.0));
-//        vertices.add(new Vertex(702.0, 534.0));
-//        vertices.add(new Vertex(743.0, 347.0));
-//        vertices.add(new Vertex(748.0, 565.0));
-//        vertices.add(new Vertex(755.0, 459.0));
-//        vertices.add(new Vertex(835.0, 494.0));
-//        vertices.add(new Vertex(845.0, 433.0));
+//        vertices.add(new Point(672.0, 707.0));
+//        vertices.add(new Point(690.0, 497.0));
+//        vertices.add(new Point(702.0, 534.0));
+//        vertices.add(new Point(743.0, 347.0));
+//        vertices.add(new Point(748.0, 565.0));
+//        vertices.add(new Point(755.0, 459.0));
+//        vertices.add(new Point(835.0, 494.0));
+//        vertices.add(new Point(845.0, 433.0));
 
 
         vertices.forEach(p -> {
@@ -81,7 +81,7 @@ public class Main extends Application {
             borderPane.getChildren().add(circle);
 
             // Зберігаємо координати
-            vertices.add(new Vertex(x, y));
+            vertices.add(new Point(x, y));
 
             // Вивід координат у консоль
             System.out.println("Клік: x=" + x + ", y=" + y);
@@ -97,10 +97,10 @@ public class Main extends Application {
         stage.show();
     }
 
-    public void drawVoronoyDiagram(Set<Vertex> polygon) {
+    public void drawVoronoyDiagram(Set<Point> polygon) {
         System.out.println("Start drawing ");
 
-        List<Cell> cells = new ArrayList<>(buildVoronoyDiagram(polygon.stream().sorted(Comparator.comparingDouble(Vertex::getX).thenComparingDouble(Vertex::getY)).toList()).values());
+        List<Cell> cells = new ArrayList<>(buildVoronoyDiagram(polygon.stream().sorted(Comparator.comparingDouble(Point::getX).thenComparingDouble(Point::getY)).toList()).values());
 
         Timeline timeline = new Timeline();
         timeline.setCycleCount(cells.size());
@@ -117,13 +117,13 @@ public class Main extends Application {
                     Edge edge = boundary;
                     if (edge != null) {
                         do {
-                            Vertex v1 = edge.getVertex();
-                            Vertex v2 = edge.getTwin().getVertex();
+                            Point p1 = edge.getPoint();
+                            Point p2 = edge.getTwin().getPoint();
 
                             javafx.scene.shape.Line line =
                                     new javafx.scene.shape.Line(
-                                            v1.getX(), v1.getY(),
-                                            v2.getX(), v2.getY()
+                                            p1.getX(), p1.getY(),
+                                            p2.getX(), p2.getY()
                                     );
 
                             line.setStroke(Color.BLUE);
@@ -137,13 +137,13 @@ public class Main extends Application {
 
                         edge = boundary;
                         do {
-                            Vertex v1 = edge.getVertex();
-                            Vertex v2 = edge.getTwin().getVertex();
+                            Point p1 = edge.getPoint();
+                            Point p2 = edge.getTwin().getPoint();
 
                             javafx.scene.shape.Line line =
                                     new javafx.scene.shape.Line(
-                                            v1.getX(), v1.getY(),
-                                            v2.getX(), v2.getY()
+                                            p1.getX(), p1.getY(),
+                                            p2.getX(), p2.getY()
                                     );
 
                             line.setStroke(Color.BLUE);
@@ -165,38 +165,38 @@ public class Main extends Application {
         System.out.println("End drawing");
     }
 
-    private Set<Vertex> buildConvexHull(List<Vertex> vertices) {
-        if (vertices.size() <= 2) {
-            return new HashSet<>(vertices);
+    private Set<Point> buildConvexHull(List<Point> points) {
+        if (points.size() <= 2) {
+            return new HashSet<>(points);
         }
-        Vertex vertex = vertices.stream().min((v1, v2) -> {
-            if (v1.getY() != v2.getY()) {
-                return Double.compare(v1.getY(), v2.getY());
+        Point point = points.stream().min((p1, p2) -> {
+            if (p1.getY() != p2.getY()) {
+                return Double.compare(p1.getY(), p2.getY());
             }
 
-            return Double.compare(v1.getX(), v2.getX());
+            return Double.compare(p1.getX(), p2.getX());
         }).orElse(null);
 
-        List<Vertex> sortedVertices = vertices.stream().filter(p -> !p.equals(vertex)).sorted((v1, v2) -> {
-            int compared = Double.compare(atan2(v1.getY() - vertex.getY(), v1.getX() - vertex.getX()), atan2(v2.getY() - vertex.getY(), v2.getX() - vertex.getX()));
+        List<Point> sortedVertices = points.stream().filter(p -> !p.equals(point)).sorted((p1, p2) -> {
+            int compared = Double.compare(atan2(p1.getY() - point.getY(), p1.getX() - point.getX()), atan2(p2.getY() - point.getY(), p2.getX() - point.getX()));
             if (compared == 0) {
-                return Double.compare(sqrt(pow(v1.getY() - vertex.getY(), 2) + pow(v1.getX() - vertex.getX(), 2)), sqrt(pow(v2.getY() - vertex.getY(), 2) + pow(v2.getX() - vertex.getX(), 2)));
+                return Double.compare(sqrt(pow(p1.getY() - point.getY(), 2) + pow(p1.getX() - point.getX(), 2)), sqrt(pow(p2.getY() - point.getY(), 2) + pow(p2.getX() - point.getX(), 2)));
             }
             return compared;
         }).toList();
 
-        Stack<Vertex> convexHull = new Stack<>();
+        Stack<Point> convexHull = new Stack<>();
         convexHull.push(sortedVertices.get(0));
-        convexHull.push(vertex);
+        convexHull.push(point);
 
         sortedVertices.forEach(v -> {
-            Vertex v1 = convexHull.get(convexHull.size() - 2);
-            double x1 = v1.getX();
-            double y1 = v1.getY();
+            Point p1 = convexHull.get(convexHull.size() - 2);
+            double x1 = p1.getX();
+            double y1 = p1.getY();
 
-            Vertex v2 = convexHull.peek();
-            double x2 = v2.getX();
-            double y2 = v2.getY();
+            Point p2 = convexHull.peek();
+            double x2 = p2.getX();
+            double y2 = p2.getY();
 
             double x3 = v.getX();
             double y3 = v.getY();
@@ -204,13 +204,13 @@ public class Main extends Application {
             while (convexHull.size() > 2 && (x2 - x1) * (y3 - y2) - (y2 - y1) * (x3 - x2) < 0) {
                 convexHull.pop();
 
-                v1 = convexHull.get(convexHull.size() - 2);
-                x1 = v1.getX();
-                y1 = v1.getY();
+                p1 = convexHull.get(convexHull.size() - 2);
+                x1 = p1.getX();
+                y1 = p1.getY();
 
-                v2 = convexHull.peek();
-                x2 = v2.getX();
-                y2 = v2.getY();
+                p2 = convexHull.peek();
+                x2 = p2.getX();
+                y2 = p2.getY();
             }
 
             convexHull.push(v);
@@ -219,34 +219,34 @@ public class Main extends Application {
         return new HashSet<>(convexHull);
     }
 
-    private Line getCommonSupport(Set<Vertex> leftPolygon, Set<Vertex> rightPolygon, boolean isUpper) {
-        Vertex maxVertex = leftPolygon.stream().max(Comparator.comparingDouble(Vertex::getX).thenComparing(Vertex::getY)).orElse(null);
-        Vertex minVertex = rightPolygon.stream().min(Comparator.comparingDouble(Vertex::getX).thenComparing(Vertex::getY)).orElse(null);
-        Line line = new Line(maxVertex, minVertex);
+    private Line getCommonSupport(Set<Point> leftPolygon, Set<Point> rightPolygon, boolean isUpper) {
+        Point maxPoint = leftPolygon.stream().max(Comparator.comparingDouble(Point::getX).thenComparing(Point::getY)).orElse(null);
+        Point minPoint = rightPolygon.stream().min(Comparator.comparingDouble(Point::getX).thenComparing(Point::getY)).orElse(null);
+        Line line = new Line(maxPoint, minPoint);
 
         for (int i = 0; i < 2; i++) {
-            Vertex leftVertex = maxVertex;
-            Vertex rightVertex = minVertex;
+            Point leftPoint = maxPoint;
+            Point rightPoint = minPoint;
 
-            Iterator<Vertex> leftConvexPolygonIterator = leftPolygon.stream().filter(p -> !p.equals(maxVertex)).iterator();
-            Iterator<Vertex> rightConvexPolygonIterator = rightPolygon.stream().filter(p -> !p.equals(minVertex)).iterator();
+            Iterator<Point> leftConvexPolygonIterator = leftPolygon.stream().filter(p -> !p.equals(maxPoint)).iterator();
+            Iterator<Point> rightConvexPolygonIterator = rightPolygon.stream().filter(p -> !p.equals(minPoint)).iterator();
             while (leftConvexPolygonIterator.hasNext() || rightConvexPolygonIterator.hasNext()) {
                 if (leftConvexPolygonIterator.hasNext()) {
-                    leftVertex = leftConvexPolygonIterator.next();
+                    leftPoint = leftConvexPolygonIterator.next();
                 }
                 if (rightConvexPolygonIterator.hasNext()) {
-                    rightVertex = rightConvexPolygonIterator.next();
+                    rightPoint = rightConvexPolygonIterator.next();
                 }
-                if (is(leftVertex, line, isUpper)) {
-                    line.setA(leftVertex);
-                    if (is(rightVertex, line, isUpper)) {
-                        line.setB(rightVertex);
+                if (is(leftPoint, line, isUpper)) {
+                    line.setA(leftPoint);
+                    if (is(rightPoint, line, isUpper)) {
+                        line.setB(rightPoint);
                     }
 
-                } else if (is(rightVertex, line, isUpper)) {
-                    line.setB(rightVertex);
-                    if (is(leftVertex, line, isUpper)) {
-                        line.setA(leftVertex);
+                } else if (is(rightPoint, line, isUpper)) {
+                    line.setB(rightPoint);
+                    if (is(leftPoint, line, isUpper)) {
+                        line.setA(leftPoint);
                     }
                 }
             }
@@ -256,26 +256,17 @@ public class Main extends Application {
     }
 
 
-    public boolean is(Vertex v, Line l, boolean isUpper) {
-        Vertex v1 = l.getA();
-        Vertex v2 = l.getB();
-        if (isUpper) {
-            return crossProduct(VectorUtils.getDirectionVector(v1, v2), VectorUtils.getDirectionVector(v1, v)) > 0;
-        }
 
-        return crossProduct(VectorUtils.getDirectionVector(v1, v2), VectorUtils.getDirectionVector(v1, v)) < 0;
-    }
-
-    private Map<Vertex, Cell> buildVoronoyDiagram(List<Vertex> polygon) {
+    private Map<Point, Cell> buildVoronoyDiagram(List<Point> polygon) {
         if (polygon.size() == 1) {
-            Map<Vertex, Cell> diagram = new HashMap<>();
-            Vertex center = polygon.get(0);
+            Map<Point, Cell> diagram = new HashMap<>();
+            Point center = polygon.get(0);
             diagram.put(center, new Cell(center, null));
             return diagram;
         } else if (polygon.size() == 2) {
-            Map<Vertex, Cell> diagram = new HashMap<>();
-            Vertex leftCenter = polygon.get(0);
-            Vertex rightCenter = polygon.get(1);
+            Map<Point, Cell> diagram = new HashMap<>();
+            Point leftCenter = polygon.get(0);
+            Point rightCenter = polygon.get(1);
 
             Line middlePerpendicular = getPerpendicular(new Line(leftCenter, rightCenter));
             Edge leftEdge = new Edge(middlePerpendicular.getA());
@@ -298,14 +289,14 @@ public class Main extends Application {
         return joinDiagrams(buildVoronoyDiagram(polygon.subList(0, polygon.size() / 2)), buildVoronoyDiagram(polygon.subList(polygon.size() / 2, polygon.size())));
     }
 
-    private Map<Vertex, Cell> joinDiagrams(Map<Vertex, Cell> leftDiagram, Map<Vertex, Cell> rightDiagram) {
-        Set<Vertex> leftPolygon = buildConvexHull(new ArrayList<>(leftDiagram.keySet()));
-        Set<Vertex> rightPolygon = buildConvexHull(new ArrayList<>(rightDiagram.keySet()));
+    private Map<Point, Cell> joinDiagrams(Map<Point, Cell> leftDiagram, Map<Point, Cell> rightDiagram) {
+        Set<Point> leftPolygon = buildConvexHull(new ArrayList<>(leftDiagram.keySet()));
+        Set<Point> rightPolygon = buildConvexHull(new ArrayList<>(rightDiagram.keySet()));
 
         Line upperCommonSupport = getCommonSupport(leftPolygon, rightPolygon, true);
         Line lowerCommonSupport = getCommonSupport(leftPolygon, rightPolygon, false);
 
-        Vertex chainVertex = null;
+        Point chainPoint = null;
         Edge currentEdge = null;
         Edge chainEdge = null;
         Line perpendicular;
@@ -336,7 +327,7 @@ public class Main extends Application {
             rightEdge.setTwin(leftEdge);
 
 
-            Map<Vertex, Cell> diagram = new HashMap<>();
+            Map<Point, Cell> diagram = new HashMap<>();
             diagram.putAll(leftDiagram);
             diagram.putAll(rightDiagram);
 
@@ -348,21 +339,21 @@ public class Main extends Application {
             Cell rightCell = rightDiagram.get(upperCommonSupport.getB());
 
             perpendicular = getPerpendicular(upperCommonSupport);
-            Vertex midVertex = upperCommonSupport.getMidVertex();
+            Point midPoint = upperCommonSupport.getMidPoint();
 
             boolean isInfinite = false;
-            if (chainVertex == null) {
+            if (chainPoint == null) {
                 isInfinite = true;
-                Vertex leftVertex = perpendicular.getA();
-                if (crossProduct(VectorUtils.getDirectionVector(upperCommonSupport.getA(), upperCommonSupport.getB()), VectorUtils.getDirectionVector(upperCommonSupport.getA(), leftVertex)) > 0) {
-                    chainVertex = leftVertex;
+                Point leftPoint = perpendicular.getA();
+                if (crossProduct(VectorUtils.geDirection(upperCommonSupport.getA(), upperCommonSupport.getB()), VectorUtils.geDirection(upperCommonSupport.getA(), leftPoint)) > 0) {
+                    chainPoint = leftPoint;
                 } else {
-                    chainVertex = perpendicular.getB();
+                    chainPoint = perpendicular.getB();
                 }
             }
 
             double leftDistance = 0;
-            Vertex leftVertex = null;
+            Point leftPoint = null;
 
             List<Edge> leftEdges = new ArrayList<>();
             if (leftCell != null) {
@@ -371,16 +362,16 @@ public class Main extends Application {
                 Optional.ofNullable(excludedEdges.get(leftCell)).ifPresent(leftEdges::addAll);
             }
 
-            Edge leftEdge = getClosestEdge(leftEdges, perpendicular, currentEdge, chainEdge, chainVertex);
+            Edge leftEdge = getClosestEdge(leftEdges, perpendicular, currentEdge, chainEdge, chainPoint);
             if (leftEdge != null) {
-                leftVertex = getPointOfIntersection(perpendicular, new Line(leftEdge));
-                assert leftVertex != null;
-                leftDistance = VectorUtils.getLength(leftVertex, chainVertex);
+                leftPoint = getPointOfIntersection(perpendicular, new Line(leftEdge));
+                assert leftPoint != null;
+                leftDistance = VectorUtils.getLength(leftPoint, chainPoint);
             }
 
 
             double rightDistance = 0;
-            Vertex rightVertex = null;
+            Point rightPoint = null;
 
             List<Edge> rightEdges = new ArrayList<>();
             if (rightCell != null) {
@@ -389,11 +380,11 @@ public class Main extends Application {
                 Optional.ofNullable(excludedEdges.get(rightCell)).ifPresent(rightEdges::addAll);
             }
 
-            Edge rightEdge = getClosestEdge(rightEdges, perpendicular, currentEdge, chainEdge, chainVertex);
+            Edge rightEdge = getClosestEdge(rightEdges, perpendicular, currentEdge, chainEdge, chainPoint);
             if (rightEdge != null) {
-                rightVertex = getPointOfIntersection(perpendicular, new Line(rightEdge));
-                assert rightVertex != null;
-                rightDistance = VectorUtils.getLength(rightVertex, chainVertex);
+                rightPoint = getPointOfIntersection(perpendicular, new Line(rightEdge));
+                assert rightPoint != null;
+                rightDistance = VectorUtils.getLength(rightPoint, chainPoint);
             }
 
             System.out.println(rightDistance - leftDistance);
@@ -405,11 +396,11 @@ public class Main extends Application {
                 Edge nextRightEdge;
 
                 assert leftCell != null;
-                if (isOnTheSameSide(leftCell.getCenter(), leftEdge.getVertex(), midVertex)) {
+                if (isOnTheSameSide(leftCell.getCenter(), leftEdge.getPoint(), midPoint)) {
                     Cell leftTwinCell = leftTwinEdge.getCell();
-                    Vertex vertex = leftTwinEdge.getVertex();
+                    Point point = leftTwinEdge.getPoint();
 
-                    Edge erasedEdge = eraseEdges(leftTwinEdge, vertex);
+                    Edge erasedEdge = eraseEdges(leftTwinEdge, point);
                     if (excludedEdges.get(leftTwinCell) == null && idleEdges.get(leftTwinCell) == null) {
                         leftTwinCell.setBoundary(leftTwinEdge);
                     }
@@ -417,18 +408,18 @@ public class Main extends Application {
                         excludedEdges.computeIfAbsent(leftTwinCell, k -> new ArrayList<>()).add(erasedEdge);
                     }
 
-                    eraseEdges(leftEdge, vertex);
+                    eraseEdges(leftEdge, point);
                     if (excludedEdges.get(leftCell) == null && idleEdges.get(leftCell) == null) {
                         leftCell.setBoundary(leftEdge);
                     }
 
-                    leftTwinEdge.setVertex(leftVertex);
+                    leftTwinEdge.setPoint(leftPoint);
                     leftTwinEdge.setInfinite(false);
-                } else if (isOnTheSameSide(leftCell.getCenter(), leftEdge.getTwin().getVertex(), midVertex)) {
+                } else if (isOnTheSameSide(leftCell.getCenter(), leftEdge.getTwin().getPoint(), midPoint)) {
                     Cell leftTwinCell = leftTwinEdge.getCell();
-                    Vertex vertex = leftEdge.getVertex();
+                    Point point = leftEdge.getPoint();
 
-                    Edge erasedEdge = eraseEdges(leftTwinEdge, vertex);
+                    Edge erasedEdge = eraseEdges(leftTwinEdge, point);
                     if (excludedEdges.get(leftTwinCell) == null && idleEdges.get(leftTwinCell) == null) {
                         leftTwinCell.setBoundary(leftTwinEdge);
                     }
@@ -436,17 +427,17 @@ public class Main extends Application {
                         excludedEdges.computeIfAbsent(leftTwinCell, k -> new ArrayList<>()).add(erasedEdge);
                     }
 
-                    eraseEdges(leftEdge, vertex);
-                    leftEdge.setVertex(leftVertex);
+                    eraseEdges(leftEdge, point);
+                    leftEdge.setPoint(leftPoint);
                     leftEdge.setInfinite(false);
                     if (excludedEdges.get(leftCell) == null && idleEdges.get(leftCell) == null) {
                         leftCell.setBoundary(leftEdge);
                     }
                 }
-                nextLeftEdge = new Edge(leftVertex, leftCell);
+                nextLeftEdge = new Edge(leftPoint, leftCell);
                 nextLeftEdge.setInfinite(false);
 
-                nextRightEdge = new Edge(chainVertex, rightCell);
+                nextRightEdge = new Edge(chainPoint, rightCell);
                 nextRightEdge.setInfinite(isInfinite);
 
                 nextRightEdge.setTwin(nextLeftEdge);
@@ -481,7 +472,7 @@ public class Main extends Application {
                 }
 
                 upperCommonSupport.setA(leftTwinEdge.getCell().getCenter());
-                chainVertex = leftVertex;
+                chainPoint = leftPoint;
                 currentEdge = leftEdge;
                 chainEdge = nextLeftEdge;
             } else if (leftEdge == null || leftDistance > rightDistance) {
@@ -490,11 +481,11 @@ public class Main extends Application {
                 Edge nextRightEdge;
 
                 assert rightCell != null;
-                if (isOnTheSameSide(rightCell.getCenter(), rightEdge.getVertex(), midVertex)) {
+                if (isOnTheSameSide(rightCell.getCenter(), rightEdge.getPoint(), midPoint)) {
                     Cell rightTwinCell = rightTwinEdge.getCell();
-                    Vertex vertex = rightEdge.getTwin().getVertex();
+                    Point point = rightEdge.getTwin().getPoint();
 
-                    Edge erasedEdge = eraseEdges(rightTwinEdge, vertex);
+                    Edge erasedEdge = eraseEdges(rightTwinEdge, point);
                     if (excludedEdges.get(rightTwinCell) == null && idleEdges.get(rightTwinCell) == null) {
                         rightTwinCell.setBoundary(rightTwinEdge);
                     }
@@ -502,18 +493,18 @@ public class Main extends Application {
                         excludedEdges.computeIfAbsent(rightTwinCell, k -> new ArrayList<>()).add(erasedEdge);
                     }
 
-                    eraseEdges(rightEdge, vertex);
+                    eraseEdges(rightEdge, point);
                     if (excludedEdges.get(rightCell) == null && idleEdges.get(rightCell) == null) {
                         rightCell.setBoundary(rightEdge);
                     }
 
-                    rightTwinEdge.setVertex(rightVertex);
+                    rightTwinEdge.setPoint(rightPoint);
                     rightTwinEdge.setInfinite(false);
-                } else if (isOnTheSameSide(rightCell.getCenter(), rightEdge.getTwin().getVertex(), midVertex)) {
+                } else if (isOnTheSameSide(rightCell.getCenter(), rightEdge.getTwin().getPoint(), midPoint)) {
                     Cell rightTwinCell = rightTwinEdge.getCell();
-                    Vertex vertex = rightEdge.getVertex();
+                    Point point = rightEdge.getPoint();
 
-                    Edge erasedEdge = eraseEdges(rightTwinEdge, vertex);
+                    Edge erasedEdge = eraseEdges(rightTwinEdge, point);
                     if (excludedEdges.get(rightTwinCell) == null && idleEdges.get(rightTwinCell) == null) {
                         rightTwinCell.setBoundary(rightTwinEdge);
                     }
@@ -521,18 +512,18 @@ public class Main extends Application {
                         excludedEdges.computeIfAbsent(rightTwinCell, k -> new ArrayList<>()).add(erasedEdge);
                     }
 
-                    eraseEdges(rightEdge, vertex);
-                    rightEdge.setVertex(rightVertex);
+                    eraseEdges(rightEdge, point);
+                    rightEdge.setPoint(rightPoint);
                     rightEdge.setInfinite(false);
                     if (excludedEdges.get(rightCell) == null && idleEdges.get(rightCell) == null) {
                         rightCell.setBoundary(rightEdge);
                     }
                 }
                 assert rightTwinEdge != null;
-                nextRightEdge = new Edge(chainVertex, rightCell);
+                nextRightEdge = new Edge(chainPoint, rightCell);
                 nextRightEdge.setInfinite(isInfinite);
 
-                nextLeftEdge = new Edge(rightVertex, leftCell);
+                nextLeftEdge = new Edge(rightPoint, leftCell);
                 nextLeftEdge.setInfinite(false);
 
                 nextLeftEdge.setTwin(nextRightEdge);
@@ -567,7 +558,7 @@ public class Main extends Application {
                 }
 
                 upperCommonSupport.setB(rightTwinEdge.getCell().getCenter());
-                chainVertex = rightVertex;
+                chainPoint = rightPoint;
                 currentEdge = rightEdge;
                 chainEdge = nextRightEdge;
             }
@@ -600,15 +591,15 @@ public class Main extends Application {
         Edge rightEdge;
         Cell leftCell = leftDiagram.get(lowerCommonSupport.getA());
         Cell rightCell = rightDiagram.get(lowerCommonSupport.getB());
-        Vertex leftVertex = perpendicular.getA();
-        assert chainVertex != null;
-        if (crossProduct(VectorUtils.getDirectionVector(lowerCommonSupport.getA(), lowerCommonSupport.getB()), VectorUtils.getDirectionVector(lowerCommonSupport.getA(), leftVertex)) < 0) {
-            leftEdge = new Edge(leftVertex, leftCell);
-            rightEdge = new Edge(chainVertex, rightCell);
+        Point leftPoint = perpendicular.getA();
+        assert chainPoint != null;
+        if (crossProduct(VectorUtils.geDirection(lowerCommonSupport.getA(), lowerCommonSupport.getB()), VectorUtils.geDirection(lowerCommonSupport.getA(), leftPoint)) < 0) {
+            leftEdge = new Edge(leftPoint, leftCell);
+            rightEdge = new Edge(chainPoint, rightCell);
         } else {
-            Vertex rightVertex = perpendicular.getB();
-            leftEdge = new Edge(rightVertex, leftCell);
-            rightEdge = new Edge(chainVertex, rightCell);
+            Point rightPoint = perpendicular.getB();
+            leftEdge = new Edge(rightPoint, leftCell);
+            rightEdge = new Edge(chainPoint, rightCell);
         }
 
 
@@ -649,7 +640,7 @@ public class Main extends Application {
             }
         }
 
-        Map<Vertex, Cell> diagram = new HashMap<>();
+        Map<Point, Cell> diagram = new HashMap<>();
         diagram.putAll(leftDiagram);
         diagram.putAll(rightDiagram);
 
@@ -657,31 +648,31 @@ public class Main extends Application {
     }
 
 
-    private void addEdge(Cell c, Edge e) {
-        Edge boundary = c.getBoundary();
-        Edge firstChainEdge = e.getStartEdge();
-        Edge lastChainEdge = e.getLastEdge();
+    private void addEdge(Cell cell, Edge edge) {
+        Edge boundary = cell.getBoundary();
+        Edge firstChainEdge = edge.getStartEdge();
+        Edge lastChainEdge = edge.getLastEdge();
 
         if (firstChainEdge != null && lastChainEdge != null) {
-            Vertex firstVertex;
-            Vertex lastVertex;
+            Point firstPoint;
+            Point lastPoint;
 
             if (isEquals(firstChainEdge, lastChainEdge)) {
-                firstVertex = firstChainEdge.getVertex();
-                lastVertex = firstChainEdge.getTwin().getVertex();
+                firstPoint = firstChainEdge.getPoint();
+                lastPoint = firstChainEdge.getTwin().getPoint();
             } else {
-                firstVertex = getVertex(firstChainEdge);
-                lastVertex = getVertex(lastChainEdge);
+                firstPoint = getPoint(firstChainEdge);
+                lastPoint = getPoint(lastChainEdge);
             }
 
             Edge firstEdge = null;
-            if (firstVertex != null) {
-                firstEdge = getConnectedEdge(boundary, firstVertex);
+            if (firstPoint != null) {
+                firstEdge = getConnectedEdge(boundary, firstPoint);
             }
 
             Edge lastEdge = null;
-            if (lastVertex != null) {
-                lastEdge = getConnectedEdge(boundary, lastVertex);
+            if (lastPoint != null) {
+                lastEdge = getConnectedEdge(boundary, lastPoint);
             }
 
             if (firstEdge != null) {
@@ -718,47 +709,7 @@ public class Main extends Application {
         }
     }
 
-    private void connectEdges(Edge e1, Edge e2) {
-        if (Objects.equals(e1.getTwin().getVertex(), e2.getVertex())) {
-            e1.setPrev(e2);
-            e2.setNext(e1);
-        } else if (Objects.equals(e1.getVertex(), e2.getTwin().getVertex())) {
-            e1.setNext(e2);
-            e2.setPrev(e1);
-        }
-    }
-
-    private boolean isIdle(Edge e) {
-        return e.getPrev() == null && e.getNext() == null;
-    }
-
-
-    private boolean isOutsideCell(Edge e1, Edge e2, Vertex v) {
-        if (e1 == null || e2 == null) {
-            return true;
-        }
-
-        Vertex vertexOfTangency = EdgeUtils.getVertexOfTangency(e1, e2);
-        if (vertexOfTangency == null) {
-            return true;
-        }
-
-        return !isPointInsideAngle(EdgeUtils.getOtherVertex(e1, vertexOfTangency), vertexOfTangency, EdgeUtils.getOtherVertex(e2, vertexOfTangency), v);
-    }
-
-    private boolean isPointInsideAngle(Vertex v1, Vertex v2, Vertex v3, Vertex v4) {
-        if (v2 == null) {
-            return false;
-        }
-
-        if (crossProduct(VectorUtils.getDirectionVector(v2, v1), VectorUtils.getDirectionVector(v2, v3)) > 0) {
-            return crossProduct(VectorUtils.getDirectionVector(v2, v1), VectorUtils.getDirectionVector(v2, v4)) > 0 && crossProduct(VectorUtils.getDirectionVector(v2, v4), VectorUtils.getDirectionVector(v2, v3)) > 0;
-        } else {
-            return crossProduct(VectorUtils.getDirectionVector(v2, v1), VectorUtils.getDirectionVector(v2, v4)) < 0 && crossProduct(VectorUtils.getDirectionVector(v2, v4), VectorUtils.getDirectionVector(v2, v3)) < 0;
-        }
-    }
-
-    private Edge getClosestEdge(List<Edge> edges, Line perpendicular, Edge currentEdge, Edge chainEdge, Vertex chainVertex) {
+    private Edge getClosestEdge(List<Edge> edges, Line perpendicular, Edge currentEdge, Edge chainEdge, Point chainPoint) {
         if (edges == null || edges.isEmpty()) {
             return null;
         }
@@ -769,9 +720,9 @@ public class Main extends Application {
             Edge nextEdge = edge;
             do {
                 if ((chainEdge == null || !isEquals(chainEdge, nextEdge)) && (currentEdge == null || !isEquals(currentEdge, nextEdge))) {
-                    Vertex intersectVertex = getPointOfIntersection(perpendicular, new Line(nextEdge));
-                    if (intersectVertex != null && isIntersected(intersectVertex, nextEdge) && isOutsideCell(currentEdge, chainEdge, intersectVertex)) {
-                        double currentDistance = VectorUtils.getLength(intersectVertex, chainVertex);
+                    Point intersectPoint = getPointOfIntersection(perpendicular, new Line(nextEdge));
+                    if (isIntersected(intersectPoint, nextEdge) && isOutsideCell(currentEdge, chainEdge, intersectPoint)) {
+                        double currentDistance = VectorUtils.getLength(intersectPoint, chainPoint);
                         if (distance == 0 || currentDistance < distance) {
                             distance = currentDistance;
                             intersectedEdge = nextEdge;
@@ -784,9 +735,9 @@ public class Main extends Application {
             Edge prevEdge = edge;
             do {
                 if ((chainEdge == null || !isEquals(chainEdge, prevEdge)) && (currentEdge == null || !isEquals(currentEdge, prevEdge))) {
-                    Vertex intersectVertex = getPointOfIntersection(perpendicular, new Line(prevEdge));
-                    if (intersectVertex != null && isIntersected(intersectVertex, prevEdge) && isOutsideCell(currentEdge, chainEdge, intersectVertex)) {
-                        double currentDistance = VectorUtils.getLength(intersectVertex, chainVertex);
+                    Point intersectPoint = getPointOfIntersection(perpendicular, new Line(prevEdge));
+                    if (isIntersected(intersectPoint, prevEdge) && isOutsideCell(currentEdge, chainEdge, intersectPoint)) {
+                        double currentDistance = VectorUtils.getLength(intersectPoint, chainPoint);
                         if (distance == 0 || currentDistance < distance) {
                             distance = currentDistance;
                             intersectedEdge = prevEdge;
@@ -799,81 +750,6 @@ public class Main extends Application {
 
         return intersectedEdge;
     }
-
-    public boolean isIntersected(Vertex v, Edge e) {
-        boolean isInfinite = e.isInfinite();
-        boolean isTwinInfinite = e.getTwin().isInfinite();
-        Vertex v1 = e.getVertex();
-        Vertex v2 = e.getTwin().getVertex();
-
-        if (v == null) {
-            return false;
-        } else if (isInfinite && isTwinInfinite) {
-            return true;
-        } else if (!isInfinite && !isTwinInfinite) {
-            return VectorUtils.dotProduct(VectorUtils.getDirectionVector(v, v1), VectorUtils.getDirectionVector(v, v2)) < 0;
-        } else if (isInfinite) {
-            return VectorUtils.dotProduct(VectorUtils.getDirectionVector(v, v2), VectorUtils.getDirectionVector(v1, v2)) > 0;
-        }
-
-        return VectorUtils.dotProduct(VectorUtils.getDirectionVector(v, v1), VectorUtils.getDirectionVector(v2, v1)) > 0;
-    }
-
-    private Line getPerpendicular(Line l) {
-        double height = 1000000;
-        double width = 1000000;
-
-        Vertex v1 = l.getMidVertex();
-        double x = v1.getX();
-        double y = v1.getY();
-
-        Vertex v2 = VectorUtils.getDirectionVector(l.getA(), l.getB());
-        if (VectorUtils.dotProduct(v2, new Vertex(1, 0)) == 0) {
-            return new Line(new Vertex(width, y), new Vertex(-width, y));
-        } else if (VectorUtils.dotProduct(v2, new Vertex(0, 1)) == 0) {
-            return new Line(new Vertex(x, -height), new Vertex(x, height));
-        } else {
-            if (v2.getX() == 0) {
-                return new Line(new Vertex(x, -height), new Vertex(x, height));
-            }
-            return new Line(new Vertex(((y + height) * v2.getY()) / v2.getX() + x, -height), new Vertex((-(height - y) * v2.getY()) / v2.getX() + x, height));
-        }
-    }
-
-    private boolean isOnTheSameSide(Vertex v1, Vertex v2, Vertex v3) {
-        return VectorUtils.dotProduct(VectorUtils.getDirectionVector(v3, v1), VectorUtils.getDirectionVector(v3, v2)) >= 0;
-    }
-
-    private Vertex getPointOfIntersection(Line l1, Line l2) {
-        Vertex v1 = l1.getA();
-        Vertex v2 = l1.getB();
-
-        Vertex v3 = l2.getA();
-        Vertex v4 = l2.getB();
-
-        double d1 = v2.getX() - v1.getX();
-        double d2 = v2.getY() - v1.getY();
-
-        double d3 = v4.getX() - v3.getX();
-        double d4 = v4.getY() - v3.getY();
-
-        if (d1 == 0) {
-            return new Vertex(v1.getX(), l2.getY(v1.getX()));
-        } else if (d3 == 0) {
-            return new Vertex(v3.getX(), l1.getY(v3.getX()));
-        }
-
-        double s1 = d2 / d1;
-        double s2 = d4 / d3;
-
-        if (d2 * d3 - d4 * d1 == 0) {
-            return null;
-        }
-
-        double x = (v3.getY() - v1.getY() + v1.getX() * s1 - v3.getX() * s2) / (s1 - s2);
-        return new Vertex(x, l1.getY(x));
-    }
-
 
     public static void main(String[] args) {
         launch(args);

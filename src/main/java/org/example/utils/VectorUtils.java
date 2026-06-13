@@ -1,25 +1,24 @@
 package org.example.utils;
 
-import org.example.entity.Vertex;
+import org.example.entity.Point;
 
 import static java.lang.Math.sqrt;
 
 public class VectorUtils {
 
-    public static double getLength(Vertex v1, Vertex v2) {
-        return sqrt(Math.pow(v2.getX() - v1.getX(), 2) + Math.pow(v2.getY() - v1.getY(), 2));
+    public static double getLength(Point p1, Point p2) {
+        return sqrt(Math.pow(p2.getX() - p1.getX(), 2) + Math.pow(p2.getY() - p1.getY(), 2));
     }
 
-    public static double crossProduct(Vertex v1, Vertex v2) {
-        return v1.getX() * v2.getY() - v1.getY() * v2.getX();
+    public static double crossProduct(Point p1, Point p2) {
+        return p1.getX() * p2.getY() - p1.getY() * p2.getX();
     }
 
-    public static double dotProduct(Vertex v1, Vertex v2) {
-        return v1.getX() * v2.getX() + v1.getY() * v2.getY();
+    public static double dotProduct(Point p1, Point p2) {
+        return p1.getX() * p2.getX() + p1.getY() * p2.getY();
     }
 
-    public static Vertex getDirectionVector(Vertex v1, Vertex v2) {
-        return new Vertex(v2.getX() - v1.getX(), v2.getY() - v1.getY());
+    public static Point geDirection(Point p1, Point p2) {
+        return new Point(p2.getX() - p1.getX(), p2.getY() - p1.getY());
     }
-
 }

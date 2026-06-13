@@ -10,19 +10,19 @@ import org.example.utils.EdgeUtils;
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class Edge {
     @EqualsAndHashCode.Include
-    private Vertex vertex;
+    private Point point;
     private Edge next;
     private Edge prev;
     private Edge twin;
     private Cell cell;
     private boolean isInfinite = true;
 
-    public Edge(Vertex vertex) {
-        this.vertex = vertex;
+    public Edge(Point point) {
+        this.point = point;
     }
 
-    public Edge(Vertex vertex, Cell cell) {
-        this.vertex = vertex;
+    public Edge(Point point, Cell cell) {
+        this.point = point;
         this.cell = cell;
     }
 

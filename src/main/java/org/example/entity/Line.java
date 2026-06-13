@@ -8,17 +8,17 @@ import lombok.*;
 @EqualsAndHashCode
 @ToString
 public class Line {
-    private Vertex a;
-    private Vertex b;
+    private Point a;
+    private Point b;
 
-    public Line(Vertex a, Vertex b) {
+    public Line(Point a, Point b) {
         this.a = a;
         this.b = b;
     }
 
     public Line(Edge edge) {
-        this.a = edge.getVertex();
-        this.b = edge.getTwin().getVertex();
+        this.a = edge.getPoint();
+        this.b = edge.getTwin().getPoint();
     }
 
     public double getY(double x) {
@@ -26,7 +26,7 @@ public class Line {
     }
 
 
-    public Vertex getMidVertex() {
-        return new Vertex((a.getX() + b.getX()) / 2, (a.getY() + b.getY()) / 2);
+    public Point getMidPoint() {
+        return new Point((a.getX() + b.getX()) / 2, (a.getY() + b.getY()) / 2);
     }
 }
