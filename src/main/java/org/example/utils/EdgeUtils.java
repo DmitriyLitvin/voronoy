@@ -179,10 +179,10 @@ public class EdgeUtils {
         return VectorUtils.dotProduct(VectorUtils.geDirection(p3, p1), VectorUtils.geDirection(p3, p2)) >= 0;
     }
 
-    public static boolean isConnected(Cell c, Edge e) {
-        Edge boundary = c.getBoundary();
-        Edge firstChainEdge = e.getStartEdge();
-        Edge lastChainEdge = e.getLastEdge();
+    public static boolean isConnected(Cell cell, Edge edge) {
+        Edge boundary = cell.getBoundary();
+        Edge firstChainEdge = edge.getStartEdge();
+        Edge lastChainEdge = edge.getLastEdge();
 
         if (firstChainEdge != null && lastChainEdge != null) {
             Point firstPoint;
