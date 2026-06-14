@@ -34,7 +34,7 @@ public class Main extends Application {
     private final Map<Cell, Edge> idleEdges = new HashMap<>();
 
     public void start(Stage stage) {
-        final Set<Point> vertices = new LinkedHashSet<>();
+        final Set<Point> points = new LinkedHashSet<>();
 
         borderPane.setCenter(pane);
 
@@ -44,21 +44,18 @@ public class Main extends Application {
         borderPane.setBottom(button);
         pane.getChildren().add(button);
 
-        vertices.add(new Point(438.0, 702.0));
-        vertices.add(new Point(469.0, 406.0));
-        vertices.add(new Point(523.0, 626.0));
-        vertices.add(new Point(575.0, 109.0));
-        vertices.add(new Point(589.0, 753.0));
-        vertices.add(new Point(629.0, 646.0));
-        vertices.add(new Point(661.0, 335.0));
-        vertices.add(new Point(666.0, 180.0));
+
+//        points.add(new Point(479.0, 451.0));
+//        points.add(new Point(481.0, 468.0));
+//        points.add(new Point(488.0, 446.0));
+//        points.add(new Point(496.0, 449.0));
 
 
-        vertices.forEach(p -> {
+        points.forEach(p -> {
             Circle circle = new Circle(p.getX(), p.getY(), 2, Color.RED);
             Label label = new Label(+circle.getCenterX() + ", " + circle.getCenterY());
-            label.relocate(circle.getCenterX(), circle.getCenterY());
-            pane.getChildren().addAll(label, circle);
+            // label.relocate(circle.getCenterX(), circle.getCenterY());
+            pane.getChildren().addAll(circle);
         });
 
         int width = 1500;
@@ -73,15 +70,15 @@ public class Main extends Application {
             borderPane.getChildren().add(circle);
 
             // Зберігаємо координати
-            vertices.add(new Point(x, y));
+            points.add(new Point(x, y));
 
             // Вивід координат у консоль
             System.out.println("Клік: x=" + x + ", y=" + y);
         });
 
         button.setOnAction(e -> {
-            drawVoronoyDiagram(vertices);
-            vertices.clear();
+            drawVoronoyDiagram(points);
+            points.clear();
         });
 
         stage.setScene(scene);
@@ -450,7 +447,12 @@ public class Main extends Application {
                 if (rightCell != null) {
                     edge = disjunctiveChain.get(rightCell);
                     if (edge == null) {
-                        disjunctiveChain.put(rightCell, nextRightEdge);
+                        Edge boundary = rightCell.getBoundary();
+                        if (boundary == null) {
+                            rightCell.setBoundary(nextRightEdge);
+                        } else {
+                            disjunctiveChain.put(rightCell, nextRightEdge);
+                        }
                     } else {
                         Edge startEdge = edge.getStartEdge();
                         if (startEdge != null && isConnected(nextRightEdge, startEdge)) {
@@ -536,7 +538,12 @@ public class Main extends Application {
                 if (leftCell != null) {
                     edge = disjunctiveChain.get(leftCell);
                     if (edge == null) {
-                        disjunctiveChain.put(leftCell, nextLeftEdge);
+                        Edge boundary = leftCell.getBoundary();
+                        if (boundary == null) {
+                            leftCell.setBoundary(nextLeftEdge);
+                        } else {
+                            disjunctiveChain.put(leftCell, nextLeftEdge);
+                        }
                     } else {
                         Edge lastEdge = edge.getLastEdge();
                         if (lastEdge != null && isConnected(nextLeftEdge, lastEdge)) {
