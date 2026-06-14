@@ -20,7 +20,7 @@ public class Cell {
             if (nextEdge == null) {
                 return false;
             }
-            if(EdgeUtils.isEquals(boundary, nextEdge)) {
+            if(EdgeUtils.equals(boundary, nextEdge)) {
                 return true;
             }
         } while (true);

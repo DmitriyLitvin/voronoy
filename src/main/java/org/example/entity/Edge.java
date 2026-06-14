@@ -33,7 +33,7 @@ public class Edge {
             Edge currentEdge = prevEdge.getPrev();
             if (currentEdge == null) {
                 return prevEdge;
-            } else if (EdgeUtils.isEquals(this, currentEdge)) {
+            } else if (EdgeUtils.equals(this, currentEdge)) {
                 return null;
             }
             prevEdge = currentEdge;
@@ -46,7 +46,7 @@ public class Edge {
             Edge currentEdge = nextEdge.getNext();
             if (currentEdge == null) {
                 return nextEdge;
-            } else if (EdgeUtils.isEquals(this, currentEdge)) {
+            } else if (EdgeUtils.equals(this, currentEdge)) {
                 return null;
             }
             nextEdge = currentEdge;
