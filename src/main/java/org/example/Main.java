@@ -573,12 +573,14 @@ public class Main extends Application {
             Cell cell = entry.getKey();
             List<Edge> edges = entry.getValue();
 
-            List<Edge> connectedEdges;
-            while (!edges.isEmpty() && !(connectedEdges = findConnectedEdges(cell, edges)).isEmpty()) {
+            List<Edge> connectedEdges = findConnectedEdges(cell, edges);
+            while (!edges.isEmpty() && !connectedEdges.isEmpty()) {
                 for (Edge edge : connectedEdges) {
                     addEdge(cell, edge);
                 }
+
                 edges.removeAll(connectedEdges);
+                connectedEdges = findConnectedEdges(cell, edges);
             }
         }
 
@@ -655,13 +657,11 @@ public class Main extends Application {
 
     private List<Edge> findConnectedEdges(Cell cell, List<Edge> edges) {
         List<Edge> connectedEdges = new ArrayList<>();
-
         for (Edge edge : edges) {
             if (isConnected(cell, edge)) {
                 connectedEdges.add(edge);
             }
         }
-
         return connectedEdges;
     }
 
