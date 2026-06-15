@@ -45,12 +45,6 @@ public class Main extends Application {
         pane.getChildren().add(button);
 
 
-//        points.add(new Point(479.0, 451.0));
-//        points.add(new Point(481.0, 468.0));
-//        points.add(new Point(488.0, 446.0));
-//        points.add(new Point(496.0, 449.0));
-
-
         points.forEach(p -> {
             Circle circle = new Circle(p.getX(), p.getY(), 2, Color.RED);
             Label label = new Label(+circle.getCenterX() + ", " + circle.getCenterY());
@@ -375,9 +369,16 @@ public class Main extends Application {
                 rightDistance = VectorUtils.getLength(rightPoint, chainPoint);
             }
 
-            System.out.println(rightDistance - leftDistance);
+            System.out.println(rightDistance + " " + leftDistance);
+
             if (rightEdge == null && leftEdge == null) {
+
+
                 throw new RuntimeException("couldn't find the closest edge");
+            } else if (Math.abs(leftDistance - rightDistance) <= 0.001) {
+
+
+                throw new RuntimeException("leftDistance - rightDistance are equals");
             } else if (leftEdge != null && (rightEdge == null || leftDistance < rightDistance)) {
                 Edge leftTwinEdge = leftEdge.getTwin();
                 Edge nextLeftEdge;
@@ -562,19 +563,33 @@ public class Main extends Application {
             }
         }
 
-        disjunctiveChain.forEach(this::addEdge);
+        for (var entry : disjunctiveChain.entrySet()) {
+            Cell cell = entry.getKey();
+            Edge edge = entry.getValue();
+            addEdge(cell, edge);
+        }
 
-        excludedEdges.forEach((cell, edges) -> {
-            int previousSize;
-            do {
-                previousSize = edges.size();
+        for (var entry : excludedEdges.entrySet()) {
+            Cell cell = entry.getKey();
+            List<Edge> edges = entry.getValue();
 
-                List<Edge> connectedEdges = edges.stream().filter(edge -> isConnected(cell, edge)).toList();
-                connectedEdges.forEach(edge -> addEdge(cell, edge));
+            List<Edge> connectedEdges;
+            while (!edges.isEmpty() && !(connectedEdges = findConnectedEdges(cell, edges)).isEmpty()) {
+                for (Edge edge : connectedEdges) {
+                    addEdge(cell, edge);
+                }
                 edges.removeAll(connectedEdges);
+            }
+        }
 
-            } while (previousSize != edges.size() && !edges.isEmpty());
-        });
+        for (var entry : idleEdges.entrySet()) {
+            Cell cell = entry.getKey();
+            Edge edge = entry.getValue();
+            if (isIdle(edge) && isConnected(cell, edge)) {
+                addEdge(cell, edge);
+                idleEdges.remove(cell);
+            }
+        }
 
         perpendicular = getPerpendicular(lowerCommonSupport);
 
@@ -636,6 +651,18 @@ public class Main extends Application {
         diagram.putAll(rightDiagram);
 
         return diagram;
+    }
+
+    private List<Edge> findConnectedEdges(Cell cell, List<Edge> edges) {
+        List<Edge> result = new ArrayList<>();
+
+        for (Edge edge : edges) {
+            if (isConnected(cell, edge)) {
+                result.add(edge);
+            }
+        }
+
+        return result;
     }
 
 
