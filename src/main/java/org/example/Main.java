@@ -573,14 +573,16 @@ public class Main extends Application {
             Cell cell = entry.getKey();
             List<Edge> edges = entry.getValue();
 
-            List<Edge> connectedEdges = findConnectedEdges(cell, edges);
-            while (!edges.isEmpty() && !connectedEdges.isEmpty()) {
+            while (!edges.isEmpty()) {
+                List<Edge> connectedEdges = findConnectedEdges(cell, edges);
+                if (connectedEdges.isEmpty()) {
+                    break;
+                }
+
                 for (Edge edge : connectedEdges) {
                     addEdge(cell, edge);
                 }
-
                 edges.removeAll(connectedEdges);
-                connectedEdges = findConnectedEdges(cell, edges);
             }
         }
 
