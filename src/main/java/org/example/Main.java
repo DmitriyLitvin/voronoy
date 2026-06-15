@@ -654,15 +654,15 @@ public class Main extends Application {
     }
 
     private List<Edge> findConnectedEdges(Cell cell, List<Edge> edges) {
-        List<Edge> result = new ArrayList<>();
+        List<Edge> connectedEdges = new ArrayList<>();
 
         for (Edge edge : edges) {
             if (isConnected(cell, edge)) {
-                result.add(edge);
+                connectedEdges.add(edge);
             }
         }
 
-        return result;
+        return connectedEdges;
     }
 
 
