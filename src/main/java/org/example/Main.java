@@ -321,7 +321,7 @@ public class Main extends Application {
             Cell rightCell = rightDiagram.get(upperCommonSupport.getB());
 
             perpendicular = getPerpendicular(upperCommonSupport);
-            Point midPoint = upperCommonSupport.getMidPoint();
+            Point middlePoint = upperCommonSupport.getMidPoint();
 
             boolean isInfinite = false;
             if (chainPoint == null) {
@@ -385,7 +385,7 @@ public class Main extends Application {
                 Edge nextRightEdge;
 
                 assert leftCell != null;
-                if (isOnTheSameSide(leftCell.getCenter(), leftEdge.getPoint(), midPoint)) {
+                if (isOnTheSameSide(leftCell.getCenter(), leftEdge.getPoint(), middlePoint)) {
                     Cell leftTwinCell = leftTwinEdge.getCell();
                     Point point = leftTwinEdge.getPoint();
 
@@ -404,7 +404,7 @@ public class Main extends Application {
 
                     leftTwinEdge.setPoint(leftPoint);
                     leftTwinEdge.setInfinite(false);
-                } else if (isOnTheSameSide(leftCell.getCenter(), leftEdge.getTwin().getPoint(), midPoint)) {
+                } else if (isOnTheSameSide(leftCell.getCenter(), leftEdge.getTwin().getPoint(), middlePoint)) {
                     Cell leftTwinCell = leftTwinEdge.getCell();
                     Point point = leftEdge.getPoint();
 
@@ -475,7 +475,7 @@ public class Main extends Application {
                 Edge nextRightEdge;
 
                 assert rightCell != null;
-                if (isOnTheSameSide(rightCell.getCenter(), rightEdge.getPoint(), midPoint)) {
+                if (isOnTheSameSide(rightCell.getCenter(), rightEdge.getPoint(), middlePoint)) {
                     Cell rightTwinCell = rightTwinEdge.getCell();
                     Point point = rightEdge.getTwin().getPoint();
 
@@ -494,7 +494,7 @@ public class Main extends Application {
 
                     rightTwinEdge.setPoint(rightPoint);
                     rightTwinEdge.setInfinite(false);
-                } else if (isOnTheSameSide(rightCell.getCenter(), rightEdge.getTwin().getPoint(), midPoint)) {
+                } else if (isOnTheSameSide(rightCell.getCenter(), rightEdge.getTwin().getPoint(), middlePoint)) {
                     Cell rightTwinCell = rightTwinEdge.getCell();
                     Point point = rightEdge.getPoint();
 
@@ -574,7 +574,13 @@ public class Main extends Application {
             List<Edge> edges = entry.getValue();
 
             while (!edges.isEmpty()) {
-                List<Edge> connectedEdges = findConnectedEdges(cell, edges);
+                List<Edge> connectedEdges = new ArrayList<>();
+                for (Edge edge : edges) {
+                    if (isConnected(cell, edge)) {
+                        connectedEdges.add(edge);
+                    }
+                }
+
                 if (connectedEdges.isEmpty()) {
                     break;
                 }
@@ -582,6 +588,7 @@ public class Main extends Application {
                 for (Edge edge : connectedEdges) {
                     addEdge(cell, edge);
                 }
+
                 edges.removeAll(connectedEdges);
             }
         }
@@ -655,16 +662,6 @@ public class Main extends Application {
         diagram.putAll(rightDiagram);
 
         return diagram;
-    }
-
-    private List<Edge> findConnectedEdges(Cell cell, List<Edge> edges) {
-        List<Edge> connectedEdges = new ArrayList<>();
-        for (Edge edge : edges) {
-            if (isConnected(cell, edge)) {
-                connectedEdges.add(edge);
-            }
-        }
-        return connectedEdges;
     }
 
 

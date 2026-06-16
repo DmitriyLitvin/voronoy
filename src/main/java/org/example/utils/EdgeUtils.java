@@ -30,31 +30,29 @@ public class EdgeUtils {
         return null;
     }
 
-    private static boolean containsEdge(Edge startEdge, Edge targetEdge) {
-        Edge currentEdge = startEdge;
-        do {
-            if (Objects.equals(currentEdge, targetEdge)) {
-                return true;
-            }
-            currentEdge = currentEdge.getNext();
-        } while (currentEdge != null && !Objects.equals(currentEdge, startEdge));
-
-        currentEdge = startEdge;
-        do {
-            if (Objects.equals(currentEdge, targetEdge)) {
-                return true;
-            }
-            currentEdge = currentEdge.getPrev();
-        } while (currentEdge != null && !Objects.equals(currentEdge, startEdge));
-
-        return false;
-    }
-
 
     public static Edge eraseEdges(Map<Cell, List<Edge>> excludedEdges, Edge edge, Point point) {
         List<Edge> edges = excludedEdges.get(edge.getCell());
         if (edges != null) {
-            edges.replaceAll(e -> containsEdge(e, edge) ? edge : e);
+            for (int i = 0; i < edges.size(); i++) {
+                Edge currentEdge = edges.get(i);
+                do {
+                    if (Objects.equals(currentEdge, edge)) {
+                        edges.set(i, edge);
+                        break;
+                    }
+                    currentEdge = currentEdge.getNext();
+                } while (currentEdge != null);
+
+                currentEdge = edges.get(i);
+                do {
+                    if (Objects.equals(currentEdge, edge)) {
+                        edges.set(i, edge);
+                        break;
+                    }
+                    currentEdge = currentEdge.getPrev();
+                } while (currentEdge != null);
+            }
         }
 
         Edge nextEdge = edge.getNext();
@@ -117,13 +115,13 @@ public class EdgeUtils {
         return null;
     }
 
-    public static void connectEdges(Edge e1, Edge e2) {
-        if (Objects.equals(e1.getTwin().getPoint(), e2.getPoint())) {
-            e1.setPrev(e2);
-            e2.setNext(e1);
-        } else if (Objects.equals(e1.getPoint(), e2.getTwin().getPoint())) {
-            e1.setNext(e2);
-            e2.setPrev(e1);
+    public static void connectEdges(Edge leftEdge, Edge rightEdge) {
+        if (Objects.equals(leftEdge.getTwin().getPoint(), rightEdge.getPoint())) {
+            leftEdge.setPrev(rightEdge);
+            rightEdge.setNext(leftEdge);
+        } else if (Objects.equals(leftEdge.getPoint(), rightEdge.getTwin().getPoint())) {
+            leftEdge.setNext(rightEdge);
+            rightEdge.setPrev(leftEdge);
         }
     }
 
@@ -134,24 +132,24 @@ public class EdgeUtils {
     public static boolean isIntersected(Point point, Edge edge) {
         boolean isInfinite = edge.isInfinite();
         boolean isTwinInfinite = edge.getTwin().isInfinite();
-        Point startPoint = edge.getPoint();
-        Point endPoint = edge.getTwin().getPoint();
+        Point start = edge.getPoint();
+        Point end = edge.getTwin().getPoint();
 
         if (point == null) {
             return false;
         } else if (isInfinite && isTwinInfinite) {
             return true;
         } else if (!isInfinite && !isTwinInfinite) {
-            return VectorUtils.dotProduct(VectorUtils.geDirection(point, startPoint), VectorUtils.geDirection(point, endPoint)) < 0;
+            return VectorUtils.dotProduct(VectorUtils.geDirection(point, start), VectorUtils.geDirection(point, end)) < 0;
         } else if (isInfinite) {
-            return VectorUtils.dotProduct(VectorUtils.geDirection(point, endPoint), VectorUtils.geDirection(startPoint, endPoint)) > 0;
+            return VectorUtils.dotProduct(VectorUtils.geDirection(point, end), VectorUtils.geDirection(start, end)) > 0;
         }
 
-        return VectorUtils.dotProduct(VectorUtils.geDirection(point, startPoint), VectorUtils.geDirection(endPoint, startPoint)) > 0;
+        return VectorUtils.dotProduct(VectorUtils.geDirection(point, start), VectorUtils.geDirection(end, start)) > 0;
     }
 
-    public static boolean isOnTheSameSide(Point p1, Point p2, Point p3) {
-        return VectorUtils.dotProduct(VectorUtils.geDirection(p3, p1), VectorUtils.geDirection(p3, p2)) >= 0;
+    public static boolean isOnTheSameSide(Point centerPoint, Point edgePoint, Point middlePoint) {
+        return VectorUtils.dotProduct(VectorUtils.geDirection(middlePoint, centerPoint), VectorUtils.geDirection(middlePoint, edgePoint)) >= 0;
     }
 
     public static boolean isConnected(Cell cell, Edge edge) {
@@ -187,57 +185,57 @@ public class EdgeUtils {
         return false;
     }
 
-    public static boolean isConnected(Edge e1, Edge e2) {
-        return Objects.equals(e1.getPoint(), e2.getTwin().getPoint()) || Objects.equals(e1.getTwin().getPoint(), e2.getPoint());
+    public static boolean isConnected(Edge leftEdge, Edge rightEdge) {
+        return Objects.equals(leftEdge.getPoint(), rightEdge.getTwin().getPoint()) || Objects.equals(leftEdge.getTwin().getPoint(), rightEdge.getPoint());
     }
 
-    public static boolean equals(Edge e1, Edge e2) {
-        Point p1 = e1.getPoint();
-        Point p2 = e1.getTwin().getPoint();
-        Point p3 = e2.getPoint();
-        Point p4 = e2.getTwin().getPoint();
+    public static boolean equals(Edge leftEdge, Edge rightEdge) {
+        Point leftStart = leftEdge.getPoint();
+        Point leftEnd = leftEdge.getTwin().getPoint();
+        Point rightStart = rightEdge.getPoint();
+        Point rightEnd = rightEdge.getTwin().getPoint();
 
-        return (Objects.equals(p1, p3) && Objects.equals(p2, p4)) || (Objects.equals(p1, p4) && Objects.equals(p2, p3));
+        return (Objects.equals(leftStart, rightStart) && Objects.equals(leftEnd, rightEnd)) || (Objects.equals(leftStart, rightEnd) && Objects.equals(leftEnd, rightStart));
     }
 
-    public static Point getPoint(Edge e1, Edge e2) {
-        Point p1 = e1.getPoint();
-        Point p2 = e1.getTwin().getPoint();
-        Point p3 = e2.getPoint();
-        Point p4 = e2.getTwin().getPoint();
+    public static Point getPoint(Edge leftEdge, Edge rightEdge) {
+        Point leftStart = leftEdge.getPoint();
+        Point leftEnd = leftEdge.getTwin().getPoint();
+        Point rightStart = rightEdge.getPoint();
+        Point rightEnd = rightEdge.getTwin().getPoint();
 
-        if (Objects.equals(p1, p3) || Objects.equals(p1, p4)) {
-            return p1;
-        } else if (Objects.equals(p2, p3) || Objects.equals(p2, p4)) {
-            return p2;
+        if (Objects.equals(leftStart, rightStart) || Objects.equals(leftStart, rightEnd)) {
+            return leftStart;
+        } else if (Objects.equals(leftEnd, rightStart) || Objects.equals(leftEnd, rightEnd)) {
+            return leftEnd;
         }
 
         return null;
     }
 
-    public static boolean isPointInsideAngle(Point p1, Point p2, Point p3, Point p4) {
-        if (p2 == null) {
+    public static boolean isPointInsideAngle(Point leftPoint, Point vertex, Point rightPoint, Point point) {
+        if (vertex == null) {
             return false;
         }
 
-        if (crossProduct(VectorUtils.geDirection(p2, p1), VectorUtils.geDirection(p2, p3)) > 0) {
-            return crossProduct(VectorUtils.geDirection(p2, p1), VectorUtils.geDirection(p2, p4)) > 0 && crossProduct(VectorUtils.geDirection(p2, p4), VectorUtils.geDirection(p2, p3)) > 0;
+        if (crossProduct(VectorUtils.geDirection(vertex, leftPoint), VectorUtils.geDirection(vertex, rightPoint)) > 0) {
+            return crossProduct(VectorUtils.geDirection(vertex, leftPoint), VectorUtils.geDirection(vertex, point)) > 0 && crossProduct(VectorUtils.geDirection(vertex, point), VectorUtils.geDirection(vertex, rightPoint)) > 0;
         } else {
-            return crossProduct(VectorUtils.geDirection(p2, p1), VectorUtils.geDirection(p2, p4)) < 0 && crossProduct(VectorUtils.geDirection(p2, p4), VectorUtils.geDirection(p2, p3)) < 0;
+            return crossProduct(VectorUtils.geDirection(vertex, leftPoint), VectorUtils.geDirection(vertex, point)) < 0 && crossProduct(VectorUtils.geDirection(vertex, point), VectorUtils.geDirection(vertex, rightPoint)) < 0;
         }
     }
 
-    public static boolean isOutsideCell(Edge e1, Edge e2, Point point) {
-        if (e1 == null || e2 == null) {
+    public static boolean isOutsideCell(Edge leftEdge, Edge rightEdge, Point point) {
+        if (leftEdge == null || rightEdge == null) {
             return true;
         }
 
-        Point vertex = EdgeUtils.getPoint(e1, e2);
+        Point vertex = EdgeUtils.getPoint(leftEdge, rightEdge);
         if (vertex == null) {
             return true;
         }
 
-        return !isPointInsideAngle(EdgeUtils.getOtherPoint(e1, vertex), vertex, EdgeUtils.getOtherPoint(e2, vertex), point);
+        return !isPointInsideAngle(EdgeUtils.getOtherPoint(leftEdge, vertex), vertex, EdgeUtils.getOtherPoint(rightEdge, vertex), point);
     }
 
 
