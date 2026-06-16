@@ -204,9 +204,9 @@ public class EdgeUtils {
         Point rightStart = rightEdge.getPoint();
         Point rightEnd = rightEdge.getTwin().getPoint();
 
-        if (Objects.equals(leftStart, rightStart) || Objects.equals(leftStart, rightEnd)) {
+        if (Objects.equals(leftStart, rightEnd)) {
             return leftStart;
-        } else if (Objects.equals(leftEnd, rightStart) || Objects.equals(leftEnd, rightEnd)) {
+        } else if (Objects.equals(leftEnd, rightStart)) {
             return leftEnd;
         }
 
