@@ -79,8 +79,8 @@ public class EdgeUtils {
     }
 
     public static Edge getConnectedEdge(Edge edge, Point point) {
-        Edge startEdge = edge.getStartEdge();
-        Edge lastEdge = edge.getLastEdge();
+        Edge startEdge = edge.getStart();
+        Edge lastEdge = edge.getLast();
         if (startEdge == null || lastEdge == null) {
             return null;
         }
@@ -144,8 +144,8 @@ public class EdgeUtils {
 
     public static boolean isConnected(Cell cell, Edge edge) {
         Edge boundary = cell.getBoundary();
-        Edge firstChainEdge = edge.getStartEdge();
-        Edge lastChainEdge = edge.getLastEdge();
+        Edge firstChainEdge = edge.getStart();
+        Edge lastChainEdge = edge.getLast();
 
         if (firstChainEdge != null && lastChainEdge != null) {
             Point firstPoint;

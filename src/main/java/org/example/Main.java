@@ -435,7 +435,7 @@ public class Main extends Application {
                 if (edge == null) {
                     disjunctiveChain.put(leftCell, nextLeftEdge);
                 } else {
-                    Edge lastEdge = edge.getLastEdge();
+                    Edge lastEdge = edge.getLast();
                     if (lastEdge != null && nextLeftEdge.isConnectedTo(lastEdge)) {
                         nextLeftEdge.setPrev(lastEdge);
                         lastEdge.setNext(nextLeftEdge);
@@ -454,7 +454,7 @@ public class Main extends Application {
                             disjunctiveChain.put(rightCell, nextRightEdge);
                         }
                     } else {
-                        Edge startEdge = edge.getStartEdge();
+                        Edge startEdge = edge.getStart();
                         if (startEdge != null && nextRightEdge.isConnectedTo(startEdge)) {
                             nextRightEdge.setNext(startEdge);
                             startEdge.setPrev(nextRightEdge);
@@ -526,7 +526,7 @@ public class Main extends Application {
                 if (edge == null) {
                     disjunctiveChain.put(rightCell, nextRightEdge);
                 } else {
-                    Edge startEdge = edge.getStartEdge();
+                    Edge startEdge = edge.getStart();
                     if (startEdge != null && nextRightEdge.isConnectedTo(startEdge)) {
                         nextRightEdge.setNext(startEdge);
                         startEdge.setPrev(nextRightEdge);
@@ -545,7 +545,7 @@ public class Main extends Application {
                             disjunctiveChain.put(leftCell, nextLeftEdge);
                         }
                     } else {
-                        Edge lastEdge = edge.getLastEdge();
+                        Edge lastEdge = edge.getLast();
                         if (lastEdge != null && nextLeftEdge.isConnectedTo(lastEdge)) {
                             nextLeftEdge.setPrev(lastEdge);
                             lastEdge.setNext(nextLeftEdge);
@@ -621,11 +621,11 @@ public class Main extends Application {
 
         Edge boundary = leftCell.getBoundary();
         if (boundary != null) {
-            Edge startEdge = boundary.getStartEdge();
-            Edge lastEdge = boundary.getLastEdge();
+            Edge startEdge = boundary.getStart();
+            Edge lastEdge = boundary.getLast();
 
             if (isIdle(boundary)) {
-                leftEdge.connectEdge(startEdge);
+                leftEdge.connect(startEdge);
             } else if (lastEdge != null && lastEdge.isConnectedTo(leftEdge)) {
                 lastEdge.setNext(leftEdge);
                 leftEdge.setPrev(lastEdge);
@@ -637,11 +637,11 @@ public class Main extends Application {
 
         boundary = rightCell.getBoundary();
         if (boundary != null) {
-            Edge startEdge = boundary.getStartEdge();
-            Edge lastEdge = boundary.getLastEdge();
+            Edge startEdge = boundary.getStart();
+            Edge lastEdge = boundary.getLast();
 
             if (isIdle(boundary)) {
-                rightEdge.connectEdge(lastEdge);
+                rightEdge.connect(lastEdge);
             } else if (startEdge != null && startEdge.isConnectedTo(rightEdge)) {
                 startEdge.setPrev(rightEdge);
                 rightEdge.setNext(startEdge);
@@ -661,8 +661,8 @@ public class Main extends Application {
 
     private void addEdge(Cell cell, Edge edge) {
         Edge boundary = cell.getBoundary();
-        Edge firstChainEdge = edge.getStartEdge();
-        Edge lastChainEdge = edge.getLastEdge();
+        Edge firstChainEdge = edge.getStart();
+        Edge lastChainEdge = edge.getLast();
 
         if (firstChainEdge != null && lastChainEdge != null) {
             Point firstPoint;
@@ -688,7 +688,7 @@ public class Main extends Application {
 
             if (firstEdge != null) {
                 if (isIdle(firstEdge) && isIdle(firstChainEdge)) {
-                    firstChainEdge.connectEdge(firstEdge);
+                    firstChainEdge.connect(firstEdge);
                 } else if (firstEdge.getNext() == null && firstEdge.isConnectedTo(firstChainEdge)) {
                     firstEdge.setNext(firstChainEdge);
                     firstChainEdge.setPrev(firstEdge);
@@ -704,7 +704,7 @@ public class Main extends Application {
 
             if (lastEdge != null) {
                 if (isIdle(lastEdge) && isIdle(lastChainEdge)) {
-                    lastChainEdge.connectEdge(lastEdge);
+                    lastChainEdge.connect(lastEdge);
                 } else if (lastEdge.getPrev() == null && lastEdge.isConnectedTo(lastChainEdge)) {
                     lastEdge.setPrev(lastChainEdge);
                     lastChainEdge.setNext(lastEdge);

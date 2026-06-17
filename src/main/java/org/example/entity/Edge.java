@@ -1,11 +1,8 @@
 package org.example.entity;
 
 import lombok.*;
-import org.example.utils.EdgeUtils;
 
 import java.util.Objects;
-
-import static org.example.utils.EdgeUtils.isPointInsideAngle;
 
 @Getter
 @Setter
@@ -29,7 +26,7 @@ public class Edge {
     }
 
 
-    public Edge getStartEdge() {
+    public Edge getStart() {
         Edge prevEdge = this;
         while (true) {
             Edge currentEdge = prevEdge.getPrev();
@@ -42,7 +39,7 @@ public class Edge {
         }
     }
 
-    public Edge getLastEdge() {
+    public Edge getLast() {
         Edge nextEdge = this;
         while (true) {
             Edge currentEdge = nextEdge.getNext();
@@ -59,7 +56,7 @@ public class Edge {
         return Objects.equals(edge.getPoint(), this.getTwin().getPoint()) || Objects.equals(edge.getTwin().getPoint(), this.getPoint());
     }
 
-    public void connectEdge(Edge edge) {
+    public void connect(Edge edge) {
         if (Objects.equals(edge.getTwin().getPoint(), this.getPoint())) {
             edge.setPrev(this);
             this.setNext(edge);
