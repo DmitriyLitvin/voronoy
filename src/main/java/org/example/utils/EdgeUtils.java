@@ -169,7 +169,7 @@ public class EdgeUtils {
                 lastEdge = getConnectedEdge(boundary, lastPoint);
             }
 
-            return firstEdge != null && (firstEdge.isConnectedTo(firstChainEdge) || firstEdge.isConnectedTo(lastChainEdge)) || (lastEdge != null && (lastEdge.isConnectedTo(lastChainEdge) || lastEdge.isConnectedTo(firstChainEdge)));
+            return firstEdge != null && (firstEdge.isConnected(firstChainEdge) || firstEdge.isConnected(lastChainEdge)) || (lastEdge != null && (lastEdge.isConnected(lastChainEdge) || lastEdge.isConnected(firstChainEdge)));
         }
 
         return false;

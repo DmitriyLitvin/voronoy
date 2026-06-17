@@ -436,9 +436,8 @@ public class Main extends Application {
                     disjunctiveChain.put(leftCell, nextLeftEdge);
                 } else {
                     Edge lastEdge = edge.getLast();
-                    if (lastEdge != null && nextLeftEdge.isConnectedTo(lastEdge)) {
-                        nextLeftEdge.setPrev(lastEdge);
-                        lastEdge.setNext(nextLeftEdge);
+                    if (lastEdge != null && nextLeftEdge.isConnected(lastEdge)) {
+                        nextLeftEdge.connect(lastEdge);
                     } else {
                         excludedEdges.computeIfAbsent(leftCell, k -> new ArrayList<>()).add(nextLeftEdge);
                     }
@@ -455,9 +454,8 @@ public class Main extends Application {
                         }
                     } else {
                         Edge startEdge = edge.getStart();
-                        if (startEdge != null && nextRightEdge.isConnectedTo(startEdge)) {
-                            nextRightEdge.setNext(startEdge);
-                            startEdge.setPrev(nextRightEdge);
+                        if (startEdge != null && nextRightEdge.isConnected(startEdge)) {
+                            nextRightEdge.connect(startEdge);
                         } else {
                             excludedEdges.computeIfAbsent(rightCell, k -> new ArrayList<>()).add(nextRightEdge);
                         }
@@ -527,9 +525,8 @@ public class Main extends Application {
                     disjunctiveChain.put(rightCell, nextRightEdge);
                 } else {
                     Edge startEdge = edge.getStart();
-                    if (startEdge != null && nextRightEdge.isConnectedTo(startEdge)) {
-                        nextRightEdge.setNext(startEdge);
-                        startEdge.setPrev(nextRightEdge);
+                    if (startEdge != null && nextRightEdge.isConnected(startEdge)) {
+                        nextRightEdge.connect(startEdge);
                     } else {
                         excludedEdges.computeIfAbsent(rightCell, k -> new ArrayList<>()).add(nextRightEdge);
                     }
@@ -546,9 +543,8 @@ public class Main extends Application {
                         }
                     } else {
                         Edge lastEdge = edge.getLast();
-                        if (lastEdge != null && nextLeftEdge.isConnectedTo(lastEdge)) {
-                            nextLeftEdge.setPrev(lastEdge);
-                            lastEdge.setNext(nextLeftEdge);
+                        if (lastEdge != null && nextLeftEdge.isConnected(lastEdge)) {
+                            nextLeftEdge.connect(lastEdge);
                         } else {
                             excludedEdges.computeIfAbsent(leftCell, k -> new ArrayList<>()).add(nextLeftEdge);
                         }
@@ -626,12 +622,10 @@ public class Main extends Application {
 
             if (isIdle(boundary)) {
                 leftEdge.connect(startEdge);
-            } else if (lastEdge != null && lastEdge.isConnectedTo(leftEdge)) {
-                lastEdge.setNext(leftEdge);
-                leftEdge.setPrev(lastEdge);
-            } else if (startEdge != null && startEdge.isConnectedTo(leftEdge)) {
-                startEdge.setPrev(leftEdge);
-                leftEdge.setNext(startEdge);
+            } else if (lastEdge != null && lastEdge.isConnected(leftEdge)) {
+                lastEdge.connect(leftEdge);
+            } else if (startEdge != null && startEdge.isConnected(leftEdge)) {
+                startEdge.connect(leftEdge);
             }
         }
 
@@ -642,12 +636,10 @@ public class Main extends Application {
 
             if (isIdle(boundary)) {
                 rightEdge.connect(lastEdge);
-            } else if (startEdge != null && startEdge.isConnectedTo(rightEdge)) {
-                startEdge.setPrev(rightEdge);
-                rightEdge.setNext(startEdge);
-            } else if (lastEdge != null && lastEdge.isConnectedTo(rightEdge)) {
-                lastEdge.setNext(rightEdge);
-                rightEdge.setPrev(lastEdge);
+            } else if (startEdge != null && startEdge.isConnected(rightEdge)) {
+                startEdge.connect(rightEdge);
+            } else if (lastEdge != null && lastEdge.isConnected(rightEdge)) {
+                lastEdge.connect(rightEdge);
             }
         }
 
@@ -689,15 +681,13 @@ public class Main extends Application {
             if (firstEdge != null) {
                 if (isIdle(firstEdge) && isIdle(firstChainEdge)) {
                     firstChainEdge.connect(firstEdge);
-                } else if (firstEdge.getNext() == null && firstEdge.isConnectedTo(firstChainEdge)) {
-                    firstEdge.setNext(firstChainEdge);
-                    firstChainEdge.setPrev(firstEdge);
-                } else if (firstEdge.getPrev() == null && firstEdge.isConnectedTo(lastChainEdge)) {
-                    firstEdge.setPrev(lastChainEdge);
-                    lastChainEdge.setNext(firstEdge);
+                } else if (firstEdge.getNext() == null && firstEdge.isConnected(firstChainEdge)) {
+                    firstEdge.connect(firstChainEdge);
+                } else if (firstEdge.getPrev() == null && firstEdge.isConnected(lastChainEdge)) {
+                    firstEdge.connect(lastChainEdge);
                 } else {
-                    System.out.println(firstEdge.isConnectedTo(firstChainEdge));
-                    System.out.println(firstEdge.isConnectedTo(lastChainEdge));
+                    System.out.println(firstEdge.isConnected(firstChainEdge));
+                    System.out.println(firstEdge.isConnected(lastChainEdge));
                     System.out.println("edge is not connected");
                 }
             }
@@ -705,15 +695,13 @@ public class Main extends Application {
             if (lastEdge != null) {
                 if (isIdle(lastEdge) && isIdle(lastChainEdge)) {
                     lastChainEdge.connect(lastEdge);
-                } else if (lastEdge.getPrev() == null && lastEdge.isConnectedTo(lastChainEdge)) {
-                    lastEdge.setPrev(lastChainEdge);
-                    lastChainEdge.setNext(lastEdge);
-                } else if (lastEdge.getNext() == null && lastEdge.isConnectedTo(firstChainEdge)) {
-                    lastEdge.setNext(firstChainEdge);
-                    firstChainEdge.setPrev(lastEdge);
+                } else if (lastEdge.getPrev() == null && lastEdge.isConnected(lastChainEdge)) {
+                    lastEdge.connect(lastChainEdge);
+                } else if (lastEdge.getNext() == null && lastEdge.isConnected(firstChainEdge)) {
+                    lastEdge.connect(firstChainEdge);
                 } else {
-                    System.out.println(lastEdge.isConnectedTo(lastChainEdge));
-                    System.out.println(lastEdge.isConnectedTo(firstChainEdge));
+                    System.out.println(lastEdge.isConnected(lastChainEdge));
+                    System.out.println(lastEdge.isConnected(firstChainEdge));
                     System.out.println("edge is not connected");
                 }
             }

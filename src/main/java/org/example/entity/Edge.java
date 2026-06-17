@@ -52,7 +52,7 @@ public class Edge {
         }
     }
 
-    public boolean isConnectedTo(Edge edge) {
+    public boolean isConnected(Edge edge) {
         return Objects.equals(edge.getPoint(), this.getTwin().getPoint()) || Objects.equals(edge.getTwin().getPoint(), this.getPoint());
     }
 
