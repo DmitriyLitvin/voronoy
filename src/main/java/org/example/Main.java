@@ -732,7 +732,7 @@ public class Main extends Application {
         for (Edge edge : edges) {
             Edge nextEdge = edge;
             do {
-                if ((chainEdge == null || !chainEdge.equals(nextEdge)) && (currentEdge == null || !(currentEdge.equals(nextEdge)))) {
+                if ((chainEdge == null || !chainEdge.equals(nextEdge)) && (currentEdge == null || !currentEdge.equals(nextEdge))) {
                     Point intersectPoint = getPointOfIntersection(perpendicular, new Line(nextEdge));
                     if (isIntersected(intersectPoint, nextEdge) && isOutsideCell(currentEdge, chainEdge, intersectPoint)) {
                         double currentDistance = VectorUtils.getLength(intersectPoint, chainPoint);
