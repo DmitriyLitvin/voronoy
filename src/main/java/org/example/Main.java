@@ -16,7 +16,6 @@ import javafx.util.Duration;
 import lombok.extern.slf4j.Slf4j;
 import org.example.entity.*;
 import org.example.entity.Point;
-import org.example.utils.EdgeUtils;
 import org.example.utils.VectorUtils;
 
 import java.util.*;
@@ -116,7 +115,7 @@ public class Main extends Application {
 
                             edge = edge.getNext();
 
-                        } while (edge != null && !EdgeUtils.equals(boundary, edge));
+                        } while (edge != null && !boundary.equals(edge));
 
                         edge = boundary;
                         do {
@@ -136,7 +135,7 @@ public class Main extends Application {
 
                             edge = edge.getPrev();
 
-                        } while (edge != null && !EdgeUtils.equals(boundary, edge));
+                        } while (edge != null && !boundary.equals(edge));
                     } else {
                         System.out.println(cell.getCenter());
                     }
@@ -437,7 +436,7 @@ public class Main extends Application {
                     disjunctiveChain.put(leftCell, nextLeftEdge);
                 } else {
                     Edge lastEdge = edge.getLastEdge();
-                    if (lastEdge != null && isConnected(nextLeftEdge, lastEdge)) {
+                    if (lastEdge != null && nextLeftEdge.isConnectedTo(lastEdge)) {
                         nextLeftEdge.setPrev(lastEdge);
                         lastEdge.setNext(nextLeftEdge);
                     } else {
@@ -456,7 +455,7 @@ public class Main extends Application {
                         }
                     } else {
                         Edge startEdge = edge.getStartEdge();
-                        if (startEdge != null && isConnected(nextRightEdge, startEdge)) {
+                        if (startEdge != null && nextRightEdge.isConnectedTo(startEdge)) {
                             nextRightEdge.setNext(startEdge);
                             startEdge.setPrev(nextRightEdge);
                         } else {
@@ -528,7 +527,7 @@ public class Main extends Application {
                     disjunctiveChain.put(rightCell, nextRightEdge);
                 } else {
                     Edge startEdge = edge.getStartEdge();
-                    if (startEdge != null && isConnected(nextRightEdge, startEdge)) {
+                    if (startEdge != null && nextRightEdge.isConnectedTo(startEdge)) {
                         nextRightEdge.setNext(startEdge);
                         startEdge.setPrev(nextRightEdge);
                     } else {
@@ -547,7 +546,7 @@ public class Main extends Application {
                         }
                     } else {
                         Edge lastEdge = edge.getLastEdge();
-                        if (lastEdge != null && isConnected(nextLeftEdge, lastEdge)) {
+                        if (lastEdge != null && nextLeftEdge.isConnectedTo(lastEdge)) {
                             nextLeftEdge.setPrev(lastEdge);
                             lastEdge.setNext(nextLeftEdge);
                         } else {
@@ -572,7 +571,6 @@ public class Main extends Application {
         for (var entry : excludedEdges.entrySet()) {
             Cell cell = entry.getKey();
             List<Edge> edges = entry.getValue();
-
             while (!edges.isEmpty()) {
                 List<Edge> connectedEdges = new ArrayList<>();
                 for (Edge edge : edges) {
@@ -580,7 +578,6 @@ public class Main extends Application {
                         connectedEdges.add(edge);
                     }
                 }
-
                 if (connectedEdges.isEmpty()) {
                     break;
                 }
@@ -588,7 +585,6 @@ public class Main extends Application {
                 for (Edge edge : connectedEdges) {
                     addEdge(cell, edge);
                 }
-
                 edges.removeAll(connectedEdges);
             }
         }
@@ -631,11 +627,11 @@ public class Main extends Application {
             Edge lastEdge = boundary.getLastEdge();
 
             if (isIdle(boundary)) {
-                connectEdges(leftEdge, startEdge);
-            } else if (lastEdge != null && isConnected(lastEdge, leftEdge)) {
+                leftEdge.connectEdge(startEdge);
+            } else if (lastEdge != null && lastEdge.isConnectedTo(leftEdge)) {
                 lastEdge.setNext(leftEdge);
                 leftEdge.setPrev(lastEdge);
-            } else if (startEdge != null && isConnected(startEdge, leftEdge)) {
+            } else if (startEdge != null && startEdge.isConnectedTo(leftEdge)) {
                 startEdge.setPrev(leftEdge);
                 leftEdge.setNext(startEdge);
             }
@@ -647,11 +643,11 @@ public class Main extends Application {
             Edge lastEdge = boundary.getLastEdge();
 
             if (isIdle(boundary)) {
-                connectEdges(rightEdge, lastEdge);
-            } else if (startEdge != null && isConnected(startEdge, rightEdge)) {
+                rightEdge.connectEdge(lastEdge);
+            } else if (startEdge != null && startEdge.isConnectedTo(rightEdge)) {
                 startEdge.setPrev(rightEdge);
                 rightEdge.setNext(startEdge);
-            } else if (lastEdge != null && isConnected(lastEdge, rightEdge)) {
+            } else if (lastEdge != null && lastEdge.isConnectedTo(rightEdge)) {
                 lastEdge.setNext(rightEdge);
                 rightEdge.setPrev(lastEdge);
             }
@@ -674,7 +670,7 @@ public class Main extends Application {
             Point firstPoint;
             Point lastPoint;
 
-            if (EdgeUtils.equals(firstChainEdge, lastChainEdge)) {
+            if (firstChainEdge.equals(lastChainEdge)) {
                 firstPoint = firstChainEdge.getPoint();
                 lastPoint = firstChainEdge.getTwin().getPoint();
             } else {
@@ -694,32 +690,32 @@ public class Main extends Application {
 
             if (firstEdge != null) {
                 if (isIdle(firstEdge) && isIdle(firstChainEdge)) {
-                    connectEdges(firstChainEdge, firstEdge);
-                } else if (firstEdge.getNext() == null && isConnected(firstEdge, firstChainEdge)) {
+                    firstChainEdge.connectEdge(firstEdge);
+                } else if (firstEdge.getNext() == null && firstEdge.isConnectedTo(firstChainEdge)) {
                     firstEdge.setNext(firstChainEdge);
                     firstChainEdge.setPrev(firstEdge);
-                } else if (firstEdge.getPrev() == null && isConnected(firstEdge, lastChainEdge)) {
+                } else if (firstEdge.getPrev() == null && firstEdge.isConnectedTo(lastChainEdge)) {
                     firstEdge.setPrev(lastChainEdge);
                     lastChainEdge.setNext(firstEdge);
                 } else {
-                    System.out.println(isConnected(firstEdge, firstChainEdge));
-                    System.out.println(isConnected(firstEdge, lastChainEdge));
+                    System.out.println(firstEdge.isConnectedTo(firstChainEdge));
+                    System.out.println(firstEdge.isConnectedTo(lastChainEdge));
                     System.out.println("edge is not connected");
                 }
             }
 
             if (lastEdge != null) {
                 if (isIdle(lastEdge) && isIdle(lastChainEdge)) {
-                    connectEdges(lastChainEdge, lastEdge);
-                } else if (lastEdge.getPrev() == null && isConnected(lastEdge, lastChainEdge)) {
+                    lastChainEdge.connectEdge(lastEdge);
+                } else if (lastEdge.getPrev() == null && lastEdge.isConnectedTo(lastChainEdge)) {
                     lastEdge.setPrev(lastChainEdge);
                     lastChainEdge.setNext(lastEdge);
-                } else if (lastEdge.getNext() == null && isConnected(lastEdge, firstChainEdge)) {
+                } else if (lastEdge.getNext() == null && lastEdge.isConnectedTo(firstChainEdge)) {
                     lastEdge.setNext(firstChainEdge);
                     firstChainEdge.setPrev(lastEdge);
                 } else {
-                    System.out.println(isConnected(lastEdge, lastChainEdge));
-                    System.out.println(isConnected(lastEdge, firstChainEdge));
+                    System.out.println(lastEdge.isConnectedTo(lastChainEdge));
+                    System.out.println(lastEdge.isConnectedTo(firstChainEdge));
                     System.out.println("edge is not connected");
                 }
             }
@@ -736,7 +732,7 @@ public class Main extends Application {
         for (Edge edge : edges) {
             Edge nextEdge = edge;
             do {
-                if ((chainEdge == null || !EdgeUtils.equals(chainEdge, nextEdge)) && (currentEdge == null || !EdgeUtils.equals(currentEdge, nextEdge))) {
+                if ((chainEdge == null || !chainEdge.equals(nextEdge)) && (currentEdge == null || !(currentEdge.equals(nextEdge)))) {
                     Point intersectPoint = getPointOfIntersection(perpendicular, new Line(nextEdge));
                     if (isIntersected(intersectPoint, nextEdge) && isOutsideCell(currentEdge, chainEdge, intersectPoint)) {
                         double currentDistance = VectorUtils.getLength(intersectPoint, chainPoint);
@@ -747,11 +743,11 @@ public class Main extends Application {
                     }
                 }
                 nextEdge = nextEdge.getNext();
-            } while (nextEdge != null && !EdgeUtils.equals(edge, nextEdge));
+            } while (nextEdge != null && !edge.equals(nextEdge));
 
             Edge prevEdge = edge;
             do {
-                if ((chainEdge == null || !EdgeUtils.equals(chainEdge, prevEdge)) && (currentEdge == null || !EdgeUtils.equals(currentEdge, prevEdge))) {
+                if ((chainEdge == null || !chainEdge.equals(prevEdge)) && (currentEdge == null || !currentEdge.equals(prevEdge))) {
                     Point intersectPoint = getPointOfIntersection(perpendicular, new Line(prevEdge));
                     if (isIntersected(intersectPoint, prevEdge) && isOutsideCell(currentEdge, chainEdge, intersectPoint)) {
                         double currentDistance = VectorUtils.getLength(intersectPoint, chainPoint);
@@ -762,7 +758,7 @@ public class Main extends Application {
                     }
                 }
                 prevEdge = prevEdge.getPrev();
-            } while (prevEdge != null && !EdgeUtils.equals(edge, prevEdge));
+            } while (prevEdge != null && !edge.equals(prevEdge));
         }
 
         return intersectedEdge;

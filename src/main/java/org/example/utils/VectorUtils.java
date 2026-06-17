@@ -6,19 +6,19 @@ import static java.lang.Math.sqrt;
 
 public class VectorUtils {
 
-    public static double getLength(Point start, Point end) {
-        return sqrt(Math.pow(end.getX() - start.getX(), 2) + Math.pow(end.getY() - start.getY(), 2));
+    public static double getLength(Point a, Point b) {
+        return sqrt(Math.pow(b.getX() - a.getX(), 2) + Math.pow(b.getY() - a.getY(), 2));
     }
 
-    public static double crossProduct(Point leftVector, Point rightVector) {
-        return leftVector.getX() * rightVector.getY() - leftVector.getY() * rightVector.getX();
+    public static double crossProduct(Point a, Point b) {
+        return a.getX() * b.getY() - a.getY() * b.getX();
     }
 
-    public static double dotProduct(Point leftVector, Point rightVector) {
-        return leftVector.getX() * rightVector.getX() + leftVector.getY() * rightVector.getY();
+    public static double dotProduct(Point a, Point b) {
+        return a.getX() * b.getX() + a.getY() * b.getY();
     }
 
-    public static Point geDirection(Point start, Point end) {
-        return new Point(end.getX() - start.getX(), end.getY() - start.getY());
+    public static Point geDirection(Point a, Point b) {
+        return new Point(b.getX() - a.getX(), b.getY() - a.getY());
     }
 }

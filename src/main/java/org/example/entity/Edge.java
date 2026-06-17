@@ -3,13 +3,15 @@ package org.example.entity;
 import lombok.*;
 import org.example.utils.EdgeUtils;
 
+import java.util.Objects;
+
+import static org.example.utils.EdgeUtils.isPointInsideAngle;
+
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class Edge {
-    @EqualsAndHashCode.Include
     private Point point;
     private Edge next;
     private Edge prev;
@@ -33,7 +35,7 @@ public class Edge {
             Edge currentEdge = prevEdge.getPrev();
             if (currentEdge == null) {
                 return prevEdge;
-            } else if (EdgeUtils.equals(this, currentEdge)) {
+            } else if (equals(currentEdge)) {
                 return null;
             }
             prevEdge = currentEdge;
@@ -46,10 +48,46 @@ public class Edge {
             Edge currentEdge = nextEdge.getNext();
             if (currentEdge == null) {
                 return nextEdge;
-            } else if (EdgeUtils.equals(this, currentEdge)) {
+            } else if (equals(currentEdge)) {
                 return null;
             }
             nextEdge = currentEdge;
         }
+    }
+
+    public boolean isConnectedTo(Edge edge) {
+        return Objects.equals(edge.getPoint(), this.getTwin().getPoint()) || Objects.equals(edge.getTwin().getPoint(), this.getPoint());
+    }
+
+    public void connectEdge(Edge edge) {
+        if (Objects.equals(edge.getTwin().getPoint(), this.getPoint())) {
+            edge.setPrev(this);
+            this.setNext(edge);
+        } else if (Objects.equals(edge.getPoint(), this.getTwin().getPoint())) {
+            edge.setNext(this);
+            this.setPrev(edge);
+        }
+    }
+
+    @Override
+    public boolean equals(Object object) {
+        if (this == object) {
+            return true;
+        }
+
+        if (!(object instanceof Edge other)) {
+            return false;
+        }
+
+        return (Objects.equals(getPoint(), other.getPoint()) &&
+                Objects.equals(getTwin().getPoint(), other.getTwin().getPoint()))
+                || (Objects.equals(getPoint(), other.getTwin().getPoint()) &&
+                Objects.equals(getTwin().getPoint(), other.getPoint()));
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(getPoint())
+                + Objects.hashCode(getTwin().getPoint());
     }
 }
