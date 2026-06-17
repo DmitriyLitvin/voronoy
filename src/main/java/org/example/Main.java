@@ -592,10 +592,8 @@ public class Main extends Application {
         for (var entry : idleEdges.entrySet()) {
             Cell cell = entry.getKey();
             Edge edge = entry.getValue();
-            if (isIdle(edge) && isConnected(cell, edge)) {
-                addEdge(cell, edge);
-                idleEdges.remove(cell);
-            }
+            addEdge(cell, edge);
+            idleEdges.remove(cell);
         }
 
         perpendicular = getPerpendicular(lowerCommonSupport);
