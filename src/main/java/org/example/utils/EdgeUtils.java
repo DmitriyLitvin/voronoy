@@ -175,13 +175,13 @@ public class EdgeUtils {
         return false;
     }
 
-    public static boolean isOutsideCell(Edge edge, Edge chainEdge, Point chainPoint) {
-        if (edge == null || chainEdge == null) {
+    public static boolean isOutsideCell(Edge currentEdge, Edge chainEdge, Point chainPoint) {
+        if (currentEdge == null || chainEdge == null) {
             return true;
         }
 
-        Point startPoint = edge.getPoint();
-        Point endPoint = edge.getTwin().getPoint();
+        Point startPoint = currentEdge.getPoint();
+        Point endPoint = currentEdge.getTwin().getPoint();
 
         Point vertex = null;
         if (Objects.equals(startPoint, chainEdge.getTwin().getPoint())) {
@@ -194,18 +194,18 @@ public class EdgeUtils {
             return true;
         }
 
-        return !isPointInsideAngle(EdgeUtils.getOtherPoint(edge, vertex), vertex, EdgeUtils.getOtherPoint(chainEdge, vertex), chainPoint);
+        return !isPointInsideAngle(EdgeUtils.getOtherPoint(currentEdge, vertex), vertex, EdgeUtils.getOtherPoint(chainEdge, vertex), chainPoint);
     }
 
-    public static boolean isPointInsideAngle(Point leftPoint, Point vertex, Point rightPoint, Point point) {
+    public static boolean isPointInsideAngle(Point currentPoint, Point vertex, Point chainPoint, Point point) {
         if (vertex == null) {
             return false;
         }
 
-        if (crossProduct(VectorUtils.geDirection(vertex, leftPoint), VectorUtils.geDirection(vertex, rightPoint)) > 0) {
-            return crossProduct(VectorUtils.geDirection(vertex, leftPoint), VectorUtils.geDirection(vertex, point)) > 0 && crossProduct(VectorUtils.geDirection(vertex, point), VectorUtils.geDirection(vertex, rightPoint)) > 0;
+        if (crossProduct(VectorUtils.geDirection(vertex, currentPoint), VectorUtils.geDirection(vertex, chainPoint)) > 0) {
+            return crossProduct(VectorUtils.geDirection(vertex, currentPoint), VectorUtils.geDirection(vertex, point)) > 0 && crossProduct(VectorUtils.geDirection(vertex, point), VectorUtils.geDirection(vertex, chainPoint)) > 0;
         } else {
-            return crossProduct(VectorUtils.geDirection(vertex, leftPoint), VectorUtils.geDirection(vertex, point)) < 0 && crossProduct(VectorUtils.geDirection(vertex, point), VectorUtils.geDirection(vertex, rightPoint)) < 0;
+            return crossProduct(VectorUtils.geDirection(vertex, currentPoint), VectorUtils.geDirection(vertex, point)) < 0 && crossProduct(VectorUtils.geDirection(vertex, point), VectorUtils.geDirection(vertex, chainPoint)) < 0;
         }
     }
 }

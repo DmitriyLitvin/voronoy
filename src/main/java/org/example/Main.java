@@ -567,6 +567,7 @@ public class Main extends Application {
         for (var entry : excludedEdges.entrySet()) {
             Cell cell = entry.getKey();
             List<Edge> edges = entry.getValue();
+
             while (!edges.isEmpty()) {
                 List<Edge> connectedEdges = new ArrayList<>();
                 for (Edge edge : edges) {
