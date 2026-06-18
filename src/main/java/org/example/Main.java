@@ -571,15 +571,12 @@ public class Main extends Application {
                 List<Edge> connectedEdges = new ArrayList<>();
                 for (Edge edge : edges) {
                     if (isConnected(cell, edge)) {
+                        addEdge(cell, edge);
                         connectedEdges.add(edge);
                     }
                 }
                 if (connectedEdges.isEmpty()) {
                     break;
-                }
-
-                for (Edge edge : connectedEdges) {
-                    addEdge(cell, edge);
                 }
                 edges.removeAll(connectedEdges);
             }
@@ -588,8 +585,10 @@ public class Main extends Application {
         for (var entry : idleEdges.entrySet()) {
             Cell cell = entry.getKey();
             Edge edge = entry.getValue();
-            addEdge(cell, edge);
-            idleEdges.remove(cell);
+            if (isConnected(cell, edge)) {
+                addEdge(cell, edge);
+                idleEdges.remove(cell);
+            }
         }
 
         perpendicular = getPerpendicular(lowerCommonSupport);
