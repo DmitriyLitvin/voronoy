@@ -180,21 +180,30 @@ public class EdgeUtils {
             return true;
         }
 
-        Point startPoint = currentEdge.getPoint();
-        Point endPoint = currentEdge.getTwin().getPoint();
-
-        Point vertex = null;
-        if (Objects.equals(startPoint, chainEdge.getTwin().getPoint())) {
-            vertex = startPoint;
-        } else if (Objects.equals(endPoint, chainEdge.getPoint())) {
-            vertex = endPoint;
-        }
-
+        Point vertex = getVertex(currentEdge, chainEdge);
         if (vertex == null) {
-            return true;
+            return  false;
         }
 
         return !isPointInsideAngle(EdgeUtils.getOtherPoint(currentEdge, vertex), vertex, EdgeUtils.getOtherPoint(chainEdge, vertex), chainPoint);
+    }
+
+    public static Point getVertex(Edge a, Edge b) {
+        if (a == null || b == null) {
+            return null;
+        }
+
+        Point startPoint = a.getPoint();
+        Point endPoint = a.getTwin().getPoint();
+
+        Point vertex = null;
+        if (Objects.equals(startPoint, b.getTwin().getPoint())) {
+            vertex = startPoint;
+        } else if (Objects.equals(endPoint, b.getPoint())) {
+            vertex = endPoint;
+        }
+
+        return vertex;
     }
 
     public static boolean isPointInsideAngle(Point currentPoint, Point vertex, Point chainPoint, Point point) {
