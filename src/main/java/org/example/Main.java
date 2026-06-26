@@ -399,7 +399,7 @@ public class Main extends Application {
                 ;
 
                 if (leftEdges.size() > 2) {
-                    Point vertex = leftEdges.get(1).getVertex(leftEdges.get(2));
+                    Point vertex = leftEdges.get(1).getCommonVertex(leftEdges.get(2));
                     if (vertex != null && VectorUtils.getLength(vertex, leftPoint) < 1) {
                         leftEdges.forEach(e -> eraseEdges(e, vertex, middlePoint, excludedEdges));
                     }
@@ -429,7 +429,7 @@ public class Main extends Application {
                 ;
 
                 if (rightEdges.size() > 2) {
-                    Point vertex = rightEdges.get(1).getVertex(rightEdges.get(2));
+                    Point vertex = rightEdges.get(1).getCommonVertex(rightEdges.get(2));
                     if (vertex != null && VectorUtils.getLength(vertex, leftPoint) < 1) {
                         rightEdges.forEach(e -> eraseEdges(e, vertex, middlePoint, excludedEdges));
                     }
@@ -438,9 +438,9 @@ public class Main extends Application {
 
                 Point vertex = null;
                 if (leftEdges.size() > 2) {
-                    vertex = leftEdges.get(1).getVertex(leftEdges.get(2));
+                    vertex = leftEdges.get(1).getCommonVertex(leftEdges.get(2));
                 } else if (rightEdges.size() > 2) {
-                    vertex = rightEdges.get(1).getVertex(rightEdges.get(2));
+                    vertex = rightEdges.get(1).getCommonVertex(rightEdges.get(2));
                 }
 
 

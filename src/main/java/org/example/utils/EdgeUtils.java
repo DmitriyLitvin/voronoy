@@ -181,7 +181,7 @@ public class EdgeUtils {
             return true;
         }
 
-        Point vertex = edge.getVertex(chainEdge);
+        Point vertex = edge.getCommonVertex(chainEdge);
         if (vertex == null) {
             return  false;
         }

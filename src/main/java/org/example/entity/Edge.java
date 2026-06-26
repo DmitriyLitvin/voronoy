@@ -66,7 +66,7 @@ public class Edge {
         }
     }
 
-    public Point getVertex(Edge edge) {
+    public Point getCommonVertex(Edge edge) {
         if (edge == null) {
             return null;
         }
