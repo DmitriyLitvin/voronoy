@@ -379,23 +379,24 @@ public class Main extends Application {
                 leftEdges = new ArrayList<>();
 
                 Edge edge = leftEdge;
-                while (true) {
+                do {
                     Edge nextLeftEdge = edge.getNext();
                     if (nextLeftEdge == null) {
                         upperCommonSupport.setA(edge.getTwin().getCell().getCenter());
-                        break;
-                    } else {
-                        leftEdges.add(nextLeftEdge);
+                        break; // Вихід, якщо ланцюжок ребер обривається
                     }
+
+                    leftEdges.add(nextLeftEdge);
+
                     Edge leftTwinEdge = nextLeftEdge.getTwin();
                     leftEdges.add(leftTwinEdge);
                     edge = leftTwinEdge;
-                    if (Objects.equals(edge, leftEdge)) {
-                        break;
-                    } else {
+
+                    if (!Objects.equals(edge, leftEdge)) {
                         upperCommonSupport.setA(nextLeftEdge.getCell().getCenter());
                     }
-                }
+
+                } while (!Objects.equals(edge, leftEdge));
                 ;
 
                 if (leftEdges.size() > 2) {
@@ -408,24 +409,23 @@ public class Main extends Application {
                 rightEdges = new ArrayList<>();
 
                 edge = rightEdge;
-                while (true) {
+                do {
                     Edge nextRightEdge = edge.getNext();
                     if (nextRightEdge == null) {
                         upperCommonSupport.setB(edge.getTwin().getCell().getCenter());
-                        break;
-                    } else {
-                        rightEdges.add(nextRightEdge);
+                        break; // Вихід, якщо ланцюжок ребер обривається
                     }
+
+                    rightEdges.add(nextRightEdge);
 
                     Edge rightTwinEdge = nextRightEdge.getTwin();
                     rightEdges.add(rightTwinEdge);
                     edge = rightTwinEdge;
-                    if (Objects.equals(edge, rightEdge)) {
-                        break;
-                    } else {
+                    if (!Objects.equals(edge, rightEdge)) {
                         upperCommonSupport.setB(nextRightEdge.getCell().getCenter());
                     }
-                }
+
+                } while (!Objects.equals(edge, rightEdge));
                 ;
 
                 if (rightEdges.size() > 2) {
