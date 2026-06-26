@@ -401,38 +401,7 @@ public class Main extends Application {
                 if (leftEdges.size() > 2) {
                     Point vertex = getVertex(leftEdges.get(1), leftEdges.get(2));
                     if (vertex != null && VectorUtils.getLength(vertex, leftPoint) < 1) {
-                        leftEdges.forEach(e -> {
-                            Edge nextEdge = e.getNext();
-                            Edge prevEdge = e.getPrev();
-                            Cell cell = e.getCell();
-                            if (nextEdge != null && !(isOnTheSameSide(cell.getCenter(), getOtherPoint(e, vertex), middlePoint) && isOnTheSameSide(cell.getCenter(), getOtherPoint(nextEdge, vertex), middlePoint))) {
-                                if (isOnTheSameSide(cell.getCenter(), getOtherPoint(e, vertex), middlePoint)) {
-                                    EdgeUtils.eraseEdges(excludedEdges, e, vertex);
-                                    if (excludedEdges.get(cell) == null && idleEdges.get(cell) == null) {
-                                        cell.setBoundary(e);
-                                    }
-                                } else if (isOnTheSameSide(cell.getCenter(), getOtherPoint(nextEdge, vertex), middlePoint)) {
-                                    EdgeUtils.eraseEdges(excludedEdges, nextEdge, vertex);
-                                    nextEdge.setInfinite(false);
-                                    if (excludedEdges.get(cell) == null && idleEdges.get(cell) == null) {
-                                        cell.setBoundary(nextEdge);
-                                    }
-                                }
-                            } else if (prevEdge != null && !(isOnTheSameSide(cell.getCenter(), getOtherPoint(e, vertex), middlePoint) && isOnTheSameSide(cell.getCenter(), getOtherPoint(prevEdge, vertex), middlePoint))) {
-                                if (isOnTheSameSide(cell.getCenter(), getOtherPoint(e, vertex), middlePoint)) {
-                                    EdgeUtils.eraseEdges(excludedEdges, e, vertex);
-                                    if (excludedEdges.get(cell) == null && idleEdges.get(cell) == null) {
-                                        cell.setBoundary(e);
-                                    }
-                                } else if (isOnTheSameSide(cell.getCenter(), getOtherPoint(prevEdge, vertex), middlePoint)) {
-                                    EdgeUtils.eraseEdges(excludedEdges, prevEdge, vertex);
-                                    prevEdge.setInfinite(false);
-                                    if (excludedEdges.get(cell) == null && idleEdges.get(cell) == null) {
-                                        cell.setBoundary(prevEdge);
-                                    }
-                                }
-                            }
-                        });
+                        leftEdges.forEach(e -> eraseEdges(e, vertex, middlePoint, excludedEdges));
                     }
                 }
 
@@ -462,40 +431,7 @@ public class Main extends Application {
                 if (rightEdges.size() > 2) {
                     Point vertex = getVertex(rightEdges.get(1), rightEdges.get(2));
                     if (vertex != null && VectorUtils.getLength(vertex, leftPoint) < 1) {
-                        rightEdges.forEach(e -> {
-                            Edge nextEdge = e.getNext();
-                            Edge prevEdge = e.getPrev();
-                            Cell cell = e.getCell();
-                            if (nextEdge != null && !(isOnTheSameSide(cell.getCenter(), getOtherPoint(e, vertex), middlePoint) && isOnTheSameSide(cell.getCenter(), getOtherPoint(nextEdge, vertex), middlePoint))) {
-                                if (isOnTheSameSide(cell.getCenter(), getOtherPoint(e, vertex), middlePoint)) {
-                                    EdgeUtils.eraseEdges(excludedEdges, e, vertex);
-                                    if (excludedEdges.get(cell) == null && idleEdges.get(cell) == null) {
-                                        cell.setBoundary(e);
-                                    }
-
-                                } else if (isOnTheSameSide(cell.getCenter(), getOtherPoint(nextEdge, vertex), middlePoint)) {
-                                    EdgeUtils.eraseEdges(excludedEdges, nextEdge, vertex);
-                                    nextEdge.setInfinite(false);
-                                    if (excludedEdges.get(cell) == null && idleEdges.get(cell) == null) {
-                                        cell.setBoundary(nextEdge);
-                                    }
-                                }
-                            } else if (prevEdge != null && !(isOnTheSameSide(cell.getCenter(), getOtherPoint(e, vertex), middlePoint) && isOnTheSameSide(cell.getCenter(), getOtherPoint(prevEdge, vertex), middlePoint))) {
-                                if (isOnTheSameSide(cell.getCenter(), getOtherPoint(e, vertex), middlePoint)) {
-                                    EdgeUtils.eraseEdges(excludedEdges, e, vertex);
-                                    if (excludedEdges.get(cell) == null && idleEdges.get(cell) == null) {
-                                        cell.setBoundary(e);
-                                    }
-
-                                } else if (isOnTheSameSide(cell.getCenter(), getOtherPoint(prevEdge, vertex), middlePoint)) {
-                                    EdgeUtils.eraseEdges(excludedEdges, prevEdge, vertex);
-                                    prevEdge.setInfinite(false);
-                                    if (excludedEdges.get(cell) == null && idleEdges.get(cell) == null) {
-                                        cell.setBoundary(prevEdge);
-                                    }
-                                }
-                            }
-                        });
+                        rightEdges.forEach(e -> eraseEdges(e, vertex, middlePoint, excludedEdges));
                     }
                 }
 
@@ -762,6 +698,41 @@ public class Main extends Application {
         diagram.putAll(rightDiagram);
 
         return diagram;
+    }
+
+    private void eraseEdges(Edge currentEdge, Point vertex, Point middlePoint, Map<Cell, List<Edge>> excludedEdges) {
+        Cell cell = currentEdge.getCell();
+        Edge nextEdge = currentEdge.getNext();
+        Edge prevEdge = currentEdge.getPrev();
+        if (nextEdge != null && !(isOnTheSameSide(cell.getCenter(), getOtherPoint(currentEdge, vertex), middlePoint) && isOnTheSameSide(cell.getCenter(), getOtherPoint(nextEdge, vertex), middlePoint))) {
+            if (isOnTheSameSide(cell.getCenter(), getOtherPoint(currentEdge, vertex), middlePoint)) {
+                EdgeUtils.eraseEdges(excludedEdges, currentEdge, vertex);
+                if (excludedEdges.get(cell) == null && idleEdges.get(cell) == null) {
+                    cell.setBoundary(currentEdge);
+                }
+
+            } else if (isOnTheSameSide(cell.getCenter(), getOtherPoint(nextEdge, vertex), middlePoint)) {
+                EdgeUtils.eraseEdges(excludedEdges, nextEdge, vertex);
+                nextEdge.setInfinite(false);
+                if (excludedEdges.get(cell) == null && idleEdges.get(cell) == null) {
+                    cell.setBoundary(nextEdge);
+                }
+            }
+        } else if (prevEdge != null && !(isOnTheSameSide(cell.getCenter(), getOtherPoint(currentEdge, vertex), middlePoint) && isOnTheSameSide(cell.getCenter(), getOtherPoint(prevEdge, vertex), middlePoint))) {
+            if (isOnTheSameSide(cell.getCenter(), getOtherPoint(currentEdge, vertex), middlePoint)) {
+                EdgeUtils.eraseEdges(excludedEdges, currentEdge, vertex);
+                if (excludedEdges.get(cell) == null && idleEdges.get(cell) == null) {
+                    cell.setBoundary(currentEdge);
+                }
+
+            } else if (isOnTheSameSide(cell.getCenter(), getOtherPoint(prevEdge, vertex), middlePoint)) {
+                EdgeUtils.eraseEdges(excludedEdges, prevEdge, vertex);
+                prevEdge.setInfinite(false);
+                if (excludedEdges.get(cell) == null && idleEdges.get(cell) == null) {
+                    cell.setBoundary(prevEdge);
+                }
+            }
+        }
     }
 
     private void eraseEdges(Cell cell, Edge edge, Point middlePoint, Map<Cell, List<Edge>> excludedEdges, Point point) {
