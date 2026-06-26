@@ -176,35 +176,17 @@ public class EdgeUtils {
         return false;
     }
 
-    public static boolean isOutsideCell(Edge currentEdge, Edge chainEdge, Point chainPoint) {
-        if (currentEdge == null || chainEdge == null) {
+    public static boolean isOutsideCell(Edge edge, Edge chainEdge, Point chainPoint) {
+        if (edge == null || chainEdge == null) {
             return true;
         }
 
-        Point vertex = getVertex(currentEdge, chainEdge);
+        Point vertex = edge.getVertex(chainEdge);
         if (vertex == null) {
             return  false;
         }
 
-        return !isPointInsideAngle(EdgeUtils.getOtherPoint(currentEdge, vertex), vertex, EdgeUtils.getOtherPoint(chainEdge, vertex), chainPoint);
-    }
-
-    public static Point getVertex(Edge a, Edge b) {
-        if (a == null || b == null) {
-            return null;
-        }
-
-        Point startPoint = a.getPoint();
-        Point endPoint = a.getTwin().getPoint();
-
-        Point vertex = null;
-        if (Objects.equals(startPoint, b.getTwin().getPoint())) {
-            vertex = startPoint;
-        } else if (Objects.equals(endPoint, b.getPoint())) {
-            vertex = endPoint;
-        }
-
-        return vertex;
+        return !isPointInsideAngle(EdgeUtils.getOtherPoint(edge, vertex), vertex, EdgeUtils.getOtherPoint(chainEdge, vertex), chainPoint);
     }
 
     public static boolean isPointInsideAngle(Point currentPoint, Point vertex, Point chainPoint, Point point) {

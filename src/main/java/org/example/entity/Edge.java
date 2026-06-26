@@ -66,6 +66,24 @@ public class Edge {
         }
     }
 
+    public Point getVertex(Edge edge) {
+        if (edge == null) {
+            return null;
+        }
+
+        Point startPoint = this.getPoint();
+        Point endPoint = this.getTwin().getPoint();
+
+        Point vertex = null;
+        if (Objects.equals(startPoint, edge.getTwin().getPoint())) {
+            vertex = startPoint;
+        } else if (Objects.equals(endPoint, edge.getPoint())) {
+            vertex = endPoint;
+        }
+
+        return vertex;
+    }
+
     @Override
     public boolean equals(Object object) {
         if (this == object) {
