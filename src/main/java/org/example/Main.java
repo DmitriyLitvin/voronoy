@@ -461,7 +461,7 @@ public class Main extends Application {
 
                 if (rightEdges.size() > 2) {
                     Point vertex = getVertex(rightEdges.get(1), rightEdges.get(2));
-                    if (vertex != null && VectorUtils.getLength(vertex, rightPoint) < 1) {
+                    if (vertex != null && VectorUtils.getLength(vertex, leftPoint) < 1) {
                         rightEdges.forEach(e -> {
                             Edge nextEdge = e.getNext();
                             Edge prevEdge = e.getPrev();
