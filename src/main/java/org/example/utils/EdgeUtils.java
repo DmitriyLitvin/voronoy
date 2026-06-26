@@ -11,6 +11,7 @@ import java.util.Objects;
 import static org.example.utils.VectorUtils.crossProduct;
 
 public class EdgeUtils {
+    private static final double eps = 0.001;
 
 
     public static boolean contains(Edge edge, Point point) {
@@ -130,12 +131,12 @@ public class EdgeUtils {
         } else if (isInfinite && isTwinInfinite) {
             return true;
         } else if (!isInfinite && !isTwinInfinite) {
-            return VectorUtils.dotProduct(VectorUtils.geDirection(point, start), VectorUtils.geDirection(point, end)) < 0;
+            return VectorUtils.dotProduct(VectorUtils.geDirection(point, start), VectorUtils.geDirection(point, end)) < 0 + eps;
         } else if (isInfinite) {
-            return VectorUtils.dotProduct(VectorUtils.geDirection(point, end), VectorUtils.geDirection(start, end)) > 0;
+            return VectorUtils.dotProduct(VectorUtils.geDirection(point, end), VectorUtils.geDirection(start, end)) > 0 - eps;
         }
 
-        return VectorUtils.dotProduct(VectorUtils.geDirection(point, start), VectorUtils.geDirection(end, start)) > 0;
+        return VectorUtils.dotProduct(VectorUtils.geDirection(point, start), VectorUtils.geDirection(end, start)) > 0 - eps;
     }
 
     public static boolean isOnTheSameSide(Point center, Point edgePoint, Point middlePoint) {
