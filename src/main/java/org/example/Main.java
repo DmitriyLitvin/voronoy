@@ -382,8 +382,9 @@ public class Main extends Application {
                 do {
                     Edge nextLeftEdge = edge.getNext();
                     if (nextLeftEdge == null) {
+                        nextLeftEdge = edge;
                         upperCommonSupport.setA(edge.getTwin().getCell().getCenter());
-                        break; // Вихід, якщо ланцюжок ребер обривається
+                        // Вихід, якщо ланцюжок ребер обривається
                     }
 
                     leftEdges.add(nextLeftEdge);
@@ -412,8 +413,9 @@ public class Main extends Application {
                 do {
                     Edge nextRightEdge = edge.getNext();
                     if (nextRightEdge == null) {
+                        nextRightEdge = edge;
                         upperCommonSupport.setB(edge.getTwin().getCell().getCenter());
-                        break; // Вихід, якщо ланцюжок ребер обривається
+                        // Вихід, якщо ланцюжок ребер обривається
                     }
 
                     rightEdges.add(nextRightEdge);
