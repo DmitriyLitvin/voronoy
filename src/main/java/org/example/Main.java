@@ -276,7 +276,7 @@ public class Main extends Application {
         Line lowerCommonSupport = getCommonSupport(leftPolygon, rightPolygon, false);
 
         Point chainPoint = null;
-        Edge currentEdge = null;
+        Edge prevEdge = null;
         Edge chainEdge = null;
         Line perpendicular;
         Map<Cell, List<Edge>> excludedEdges = new HashMap<>();
@@ -343,7 +343,7 @@ public class Main extends Application {
                 Optional.ofNullable(excludedEdges.get(leftCell)).ifPresent(leftEdges::addAll);
             }
 
-            Edge leftEdge = getClosestEdge(leftEdges, perpendicular, currentEdge, chainEdge, chainPoint);
+            Edge leftEdge = getClosestEdge(leftEdges, perpendicular, prevEdge, chainEdge, chainPoint);
             if (leftEdge != null) {
                 leftPoint = getPointOfIntersection(perpendicular, new Line(leftEdge));
                 assert leftPoint != null;
@@ -361,7 +361,7 @@ public class Main extends Application {
                 Optional.ofNullable(excludedEdges.get(rightCell)).ifPresent(rightEdges::addAll);
             }
 
-            Edge rightEdge = getClosestEdge(rightEdges, perpendicular, currentEdge, chainEdge, chainPoint);
+            Edge rightEdge = getClosestEdge(rightEdges, perpendicular, prevEdge, chainEdge, chainPoint);
             if (rightEdge != null) {
                 rightPoint = getPointOfIntersection(perpendicular, new Line(rightEdge));
                 assert rightPoint != null;
@@ -378,12 +378,12 @@ public class Main extends Application {
             } else if (rightEdge != null && leftEdge != null && abs(leftDistance - rightDistance) <= 0.01) {
                 leftEdges = new ArrayList<>();
 
-                Edge edge = leftEdge;
+                Edge currentEdge = leftEdge;
                 do {
-                    Edge nextLeftEdge = edge.getNext();
+                    Edge nextLeftEdge = currentEdge.getNext();
                     if (nextLeftEdge == null) {
-                        nextLeftEdge = edge;
-                        upperCommonSupport.setA(edge.getTwin().getCell().getCenter());
+                        nextLeftEdge = currentEdge;
+                        upperCommonSupport.setA(currentEdge.getTwin().getCell().getCenter());
                         // Вихід, якщо ланцюжок ребер обривається
                     }
 
@@ -391,13 +391,13 @@ public class Main extends Application {
 
                     Edge leftTwinEdge = nextLeftEdge.getTwin();
                     leftEdges.add(leftTwinEdge);
-                    edge = leftTwinEdge;
+                    currentEdge = leftTwinEdge;
 
-                    if (!Objects.equals(edge, leftEdge)) {
+                    if (!Objects.equals(currentEdge, leftEdge)) {
                         upperCommonSupport.setA(nextLeftEdge.getCell().getCenter());
                     }
 
-                } while (!Objects.equals(edge, leftEdge));
+                } while (!Objects.equals(currentEdge, leftEdge));
                 ;
 
                 if (leftEdges.size() > 2) {
@@ -409,12 +409,12 @@ public class Main extends Application {
 
                 rightEdges = new ArrayList<>();
 
-                edge = rightEdge;
+                currentEdge = rightEdge;
                 do {
-                    Edge nextRightEdge = edge.getNext();
+                    Edge nextRightEdge = currentEdge.getNext();
                     if (nextRightEdge == null) {
-                        nextRightEdge = edge;
-                        upperCommonSupport.setB(edge.getTwin().getCell().getCenter());
+                        nextRightEdge = currentEdge;
+                        upperCommonSupport.setB(currentEdge.getTwin().getCell().getCenter());
                         // Вихід, якщо ланцюжок ребер обривається
                     }
 
@@ -422,12 +422,12 @@ public class Main extends Application {
 
                     Edge rightTwinEdge = nextRightEdge.getTwin();
                     rightEdges.add(rightTwinEdge);
-                    edge = rightTwinEdge;
-                    if (!Objects.equals(edge, rightEdge)) {
+                    currentEdge = rightTwinEdge;
+                    if (!Objects.equals(currentEdge, rightEdge)) {
                         upperCommonSupport.setB(nextRightEdge.getCell().getCenter());
                     }
 
-                } while (!Objects.equals(edge, rightEdge));
+                } while (!Objects.equals(currentEdge, rightEdge));
                 ;
 
                 if (rightEdges.size() > 2) {
@@ -553,7 +553,7 @@ public class Main extends Application {
 
                 upperCommonSupport.setA(leftTwinEdge.getCell().getCenter());
                 chainPoint = leftPoint;
-                currentEdge = leftEdge;
+                prevEdge = leftEdge;
                 chainEdge = nextLeftEdge;
             } else if (leftEdge == null || leftDistance > rightDistance) {
                 Edge rightTwinEdge = rightEdge.getTwin();
@@ -605,7 +605,7 @@ public class Main extends Application {
 
                 upperCommonSupport.setB(rightTwinEdge.getCell().getCenter());
                 chainPoint = rightPoint;
-                currentEdge = rightEdge;
+                prevEdge = rightEdge;
                 chainEdge = nextRightEdge;
             }
         }
@@ -702,15 +702,15 @@ public class Main extends Application {
         return diagram;
     }
 
-    private void eraseEdges(Edge currentEdge, Point vertex, Point middlePoint, Map<Cell, List<Edge>> excludedEdges) {
-        Cell cell = currentEdge.getCell();
-        Edge nextEdge = currentEdge.getNext();
-        Edge prevEdge = currentEdge.getPrev();
-        if (nextEdge != null && !(isOnTheSameSide(cell.getCenter(), getOtherPoint(currentEdge, vertex), middlePoint) && isOnTheSameSide(cell.getCenter(), getOtherPoint(nextEdge, vertex), middlePoint))) {
-            if (isOnTheSameSide(cell.getCenter(), getOtherPoint(currentEdge, vertex), middlePoint)) {
-                EdgeUtils.eraseEdges(excludedEdges, currentEdge, vertex);
+    private void eraseEdges(Edge edge, Point vertex, Point middlePoint, Map<Cell, List<Edge>> excludedEdges) {
+        Cell cell = edge.getCell();
+        Edge nextEdge = edge.getNext();
+        Edge prevEdge = edge.getPrev();
+        if (nextEdge != null && !(isOnTheSameSide(cell.getCenter(), getOtherPoint(edge, vertex), middlePoint) && isOnTheSameSide(cell.getCenter(), getOtherPoint(nextEdge, vertex), middlePoint))) {
+            if (isOnTheSameSide(cell.getCenter(), getOtherPoint(edge, vertex), middlePoint)) {
+                EdgeUtils.eraseEdges(excludedEdges, edge, vertex);
                 if (excludedEdges.get(cell) == null && idleEdges.get(cell) == null) {
-                    cell.setBoundary(currentEdge);
+                    cell.setBoundary(edge);
                 }
 
             } else if (isOnTheSameSide(cell.getCenter(), getOtherPoint(nextEdge, vertex), middlePoint)) {
@@ -720,11 +720,11 @@ public class Main extends Application {
                     cell.setBoundary(nextEdge);
                 }
             }
-        } else if (prevEdge != null && !(isOnTheSameSide(cell.getCenter(), getOtherPoint(currentEdge, vertex), middlePoint) && isOnTheSameSide(cell.getCenter(), getOtherPoint(prevEdge, vertex), middlePoint))) {
-            if (isOnTheSameSide(cell.getCenter(), getOtherPoint(currentEdge, vertex), middlePoint)) {
-                EdgeUtils.eraseEdges(excludedEdges, currentEdge, vertex);
+        } else if (prevEdge != null && !(isOnTheSameSide(cell.getCenter(), getOtherPoint(edge, vertex), middlePoint) && isOnTheSameSide(cell.getCenter(), getOtherPoint(prevEdge, vertex), middlePoint))) {
+            if (isOnTheSameSide(cell.getCenter(), getOtherPoint(edge, vertex), middlePoint)) {
+                EdgeUtils.eraseEdges(excludedEdges, edge, vertex);
                 if (excludedEdges.get(cell) == null && idleEdges.get(cell) == null) {
-                    cell.setBoundary(currentEdge);
+                    cell.setBoundary(edge);
                 }
 
             } else if (isOnTheSameSide(cell.getCenter(), getOtherPoint(prevEdge, vertex), middlePoint)) {
