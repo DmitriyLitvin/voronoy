@@ -849,7 +849,7 @@ public class Main extends Application {
             do {
                 if ((chainEdge == null || !chainEdge.equals(nextEdge)) && (currentEdge == null || !currentEdge.equals(nextEdge))) {
                     Point intersectPoint = getPointOfIntersection(perpendicular, new Line(nextEdge));
-                    if (isIntersected(intersectPoint, nextEdge) && isOutsideCell(currentEdge, chainEdge, intersectPoint)) {
+                    if (intersectPoint != null && isOutsideCell(currentEdge, chainEdge, intersectPoint)) {
                         double currentDistance = VectorUtils.getLength(intersectPoint, chainPoint);
                         if (distance == 0 || currentDistance < distance) {
                             distance = currentDistance;
@@ -864,7 +864,7 @@ public class Main extends Application {
             do {
                 if ((chainEdge == null || !chainEdge.equals(prevEdge)) && (currentEdge == null || !currentEdge.equals(prevEdge))) {
                     Point intersectPoint = getPointOfIntersection(perpendicular, new Line(prevEdge));
-                    if (isIntersected(intersectPoint, prevEdge) && isOutsideCell(currentEdge, chainEdge, intersectPoint)) {
+                    if (intersectPoint != null && isOutsideCell(currentEdge, chainEdge, intersectPoint)) {
                         double currentDistance = VectorUtils.getLength(intersectPoint, chainPoint);
                         if (distance == 0 || currentDistance < distance) {
                             distance = currentDistance;

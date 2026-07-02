@@ -11,7 +11,6 @@ import java.util.Objects;
 import static org.example.utils.VectorUtils.crossProduct;
 
 public class EdgeUtils {
-    private static final double eps = 0.001;
 
 
     public static boolean contains(Edge edge, Point point) {
@@ -120,27 +119,27 @@ public class EdgeUtils {
         return edge.getPrev() == null && edge.getNext() == null;
     }
 
-    public static boolean isIntersected(Point point, Edge edge) {
-        boolean isInfinite = edge.isInfinite();
-        boolean isTwinInfinite = edge.getTwin().isInfinite();
-        Point start = edge.getPoint();
-        Point end = edge.getTwin().getPoint();
-
-        if (point == null) {
-            return false;
-        } else if (isInfinite && isTwinInfinite) {
-            return true;
-        } else if (!isInfinite && !isTwinInfinite) {
-            return VectorUtils.dotProduct(VectorUtils.geDirection(point, start), VectorUtils.geDirection(point, end)) < 0 + eps;
-        } else if (isInfinite) {
-            return VectorUtils.dotProduct(VectorUtils.geDirection(point, end), VectorUtils.geDirection(start, end)) > 0 - eps;
-        }
-
-        return VectorUtils.dotProduct(VectorUtils.geDirection(point, start), VectorUtils.geDirection(end, start)) > 0 - eps;
-    }
+//    public static boolean isIntersected(Point point, Edge edge) {
+//        boolean isInfinite = edge.isInfinite();
+//        boolean isTwinInfinite = edge.getTwin().isInfinite();
+//        Point start = edge.getPoint();
+//        Point end = edge.getTwin().getPoint();
+//
+//        if (point == null) {
+//            return false;
+//        } else if (isInfinite && isTwinInfinite) {
+//            return true;
+//        } else if (!isInfinite && !isTwinInfinite) {
+//            return VectorUtils.dotProduct(VectorUtils.geDirection(point, start), VectorUtils.geDirection(point, end)) < 0 + eps;
+//        } else if (isInfinite) {
+//            return VectorUtils.dotProduct(VectorUtils.geDirection(point, end), VectorUtils.geDirection(start, end)) > 0 - eps;
+//        }
+//
+//        return VectorUtils.dotProduct(VectorUtils.geDirection(point, start), VectorUtils.geDirection(end, start)) > 0 - eps;
+//    }
 
     public static boolean isOnTheSameSide(Point center, Point edgePoint, Point middlePoint) {
-        return VectorUtils.dotProduct(VectorUtils.geDirection(middlePoint, center), VectorUtils.geDirection(middlePoint, edgePoint)) >= 0;
+        return VectorUtils.dotProduct(VectorUtils.geDirection(middlePoint, center), VectorUtils.geDirection(middlePoint, edgePoint)) >= -0.01;
     }
 
     public static boolean isConnected(Cell cell, Edge edge) {
@@ -183,7 +182,7 @@ public class EdgeUtils {
 
         Point vertex = edge.getCommonVertex(chainEdge);
         if (vertex == null) {
-            return  false;
+            return false;
         }
 
         return !isPointInsideAngle(EdgeUtils.getOtherPoint(edge, vertex), vertex, EdgeUtils.getOtherPoint(chainEdge, vertex), chainPoint);
