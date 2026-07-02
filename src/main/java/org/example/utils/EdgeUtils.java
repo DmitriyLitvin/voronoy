@@ -130,16 +130,16 @@ public class EdgeUtils {
 //        } else if (isInfinite && isTwinInfinite) {
 //            return true;
 //        } else if (!isInfinite && !isTwinInfinite) {
-//            return VectorUtils.dotProduct(VectorUtils.geDirection(point, start), VectorUtils.geDirection(point, end)) < 0 + eps;
+//            return VectorUtils.dotProduct(VectorUtils.geDirection(point, start), VectorUtils.geDirection(point, end)) < 0;
 //        } else if (isInfinite) {
-//            return VectorUtils.dotProduct(VectorUtils.geDirection(point, end), VectorUtils.geDirection(start, end)) > 0 - eps;
+//            return VectorUtils.dotProduct(VectorUtils.geDirection(point, end), VectorUtils.geDirection(start, end)) > 0 ;
 //        }
 //
-//        return VectorUtils.dotProduct(VectorUtils.geDirection(point, start), VectorUtils.geDirection(end, start)) > 0 - eps;
+//        return VectorUtils.dotProduct(VectorUtils.geDirection(point, start), VectorUtils.geDirection(end, start)) > 0;
 //    }
 
     public static boolean isOnTheSameSide(Point center, Point edgePoint, Point middlePoint) {
-        return VectorUtils.dotProduct(VectorUtils.geDirection(middlePoint, center), VectorUtils.geDirection(middlePoint, edgePoint)) >= -0.01;
+        return VectorUtils.dotProduct(VectorUtils.geDirection(middlePoint, center), VectorUtils.geDirection(middlePoint, edgePoint)) >= 0;
     }
 
     public static boolean isConnected(Cell cell, Edge edge) {
