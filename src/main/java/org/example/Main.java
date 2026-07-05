@@ -609,9 +609,13 @@ public class Main extends Application {
             }
         }
 
-        disjunctiveChain.forEach(this::addEdge);
+        for (var entry : disjunctiveChain.entrySet()) {
+            Cell cell = entry.getKey();
+            Edge edge =  entry.getValue();
+            addEdge(cell, edge);
+        }
 
-        for (Map.Entry<Cell, List<Edge>> entry : excludedEdges.entrySet()) {
+        for (var entry : excludedEdges.entrySet()) {
             Cell cell = entry.getKey();
             List<Edge> edges = entry.getValue();
 
@@ -630,15 +634,18 @@ public class Main extends Application {
             }
         }
 
-        idleEdges.entrySet().removeIf(entry -> {
+        List<Edge> edgesToDelete = new ArrayList<>();
+        for (var entry : idleEdges.entrySet()) {
             Cell cell = entry.getKey();
             Edge edge = entry.getValue();
             if (isConnected(cell, edge)) {
                 addEdge(cell, edge);
-                return true;
+                edgesToDelete.add(edge);
             }
-            return false;
-        });
+        }
+
+        edgesToDelete.removeIf(e -> idleEdges.get(e.getCell()) != null);
+
 
         perpendicular = getPerpendicular(lowerCommonSupport);
 
