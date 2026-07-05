@@ -45,12 +45,14 @@ public class Main extends Application {
         borderPane.setBottom(button);
         pane.getChildren().add(button);
 
-        points.add(new Point(479.0, 451.0));
-        points.add(new Point(481.0, 468.0));
-        points.add(new Point(488.0, 446.0));
-        points.add(new Point(496.0, 449.0));
-        points.add(new Point(498.0, 466.0));
-
+        points.add(new Point(350.0, 500.0));
+        points.add(new Point(450.0, 500.0));
+        points.add(new Point(500.0, 350.0));
+        points.add(new Point(500.0, 450.0));
+        points.add(new Point(500.0, 550.0));
+        points.add(new Point(500.0, 650.0));
+        points.add(new Point(550.0, 500.0));
+        points.add(new Point(650.0, 500.0));
 
         points.forEach(p -> {
             Circle circle = new Circle(p.getX(), p.getY(), 2, Color.RED);
@@ -384,7 +386,6 @@ public class Main extends Application {
                     if (nextLeftEdge == null) {
                         nextLeftEdge = currentEdge;
                         upperCommonSupport.setA(currentEdge.getTwin().getCell().getCenter());
-                        // Вихід, якщо ланцюжок ребер обривається
                     }
 
                     leftEdges.add(nextLeftEdge);
@@ -415,7 +416,6 @@ public class Main extends Application {
                     if (nextRightEdge == null) {
                         nextRightEdge = currentEdge;
                         upperCommonSupport.setB(currentEdge.getTwin().getCell().getCenter());
-                        // Вихід, якщо ланцюжок ребер обривається
                     }
 
                     rightEdges.add(nextRightEdge);
@@ -495,22 +495,21 @@ public class Main extends Application {
                 assert leftCell != null;
                 assert rightCell != null;
                 if (vertex != null && VectorUtils.getLength(vertex, leftPoint) < 1) {
-                    eraseEdges(leftCell, leftEdge, middlePoint, excludedEdges, vertex);
-                    eraseEdges(rightCell, rightEdge, middlePoint, excludedEdges, vertex);
+                    eraseEdges(leftEdge, middlePoint, excludedEdges, vertex);
+                    eraseEdges(rightEdge, middlePoint, excludedEdges, vertex);
                     chainPoint = vertex;
                 } else {
-                    eraseEdges(leftCell, leftEdge, middlePoint, excludedEdges, leftPoint);
-                    eraseEdges(rightCell, rightEdge, middlePoint, excludedEdges, leftPoint);
+                    eraseEdges(leftEdge, middlePoint, excludedEdges, leftPoint);
+                    eraseEdges(rightEdge, middlePoint, excludedEdges, leftPoint);
                     chainPoint = leftPoint;
                 }
-
             } else if (leftEdge != null && (rightEdge == null || leftDistance < rightDistance)) {
                 Edge leftTwinEdge = leftEdge.getTwin();
                 Edge nextLeftEdge;
                 Edge nextRightEdge;
 
                 assert leftCell != null;
-                eraseEdges(leftCell, leftEdge, middlePoint, excludedEdges, leftPoint);
+                eraseEdges(leftEdge, middlePoint, excludedEdges, leftPoint);
                 nextLeftEdge = new Edge(leftPoint, leftCell);
                 nextLeftEdge.setInfinite(false);
 
@@ -561,7 +560,7 @@ public class Main extends Application {
                 Edge nextRightEdge;
 
                 assert rightCell != null;
-                eraseEdges(rightCell, rightEdge, middlePoint, excludedEdges, rightPoint);
+                eraseEdges(rightEdge, middlePoint, excludedEdges, rightPoint);
                 assert rightTwinEdge != null;
                 nextRightEdge = new Edge(chainPoint, rightCell);
                 nextRightEdge.setInfinite(isInfinite);
@@ -610,13 +609,11 @@ public class Main extends Application {
             }
         }
 
-        for (var entry : disjunctiveChain.entrySet()) {
-            Cell cell = entry.getKey();
-            Edge edge = entry.getValue();
-            addEdge(cell, edge);
+        for (Map.Entry<Cell, Edge> entry : disjunctiveChain.entrySet()) {
+            addEdge(entry.getKey(), entry.getValue());
         }
 
-        for (var entry : excludedEdges.entrySet()) {
+        for (Map.Entry<Cell, List<Edge>> entry : excludedEdges.entrySet()) {
             Cell cell = entry.getKey();
             List<Edge> edges = entry.getValue();
 
@@ -635,7 +632,7 @@ public class Main extends Application {
             }
         }
 
-        for (var entry : idleEdges.entrySet()) {
+        for (Map.Entry<Cell, Edge> entry : idleEdges.entrySet()) {
             Cell cell = entry.getKey();
             Edge edge = entry.getValue();
             if (isConnected(cell, edge)) {
@@ -737,7 +734,8 @@ public class Main extends Application {
         }
     }
 
-    private void eraseEdges(Cell cell, Edge edge, Point middlePoint, Map<Cell, List<Edge>> excludedEdges, Point point) {
+    private void eraseEdges(Edge edge, Point middlePoint, Map<Cell, List<Edge>> excludedEdges, Point point) {
+        Cell cell = edge.getCell();
         Edge twinEdge = edge.getTwin();
         if (isOnTheSameSide(cell.getCenter(), edge.getPoint(), middlePoint)) {
             Cell leftTwinCell = twinEdge.getCell();
