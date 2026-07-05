@@ -644,7 +644,7 @@ public class Main extends Application {
             }
         }
 
-        edgesToDelete.removeIf(e -> idleEdges.get(e.getCell()) != null);
+        edgesToDelete.forEach(e -> idleEdges.remove(e.getCell()));
 
 
         perpendicular = getPerpendicular(lowerCommonSupport);
