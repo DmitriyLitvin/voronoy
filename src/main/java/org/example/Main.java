@@ -609,9 +609,7 @@ public class Main extends Application {
             }
         }
 
-        for (Map.Entry<Cell, Edge> entry : disjunctiveChain.entrySet()) {
-            addEdge(entry.getKey(), entry.getValue());
-        }
+        disjunctiveChain.forEach(this::addEdge);
 
         for (Map.Entry<Cell, List<Edge>> entry : excludedEdges.entrySet()) {
             Cell cell = entry.getKey();
@@ -632,14 +630,15 @@ public class Main extends Application {
             }
         }
 
-        for (Map.Entry<Cell, Edge> entry : idleEdges.entrySet()) {
+        idleEdges.entrySet().removeIf(entry -> {
             Cell cell = entry.getKey();
             Edge edge = entry.getValue();
             if (isConnected(cell, edge)) {
                 addEdge(cell, edge);
-                idleEdges.remove(cell);
+                return true;
             }
-        }
+            return false;
+        });
 
         perpendicular = getPerpendicular(lowerCommonSupport);
 
