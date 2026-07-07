@@ -102,7 +102,6 @@ public class Edge {
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(getPoint())
-                + Objects.hashCode(getTwin().getPoint());
+        return Objects.hashCode(getPoint());
     }
 }

@@ -57,8 +57,8 @@ public class Main extends Application {
         points.forEach(p -> {
             Circle circle = new Circle(p.getX(), p.getY(), 2, Color.RED);
             Label label = new Label(+circle.getCenterX() + ", " + circle.getCenterY());
-            // label.relocate(circle.getCenterX(), circle.getCenterY());
-            pane.getChildren().addAll(circle);
+            label.relocate(circle.getCenterX(), circle.getCenterY());
+            pane.getChildren().addAll(label, circle);
         });
 
         int width = 1500;
@@ -270,6 +270,26 @@ public class Main extends Application {
         return joinDiagrams(buildVoronoyDiagram(polygon.subList(0, polygon.size() / 2)), buildVoronoyDiagram(polygon.subList(polygon.size() / 2, polygon.size())));
     }
 
+    private Point getCommonVertex(Edge edge) {
+        Edge nextEdge = edge.getNext();
+        if (nextEdge != null) {
+            Point vertex = edge.getCommonVertex(nextEdge);
+            if (vertex != null) {
+                return vertex;
+            }
+        }
+
+        Edge prevEdge = edge.getPrev();
+        if (prevEdge != null) {
+            Point vertex = edge.getCommonVertex(prevEdge);
+            if (vertex != null) {
+                return vertex;
+            }
+        }
+
+        return null;
+    }
+
     private Map<Point, Cell> joinDiagrams(Map<Point, Cell> leftDiagram, Map<Point, Cell> rightDiagram) {
         Set<Point> leftPolygon = buildConvexHull(new ArrayList<>(leftDiagram.keySet()));
         Set<Point> rightPolygon = buildConvexHull(new ArrayList<>(rightDiagram.keySet()));
@@ -374,77 +394,53 @@ public class Main extends Application {
             System.out.println(leftEdge);
 
             if (rightEdge == null && leftEdge == null) {
-
-
                 throw new RuntimeException("couldn't find the closest edge");
             } else if (rightEdge != null && leftEdge != null && abs(leftDistance - rightDistance) <= 0.01) {
                 leftEdges = new ArrayList<>();
+                Point leftVertex = getCommonVertex(leftEdge);
+                if (leftVertex != null && VectorUtils.getLength(leftVertex, leftPoint) < 1) {
+                    Edge currentEdge = leftEdge;
+                    do {
+                        Edge nextLeftEdge = currentEdge.getNext();
+                        if (nextLeftEdge == null) {
+                            nextLeftEdge = currentEdge;
+                        }
+                        leftEdges.add(nextLeftEdge);
 
-                Edge currentEdge = leftEdge;
-                do {
-                    Edge nextLeftEdge = currentEdge.getNext();
-                    if (nextLeftEdge == null) {
-                        nextLeftEdge = currentEdge;
-                        upperCommonSupport.setA(currentEdge.getTwin().getCell().getCenter());
-                    }
-
-                    leftEdges.add(nextLeftEdge);
-
-                    Edge leftTwinEdge = nextLeftEdge.getTwin();
-                    leftEdges.add(leftTwinEdge);
-                    currentEdge = leftTwinEdge;
-
-                    if (!Objects.equals(currentEdge, leftEdge)) {
-                        upperCommonSupport.setA(nextLeftEdge.getCell().getCenter());
-                    }
-
-                } while (!Objects.equals(currentEdge, leftEdge));
-                ;
-
-                if (leftEdges.size() > 2) {
-                    Point vertex = leftEdges.get(1).getCommonVertex(leftEdges.get(2));
-                    if (vertex != null && VectorUtils.getLength(vertex, leftPoint) < 1) {
-                        leftEdges.forEach(e -> eraseEdges(e, vertex, middlePoint, excludedEdges));
-                    }
+                        Edge leftTwinEdge = nextLeftEdge.getTwin();
+                        leftEdges.add(leftTwinEdge);
+                        currentEdge = leftTwinEdge;
+                        if (!Objects.equals(currentEdge, leftEdge)) {
+                            upperCommonSupport.setA(nextLeftEdge.getCell().getCenter());
+                        }
+                    } while (!Objects.equals(currentEdge, leftEdge));
+                } else {
+                    upperCommonSupport.setA(leftEdge.getTwin().getCell().getCenter());
                 }
 
                 rightEdges = new ArrayList<>();
+                Point rightVertex = getCommonVertex(rightEdge);
+                if (rightVertex != null && VectorUtils.getLength(rightVertex, rightPoint) < 1) {
+                    Edge currentEdge = rightEdge;
+                    do {
+                        Edge nextRightEdge = currentEdge.getNext();
+                        if (nextRightEdge == null) {
+                            nextRightEdge = currentEdge;
+                        }
+                        rightEdges.add(nextRightEdge);
 
-                currentEdge = rightEdge;
-                do {
-                    Edge nextRightEdge = currentEdge.getNext();
-                    if (nextRightEdge == null) {
-                        nextRightEdge = currentEdge;
-                        upperCommonSupport.setB(currentEdge.getTwin().getCell().getCenter());
-                    }
-
-                    rightEdges.add(nextRightEdge);
-
-                    Edge rightTwinEdge = nextRightEdge.getTwin();
-                    rightEdges.add(rightTwinEdge);
-                    currentEdge = rightTwinEdge;
-                    if (!Objects.equals(currentEdge, rightEdge)) {
-                        upperCommonSupport.setB(nextRightEdge.getCell().getCenter());
-                    }
-
-                } while (!Objects.equals(currentEdge, rightEdge));
-                ;
-
-                if (rightEdges.size() > 2) {
-                    Point vertex = rightEdges.get(1).getCommonVertex(rightEdges.get(2));
-                    if (vertex != null && VectorUtils.getLength(vertex, leftPoint) < 1) {
-                        rightEdges.forEach(e -> eraseEdges(e, vertex, middlePoint, excludedEdges));
-                    }
+                        Edge rightTwinEdge = nextRightEdge.getTwin();
+                        rightEdges.add(rightTwinEdge);
+                        currentEdge = rightTwinEdge;
+                        if (!Objects.equals(currentEdge, rightEdge)) {
+                            upperCommonSupport.setB(nextRightEdge.getCell().getCenter());
+                        }
+                    } while (!Objects.equals(currentEdge, rightEdge));
+                } else {
+                    upperCommonSupport.setB(rightEdge.getTwin().getCell().getCenter());
                 }
 
-
-                Point vertex = null;
-                if (leftEdges.size() > 2) {
-                    vertex = leftEdges.get(1).getCommonVertex(leftEdges.get(2));
-                } else if (rightEdges.size() > 2) {
-                    vertex = rightEdges.get(1).getCommonVertex(rightEdges.get(2));
-                }
-
+                Point vertex = leftVertex != null ? leftVertex : rightVertex;
 
                 Edge nextLeftEdge;
                 if (vertex != null && VectorUtils.getLength(vertex, leftPoint) < 1) {
@@ -492,15 +488,25 @@ public class Main extends Application {
                     }
                 }
 
-                assert leftCell != null;
-                assert rightCell != null;
-                if (vertex != null && VectorUtils.getLength(vertex, leftPoint) < 1) {
+                if (leftVertex != null && VectorUtils.getLength(leftVertex, leftPoint) < 1) {
+                    leftEdges.forEach(e -> eraseEdges(e, vertex, middlePoint, excludedEdges));
                     eraseEdges(leftEdge, middlePoint, excludedEdges, vertex);
-                    eraseEdges(rightEdge, middlePoint, excludedEdges, vertex);
-                    chainPoint = vertex;
                 } else {
                     eraseEdges(leftEdge, middlePoint, excludedEdges, leftPoint);
+                }
+
+
+                if (rightVertex != null && VectorUtils.getLength(rightVertex, rightPoint) < 1) {
+                    rightEdges.forEach(e -> eraseEdges(e, vertex, middlePoint, excludedEdges));
+                    eraseEdges(leftEdge, middlePoint, excludedEdges, vertex);
+                } else {
                     eraseEdges(rightEdge, middlePoint, excludedEdges, leftPoint);
+                }
+
+
+                if (vertex != null && VectorUtils.getLength(vertex, leftPoint) < 1) {
+                    chainPoint = vertex;
+                } else {
                     chainPoint = leftPoint;
                 }
             } else if (leftEdge != null && (rightEdge == null || leftDistance < rightDistance)) {
@@ -611,7 +617,7 @@ public class Main extends Application {
 
         for (var entry : disjunctiveChain.entrySet()) {
             Cell cell = entry.getKey();
-            Edge edge =  entry.getValue();
+            Edge edge = entry.getValue();
             addEdge(cell, edge);
         }
 
