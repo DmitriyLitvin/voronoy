@@ -334,7 +334,7 @@ public class Main extends Application {
             return diagram;
         }
 
-        List<Edge> prevEdges = new ArrayList<>();
+        List<Edge> currentEdges = new ArrayList<>();
         while (!Objects.equals(upperCommonSupport, lowerCommonSupport)) {
             System.out.println(upperCommonSupport);
             System.out.println(lowerCommonSupport);
@@ -365,7 +365,7 @@ public class Main extends Application {
                 Optional.ofNullable(excludedEdges.get(leftCell)).ifPresent(leftEdges::addAll);
             }
 
-            Edge leftEdge = getClosestEdge(leftEdges, perpendicular, prevEdges, chainEdge, chainPoint);
+            Edge leftEdge = getClosestEdge(leftEdges, perpendicular, currentEdges, chainEdge, chainPoint);
             if (leftEdge != null) {
                 leftPoint = getPointOfIntersection(perpendicular, new Line(leftEdge));
                 assert leftPoint != null;
@@ -383,7 +383,7 @@ public class Main extends Application {
                 Optional.ofNullable(excludedEdges.get(rightCell)).ifPresent(rightEdges::addAll);
             }
 
-            Edge rightEdge = getClosestEdge(rightEdges, perpendicular, prevEdges, chainEdge, chainPoint);
+            Edge rightEdge = getClosestEdge(rightEdges, perpendicular, currentEdges, chainEdge, chainPoint);
             if (rightEdge != null) {
                 rightPoint = getPointOfIntersection(perpendicular, new Line(rightEdge));
                 assert rightPoint != null;
@@ -393,7 +393,7 @@ public class Main extends Application {
             System.out.println(rightEdge);
             System.out.println(leftEdge);
 
-            prevEdges.clear();
+            currentEdges.clear();
 
             if (rightEdge == null && leftEdge == null) {
                 throw new RuntimeException("couldn't find the closest edge");
@@ -512,8 +512,8 @@ public class Main extends Application {
                     chainPoint = leftPoint;
                 }
 
-                prevEdges.add(leftEdge);
-                prevEdges.add(rightEdge);
+                currentEdges.add(leftEdge);
+                currentEdges.add(rightEdge);
             } else if (leftEdge != null && (rightEdge == null || leftDistance < rightDistance)) {
                 Edge leftTwinEdge = leftEdge.getTwin();
                 Edge nextLeftEdge;
@@ -564,7 +564,7 @@ public class Main extends Application {
                 upperCommonSupport.setA(leftTwinEdge.getCell().getCenter());
                 chainPoint = leftPoint;
                 chainEdge = nextLeftEdge;
-                prevEdges.add(leftEdge);
+                currentEdges.add(leftEdge);
             } else if (leftEdge == null || leftDistance > rightDistance) {
                 Edge rightTwinEdge = rightEdge.getTwin();
                 Edge nextLeftEdge;
@@ -616,7 +616,7 @@ public class Main extends Application {
                 upperCommonSupport.setB(rightTwinEdge.getCell().getCenter());
                 chainPoint = rightPoint;
                 chainEdge = nextRightEdge;
-                prevEdges.add(rightEdge);
+                currentEdges.add(rightEdge);
             }
         }
 
@@ -852,7 +852,7 @@ public class Main extends Application {
         }
     }
 
-    private Edge getClosestEdge(List<Edge> edges, Line perpendicular, List<Edge> prevEdges, Edge chainEdge, Point chainPoint) {
+    private Edge getClosestEdge(List<Edge> edges, Line perpendicular, List<Edge> currentEdges, Edge chainEdge, Point chainPoint) {
         if (edges == null || edges.isEmpty()) {
             return null;
         }
@@ -862,9 +862,9 @@ public class Main extends Application {
         for (Edge edge : edges) {
             Edge nextEdge = edge;
             do {
-                if ((chainEdge == null || !chainEdge.equals(nextEdge)) && (prevEdges == null || !prevEdges.contains(nextEdge))) {
+                if ((chainEdge == null || !chainEdge.equals(nextEdge)) && (currentEdges == null || !currentEdges.contains(nextEdge))) {
                     Point intersectPoint = getPointOfIntersection(perpendicular, new Line(nextEdge));
-                    if (intersectPoint != null && prevEdges.stream().allMatch(e -> isOutsideCell(e, chainEdge, intersectPoint))) {
+                    if (intersectPoint != null && currentEdges.stream().allMatch(e -> isOutsideCell(e, chainEdge, intersectPoint))) {
                         double currentDistance = VectorUtils.getLength(intersectPoint, chainPoint);
                         if (distance == 0 || currentDistance < distance) {
                             distance = currentDistance;
@@ -877,9 +877,9 @@ public class Main extends Application {
 
             Edge prevEdge = edge;
             do {
-                if ((chainEdge == null || !chainEdge.equals(prevEdge)) && (prevEdges == null || !prevEdges.contains(prevEdge))) {
+                if ((chainEdge == null || !chainEdge.equals(prevEdge)) && (currentEdges == null || !currentEdges.contains(prevEdge))) {
                     Point intersectPoint = getPointOfIntersection(perpendicular, new Line(prevEdge));
-                    if (intersectPoint != null && prevEdges.stream().allMatch(e -> isOutsideCell(e, chainEdge, intersectPoint))) {
+                    if (intersectPoint != null && currentEdges.stream().allMatch(e -> isOutsideCell(e, chainEdge, intersectPoint))) {
                         double currentDistance = VectorUtils.getLength(intersectPoint, chainPoint);
                         if (distance == 0 || currentDistance < distance) {
                             distance = currentDistance;

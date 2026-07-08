@@ -175,17 +175,17 @@ public class EdgeUtils {
         return false;
     }
 
-    public static boolean isOutsideCell(Edge edge, Edge chainEdge, Point chainPoint) {
-        if (edge == null || chainEdge == null) {
+    public static boolean isOutsideCell(Edge currentEdge, Edge chainEdge, Point chainPoint) {
+        if (currentEdge == null || chainEdge == null) {
             return true;
         }
 
-        Point vertex = edge.getCommonVertex(chainEdge);
+        Point vertex = currentEdge.getCommonVertex(chainEdge);
         if (vertex == null) {
             return false;
         }
 
-        return !isPointInsideAngle(EdgeUtils.getOtherPoint(edge, vertex), vertex, EdgeUtils.getOtherPoint(chainEdge, vertex), chainPoint);
+        return !isPointInsideAngle(EdgeUtils.getOtherPoint(currentEdge, vertex), vertex, EdgeUtils.getOtherPoint(chainEdge, vertex), chainPoint);
     }
 
     public static boolean isPointInsideAngle(Point currentPoint, Point vertex, Point chainPoint, Point point) {
