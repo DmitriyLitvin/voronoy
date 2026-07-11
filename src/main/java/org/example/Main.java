@@ -35,7 +35,7 @@ public class Main extends Application {
     private final Map<Cell, Edge> idleEdges = new HashMap<>();
 
     public void start(Stage stage) {
-        final Set<Point> points = new LinkedHashSet<>();
+        final List<Point> points = new LinkedList<>();
 
         borderPane.setCenter(pane);
 
@@ -45,20 +45,23 @@ public class Main extends Application {
         borderPane.setBottom(button);
         pane.getChildren().add(button);
 
-//        points.add(new Point(350.0, 500.0));
-//        points.add(new Point(450.0, 500.0));
-//        points.add(new Point(500.0, 350.0));
-//        points.add(new Point(500.0, 450.0));
-//        points.add(new Point(500.0, 550.0));
-//        points.add(new Point(500.0, 650.0));
-//        points.add(new Point(550.0, 500.0));
-//        points.add(new Point(650.0, 500.0));
+//        Random random = new Random();
+//
+//        int count = 500; // Кількість точок, яку потрібно згенерувати
+//
+//        for (int i = 0; i < count; i++) {
+//            // random.nextInt(max - min + 1) + min
+//            int x = random.nextInt(1000 - 20 + 1) + 20;
+//            int y = random.nextInt(1000- 20 + 1) + 20;
+//
+//            points.add(new Point(x, y));
+//        }
 
         points.forEach(p -> {
             Circle circle = new Circle(p.getX(), p.getY(), 2, Color.RED);
             Label label = new Label(+circle.getCenterX() + ", " + circle.getCenterY());
             label.relocate(circle.getCenterX(), circle.getCenterY());
-            pane.getChildren().addAll(label, circle);
+            pane.getChildren().addAll(circle);
         });
 
         int width = 1500;
@@ -89,60 +92,98 @@ public class Main extends Application {
         stage.show();
     }
 
-    public void drawVoronoyDiagram(Set<Point> polygon) {
-        System.out.println("Start drawing ");
+    public void drawVoronoyDiagram(List<Point> polygon) {
+        for (int i = 0; i < polygon.size(); i++) {
+            Point p = polygon.get(i);
+            // Сдвиг зависит от индекса точки и гарантированно уникален
+            p.setY(p.getY() + i * 1e-8);
+        }
 
-        List<Cell> cells = new ArrayList<>(buildVoronoyDiagram(polygon.stream().sorted(Comparator.comparingDouble(Point::getX).thenComparingDouble(Point::getY)).toList()).values());
+        polygon.sort((p1, p2) -> p1.getX() != p2.getX() ? Double.compare(p1.getX(), p2.getX()) : Double.compare(p1.getY(), p2.getY()));
 
-        Timeline timeline = new Timeline();
-        timeline.setCycleCount(cells.size());
-
-        final int[] index = {0};
-
-        timeline.getKeyFrames().add(new KeyFrame(Duration.seconds(2), event -> {
-            pane.getChildren().removeIf(node -> node instanceof javafx.scene.shape.Line);
-
-            Cell cell = cells.get(index[0]++);
+        buildVoronoyDiagram(polygon.stream().toList()).values().forEach(cell -> {
             Edge boundary = cell.getBoundary();
-
-            Edge edge = boundary;
-            if (edge != null) {
+            Edge nextEdge = cell.getBoundary();
+            if (nextEdge != null) {
                 do {
-                    Point p1 = edge.getPoint();
-                    Point p2 = edge.getTwin().getPoint();
-
-                    javafx.scene.shape.Line line = new javafx.scene.shape.Line(p1.getX(), p1.getY(), p2.getX(), p2.getY());
-
+                    Point startPoint = nextEdge.getPoint();
+                    Point endPoint = nextEdge.getTwin().getPoint();
+                    javafx.scene.shape.Line line = new javafx.scene.shape.Line(startPoint.getX(), startPoint.getY(), endPoint.getX(), endPoint.getY());
                     line.setStroke(Color.BLUE);
                     line.setStrokeWidth(1);
-
                     pane.getChildren().add(line);
-
-                    edge = edge.getNext();
-
-                } while (edge != null && !boundary.equals(edge));
-
-                edge = boundary;
-                do {
-                    Point p1 = edge.getPoint();
-                    Point p2 = edge.getTwin().getPoint();
-
-                    javafx.scene.shape.Line line = new javafx.scene.shape.Line(p1.getX(), p1.getY(), p2.getX(), p2.getY());
-
-                    line.setStroke(Color.BLUE);
-                    line.setStrokeWidth(1);
-
-                    pane.getChildren().add(line);
-
-                    edge = edge.getPrev();
-
-                } while (edge != null && !boundary.equals(edge));
-            } else {
-                System.out.println(cell.getCenter());
+                    nextEdge = nextEdge.getNext();
+                } while (nextEdge != null && !Objects.equals(boundary, nextEdge));
             }
-        }));
 
-        timeline.play();
+            Edge prevEdge = cell.getBoundary();
+            if (prevEdge != null) {
+                do {
+                    Point startPoint = prevEdge.getPoint();
+                    Point endPoint = prevEdge.getTwin().getPoint();
+                    javafx.scene.shape.Line line = new javafx.scene.shape.Line(startPoint.getX(), startPoint.getY(), endPoint.getX(), endPoint.getY());
+                    line.setStroke(Color.BLUE);
+                    line.setStrokeWidth(1);
+                    pane.getChildren().add(line);
+                    prevEdge = prevEdge.getPrev();
+                } while (prevEdge != null && !Objects.equals(boundary, prevEdge));
+            }
+        });
+
+
+//        System.out.println("Start drawing ");
+//
+//        List<Cell> cells = new ArrayList<>(buildVoronoyDiagram(polygon.stream().sorted(Comparator.comparingDouble(Point::getX).thenComparingDouble(Point::getY)).toList()).values());
+//
+//        Timeline timeline = new Timeline();
+//        timeline.setCycleCount(cells.size());
+//
+//        final int[] index = {0};
+//
+//        timeline.getKeyFrames().add(new KeyFrame(Duration.seconds(2), event -> {
+//            pane.getChildren().removeIf(node -> node instanceof javafx.scene.shape.Line);
+//
+//            Cell cell = cells.get(index[0]++);
+//            Edge boundary = cell.getBoundary();
+//
+//            Edge edge = boundary;
+//            if (edge != null) {
+//                do {
+//                    Point p1 = edge.getPoint();
+//                    Point p2 = edge.getTwin().getPoint();
+//
+//                    javafx.scene.shape.Line line = new javafx.scene.shape.Line(p1.getX(), p1.getY(), p2.getX(), p2.getY());
+//
+//                    line.setStroke(Color.BLUE);
+//                    line.setStrokeWidth(1);
+//
+//                    pane.getChildren().add(line);
+//
+//                    edge = edge.getNext();
+//
+//                } while (edge != null && !boundary.equals(edge));
+//
+//                edge = boundary;
+//                do {
+//                    Point p1 = edge.getPoint();
+//                    Point p2 = edge.getTwin().getPoint();
+//
+//                    javafx.scene.shape.Line line = new javafx.scene.shape.Line(p1.getX(), p1.getY(), p2.getX(), p2.getY());
+//
+//                    line.setStroke(Color.BLUE);
+//                    line.setStrokeWidth(1);
+//
+//                    pane.getChildren().add(line);
+//
+//                    edge = edge.getPrev();
+//
+//                } while (edge != null && !boundary.equals(edge));
+//            } else {
+//                System.out.println(cell.getCenter());
+//            }
+//        }));
+//
+//        timeline.play();
 
         System.out.println("End drawing");
     }
@@ -336,8 +377,6 @@ public class Main extends Application {
 
         List<Edge> currentEdges = new ArrayList<>();
         while (!Objects.equals(upperCommonSupport, lowerCommonSupport)) {
-            System.out.println(upperCommonSupport);
-            System.out.println(lowerCommonSupport);
             Cell leftCell = leftDiagram.get(upperCommonSupport.getA());
             Cell rightCell = rightDiagram.get(upperCommonSupport.getB());
 
@@ -395,8 +434,9 @@ public class Main extends Application {
 
             currentEdges.clear();
 
+            System.out.println(leftDistance + " " + rightDistance + " " + (rightDistance - leftDistance));
             if (rightEdge == null && leftEdge == null) {
-                throw new RuntimeException("couldn't find the closest edge");
+                throw new RuntimeException("");
             } else if (rightEdge != null && leftEdge != null && abs(leftDistance - rightDistance) <= 0.01) {
                 leftEdges = new ArrayList<>();
                 Point leftVertex = getCommonVertex(leftEdge);
@@ -726,7 +766,6 @@ public class Main extends Application {
                 if (excludedEdges.get(cell) == null && idleEdges.get(cell) == null) {
                     cell.setBoundary(edge);
                 }
-
             } else if (isOnTheSameSide(cell.getCenter(), getOtherPoint(nextEdge, vertex), middlePoint)) {
                 EdgeUtils.eraseEdges(excludedEdges, nextEdge, vertex);
                 nextEdge.setInfinite(false);
@@ -740,7 +779,6 @@ public class Main extends Application {
                 if (excludedEdges.get(cell) == null && idleEdges.get(cell) == null) {
                     cell.setBoundary(edge);
                 }
-
             } else if (isOnTheSameSide(cell.getCenter(), getOtherPoint(prevEdge, vertex), middlePoint)) {
                 EdgeUtils.eraseEdges(excludedEdges, prevEdge, vertex);
                 prevEdge.setInfinite(false);
