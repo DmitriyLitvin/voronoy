@@ -10,12 +10,12 @@ public class LineUtils {
     private static final double WIDTH = 1000000;
 
 
-    public static Point getPointOfIntersection(Line perpendicular, Line line) {
-        Point p1 = perpendicular.getA();
-        Point p2 = perpendicular.getB();
+    public static Point getPointOfIntersection(Line line, Line online) {
+        Point p1 = line.getA();
+        Point p2 = line.getB();
 
-        Point p3 = line.getA();
-        Point p4 = line.getB();
+        Point p3 = online.getA();
+        Point p4 = online.getB();
 
         double d1 = p2.getX() - p1.getX();
         double d2 = p2.getY() - p1.getY();
@@ -24,9 +24,9 @@ public class LineUtils {
         double d4 = p4.getY() - p3.getY();
 
         if (d1 == 0) {
-            return new Point(p1.getX(), line.getY(p1.getX()));
+            return new Point(p1.getX(), online.getY(p1.getX()));
         } else if (d3 == 0) {
-            return new Point(p3.getX(), perpendicular.getY(p3.getX()));
+            return new Point(p3.getX(), line.getY(p3.getX()));
         }
 
         double s1 = d2 / d1;
@@ -37,7 +37,7 @@ public class LineUtils {
         }
 
         double x = (p3.getY() - p1.getY() + p1.getX() * s1 - p3.getX() * s2) / (s1 - s2);
-        return new Point(x, perpendicular.getY(x));
+        return new Point(x, line.getY(x));
     }
 
     public static Line getPerpendicular(Line line) {
