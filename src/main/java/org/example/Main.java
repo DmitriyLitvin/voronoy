@@ -94,17 +94,17 @@ public class Main extends Application {
     }
 
     public void drawVoronoyDiagram(List<Point> polygon) {
-        for (int i = 0; i < polygon.size(); i++) {
-            Point p = polygon.get(i);
-
-            long hash = Double.doubleToLongBits(p.getX() + p.getY() + i);
-            double noiseX = Math.sin(hash) * 1e-10; // 0.00000001% від величини координати
-            double noiseY = Math.cos(hash) * 1e-10;
-
-            // Зсув автоматично підлаштовується під масштаб числа
-            p.setX(p.getX() + p.getX() * noiseX);
-            p.setY(p.getY() + p.getY() * noiseY);
-        }
+//        for (int i = 0; i < polygon.size(); i++) {
+//            Point p = polygon.get(i);
+//
+//            long hash = Double.doubleToLongBits(p.getX() + p.getY() + i);
+//            double noiseX = Math.sin(hash) * 1e-10; // 0.00000001% від величини координати
+//            double noiseY = Math.cos(hash) * 1e-10;
+//
+//            // Зсув автоматично підлаштовується під масштаб числа
+//            p.setX(p.getX() + p.getX() * noiseX);
+//            p.setY(p.getY() + p.getY() * noiseY);
+//        }
 
 
         polygon.sort((p1, p2) -> p1.getX() != p2.getX() ? Double.compare(p1.getX(), p2.getX()) : Double.compare(p1.getY(), p2.getY()));
