@@ -48,22 +48,23 @@ public class Main extends Application {
 
         Random random = new Random();
 
-        int count = 1000; // Кількість точок, яку потрібно згенерувати
+        int count = 7000; // Кількість точок, яку потрібно згенерувати
 
 //        for (int i = 0; i < count; i++) {
 //            // random.nextInt(max - min + 1) + min
 //            int x = random.nextInt(1500 - 20 + 1) + 20;
-//            int y = random.nextInt(1500- 20 + 1) + 20;
+//            int y = random.nextInt(1500 - 20 + 1) + 20;
 //
 //            points.add(new Point(x, y));
+//            System.out.println(x + " " + y);
 //        }
 
-//        points.forEach(p -> {
-//            Circle circle = new Circle(p.getX(), p.getY(), 2, Color.RED);
-//            Label label = new Label(+circle.getCenterX() + ", " + circle.getCenterY());
-//            label.relocate(circle.getCenterX(), circle.getCenterY());
-//            pane.getChildren().addAll(circle);
-//        });
+        points.forEach(p -> {
+            Circle circle = new Circle(p.getX(), p.getY(), 2, Color.RED);
+            Label label = new Label(+circle.getCenterX() + ", " + circle.getCenterY());
+            label.relocate(circle.getCenterX(), circle.getCenterY());
+            pane.getChildren().addAll(circle);
+        });
 
         int width = 1500;
         int height = 1000;
@@ -99,8 +100,8 @@ public class Main extends Application {
             Point p = polygon.get(i);
 
             long hash = Double.doubleToLongBits(p.getX() + p.getY() + i);
-            double noiseX = Math.sin(hash) * 1e-4; // 0.00000001% від величини координати
-            double noiseY = Math.cos(hash) * 1e-4;
+            double noiseX = Math.sin(hash) * 1e-3; // 0.00000001% від величини координати
+            double noiseY = Math.cos(hash) * 1e-3;
 
             // Зсув автоматично підлаштовується під масштаб числа
             p.setX(p.getX() + p.getX() * noiseX);
@@ -109,7 +110,6 @@ public class Main extends Application {
 
 
         polygon.sort((p1, p2) -> p1.getX() != p2.getX() ? Double.compare(p1.getX(), p2.getX()) : Double.compare(p1.getY(), p2.getY()));
-
 
 
         System.out.println("Start drawing ");
@@ -408,6 +408,10 @@ public class Main extends Application {
                 rightPoint = getPointOfIntersection(perpendicular, new Line(rightEdge));
                 assert rightPoint != null;
                 rightDistance = VectorUtils.getLength(rightPoint, chainPoint);
+            }
+
+            if (Math.abs(leftDistance - rightDistance) < 0.01) {
+                System.out.println("111111111111111111111111111111111111111111");
             }
 
 
@@ -758,6 +762,10 @@ public class Main extends Application {
         }
     }
 
+    private boolean isCorrectDirection(Point chainPoint, Point intersectPoint, Line perpendicular) {
+        return crossProduct(VectorUtils.geDirection(chainPoint, intersectPoint), VectorUtils.geDirection(perpendicular.getA(), perpendicular.getB())) > 0;
+    }
+
     private Edge getClosestEdge(List<Edge> edges, Line perpendicular, Edge currenEdge, Edge chainEdge, Point chainPoint) {
         if (edges == null || edges.isEmpty()) {
             return null;
@@ -772,7 +780,7 @@ public class Main extends Application {
                     Point intersectPoint = getPointOfIntersection(perpendicular, new Line(nextEdge));
                     if (isIntersected(intersectPoint, nextEdge) && isOutsideCell(currenEdge, chainEdge, intersectPoint)) {
                         double currentDistance = VectorUtils.getLength(intersectPoint, chainPoint);
-                        if (distance == 0 || currentDistance < distance) {
+                        if (distance == 0 || currentDistance < distance && isCorrectDirection(chainPoint, intersectPoint, perpendicular)) {
                             distance = currentDistance;
                             intersectedEdge = nextEdge;
                         }
@@ -787,7 +795,7 @@ public class Main extends Application {
                     Point intersectPoint = getPointOfIntersection(perpendicular, new Line(prevEdge));
                     if (isIntersected(intersectPoint, prevEdge) && isOutsideCell(currenEdge, chainEdge, intersectPoint)) {
                         double currentDistance = VectorUtils.getLength(intersectPoint, chainPoint);
-                        if (distance == 0 || currentDistance < distance) {
+                        if (distance == 0 || currentDistance < distance && isCorrectDirection(chainPoint, intersectPoint, perpendicular)) {
                             distance = currentDistance;
                             intersectedEdge = prevEdge;
                         }

@@ -194,9 +194,9 @@ public class EdgeUtils {
         }
 
         if (crossProduct(VectorUtils.geDirection(vertex, currentPoint), VectorUtils.geDirection(vertex, chainPoint)) > 0) {
-            return crossProduct(VectorUtils.geDirection(vertex, currentPoint), VectorUtils.geDirection(vertex, point)) > 0 && crossProduct(VectorUtils.geDirection(vertex, point), VectorUtils.geDirection(vertex, chainPoint)) > 0;
+            return crossProduct(VectorUtils.geDirection(vertex, currentPoint), VectorUtils.geDirection(vertex, point)) >= 0 && crossProduct(VectorUtils.geDirection(vertex, point), VectorUtils.geDirection(vertex, chainPoint)) >= 0;
         } else {
-            return crossProduct(VectorUtils.geDirection(vertex, currentPoint), VectorUtils.geDirection(vertex, point)) < 0 && crossProduct(VectorUtils.geDirection(vertex, point), VectorUtils.geDirection(vertex, chainPoint)) < 0;
+            return crossProduct(VectorUtils.geDirection(vertex, currentPoint), VectorUtils.geDirection(vertex, point)) <= 0 && crossProduct(VectorUtils.geDirection(vertex, point), VectorUtils.geDirection(vertex, chainPoint)) <= 0;
         }
     }
 }
