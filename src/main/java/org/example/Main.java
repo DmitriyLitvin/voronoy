@@ -94,6 +94,7 @@ public class Main extends Application {
     }
 
     public void drawVoronoyDiagram(List<Point> polygon) {
+        //symbolic perturbations - temporary solution
         for (int i = 0; i < polygon.size(); i++) {
             Point p = polygon.get(i);
 
@@ -642,47 +643,47 @@ public class Main extends Application {
         return diagram;
     }
 
-    private List<Edge> getRightEdges(Edge rightEdge, Line upperCommonSupport) {
-        List<Edge> rightEdges = new ArrayList<>();
-        Edge currentEdge = rightEdge;
-        do {
-            Edge nextRightEdge = currentEdge.getNext();
-            if (nextRightEdge == null) {
-                nextRightEdge = currentEdge;
-            }
-            rightEdges.add(nextRightEdge);
-
-            Edge rightTwinEdge = nextRightEdge.getTwin();
-            rightEdges.add(rightTwinEdge);
-            currentEdge = rightTwinEdge;
-            if (!Objects.equals(currentEdge, rightEdge)) {
-                upperCommonSupport.setB(nextRightEdge.getCell().getCenter());
-            }
-        } while (!Objects.equals(currentEdge, rightEdge));
-
-        return rightEdges;
-    }
-
-    private List<Edge> getLeftEdges(Edge leftEdge, Line upperCommonSupport) {
-        List<Edge> leftEdges = new ArrayList<>();
-        Edge currentEdge = leftEdge;
-        do {
-            Edge nextLeftEdge = currentEdge.getNext();
-            if (nextLeftEdge == null) {
-                nextLeftEdge = currentEdge;
-            }
-            leftEdges.add(nextLeftEdge);
-
-            Edge leftTwinEdge = nextLeftEdge.getTwin();
-            leftEdges.add(leftTwinEdge);
-            currentEdge = leftTwinEdge;
-            if (!Objects.equals(currentEdge, leftEdge)) {
-                upperCommonSupport.setA(nextLeftEdge.getCell().getCenter());
-            }
-        } while (!Objects.equals(currentEdge, leftEdge));
-
-        return leftEdges;
-    }
+//    private List<Edge> getRightEdges(Edge rightEdge, Line upperCommonSupport) {
+//        List<Edge> rightEdges = new ArrayList<>();
+//        Edge currentEdge = rightEdge;
+//        do {
+//            Edge nextRightEdge = currentEdge.getNext();
+//            if (nextRightEdge == null) {
+//                nextRightEdge = currentEdge;
+//            }
+//            rightEdges.add(nextRightEdge);
+//
+//            Edge rightTwinEdge = nextRightEdge.getTwin();
+//            rightEdges.add(rightTwinEdge);
+//            currentEdge = rightTwinEdge;
+//            if (!Objects.equals(currentEdge, rightEdge)) {
+//                upperCommonSupport.setB(nextRightEdge.getCell().getCenter());
+//            }
+//        } while (!Objects.equals(currentEdge, rightEdge));
+//
+//        return rightEdges;
+//    }
+//
+//    private List<Edge> getLeftEdges(Edge leftEdge, Line upperCommonSupport) {
+//        List<Edge> leftEdges = new ArrayList<>();
+//        Edge currentEdge = leftEdge;
+//        do {
+//            Edge nextLeftEdge = currentEdge.getNext();
+//            if (nextLeftEdge == null) {
+//                nextLeftEdge = currentEdge;
+//            }
+//            leftEdges.add(nextLeftEdge);
+//
+//            Edge leftTwinEdge = nextLeftEdge.getTwin();
+//            leftEdges.add(leftTwinEdge);
+//            currentEdge = leftTwinEdge;
+//            if (!Objects.equals(currentEdge, leftEdge)) {
+//                upperCommonSupport.setA(nextLeftEdge.getCell().getCenter());
+//            }
+//        } while (!Objects.equals(currentEdge, leftEdge));
+//
+//        return leftEdges;
+//    }
 
     private void eraseEdges(Edge edge, Point middlePoint, Map<Cell, List<Edge>> excludedEdges, Point point) {
         Cell cell = edge.getCell();
