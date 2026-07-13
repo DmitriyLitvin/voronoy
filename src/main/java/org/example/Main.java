@@ -110,89 +110,61 @@ public class Main extends Application {
 
         polygon.sort((p1, p2) -> p1.getX() != p2.getX() ? Double.compare(p1.getX(), p2.getX()) : Double.compare(p1.getY(), p2.getY()));
 
-        buildVoronoyDiagram(polygon.stream().toList()).values().forEach(cell -> {
+
+
+        System.out.println("Start drawing ");
+
+        List<Cell> cells = new ArrayList<>(buildVoronoyDiagram(polygon.stream().sorted(Comparator.comparingDouble(Point::getX).thenComparingDouble(Point::getY)).toList()).values());
+
+        Timeline timeline = new Timeline();
+        timeline.setCycleCount(cells.size());
+
+        final int[] index = {0};
+
+        timeline.getKeyFrames().add(new KeyFrame(Duration.seconds(2), event -> {
+            pane.getChildren().removeIf(node -> node instanceof javafx.scene.shape.Line);
+
+            Cell cell = cells.get(index[0]++);
             Edge boundary = cell.getBoundary();
-            Edge nextEdge = cell.getBoundary();
-            if (nextEdge != null) {
+
+            Edge edge = boundary;
+            if (edge != null) {
                 do {
-                    Point startPoint = nextEdge.getPoint();
-                    Point endPoint = nextEdge.getTwin().getPoint();
-                    javafx.scene.shape.Line line = new javafx.scene.shape.Line(startPoint.getX(), startPoint.getY(), endPoint.getX(), endPoint.getY());
+                    Point p1 = edge.getPoint();
+                    Point p2 = edge.getTwin().getPoint();
+
+                    javafx.scene.shape.Line line = new javafx.scene.shape.Line(p1.getX(), p1.getY(), p2.getX(), p2.getY());
+
                     line.setStroke(Color.BLUE);
                     line.setStrokeWidth(1);
-                    pane.getChildren().add(line);
-                    nextEdge = nextEdge.getNext();
-                } while (nextEdge != null && !Objects.equals(boundary, nextEdge));
-            }
 
-            Edge prevEdge = cell.getBoundary();
-            if (prevEdge != null) {
+                    pane.getChildren().add(line);
+
+                    edge = edge.getNext();
+
+                } while (edge != null && !boundary.equals(edge));
+
+                edge = boundary;
                 do {
-                    Point startPoint = prevEdge.getPoint();
-                    Point endPoint = prevEdge.getTwin().getPoint();
-                    javafx.scene.shape.Line line = new javafx.scene.shape.Line(startPoint.getX(), startPoint.getY(), endPoint.getX(), endPoint.getY());
+                    Point p1 = edge.getPoint();
+                    Point p2 = edge.getTwin().getPoint();
+
+                    javafx.scene.shape.Line line = new javafx.scene.shape.Line(p1.getX(), p1.getY(), p2.getX(), p2.getY());
+
                     line.setStroke(Color.BLUE);
                     line.setStrokeWidth(1);
+
                     pane.getChildren().add(line);
-                    prevEdge = prevEdge.getPrev();
-                } while (prevEdge != null && !Objects.equals(boundary, prevEdge));
+
+                    edge = edge.getPrev();
+
+                } while (edge != null && !boundary.equals(edge));
+            } else {
+                System.out.println(cell.getCenter());
             }
-        });
+        }));
 
-
-//        System.out.println("Start drawing ");
-//
-//        List<Cell> cells = new ArrayList<>(buildVoronoyDiagram(polygon.stream().sorted(Comparator.comparingDouble(Point::getX).thenComparingDouble(Point::getY)).toList()).values());
-//
-//        Timeline timeline = new Timeline();
-//        timeline.setCycleCount(cells.size());
-//
-//        final int[] index = {0};
-//
-//        timeline.getKeyFrames().add(new KeyFrame(Duration.seconds(2), event -> {
-//            pane.getChildren().removeIf(node -> node instanceof javafx.scene.shape.Line);
-//
-//            Cell cell = cells.get(index[0]++);
-//            Edge boundary = cell.getBoundary();
-//
-//            Edge edge = boundary;
-//            if (edge != null) {
-//                do {
-//                    Point p1 = edge.getPoint();
-//                    Point p2 = edge.getTwin().getPoint();
-//
-//                    javafx.scene.shape.Line line = new javafx.scene.shape.Line(p1.getX(), p1.getY(), p2.getX(), p2.getY());
-//
-//                    line.setStroke(Color.BLUE);
-//                    line.setStrokeWidth(1);
-//
-//                    pane.getChildren().add(line);
-//
-//                    edge = edge.getNext();
-//
-//                } while (edge != null && !boundary.equals(edge));
-//
-//                edge = boundary;
-//                do {
-//                    Point p1 = edge.getPoint();
-//                    Point p2 = edge.getTwin().getPoint();
-//
-//                    javafx.scene.shape.Line line = new javafx.scene.shape.Line(p1.getX(), p1.getY(), p2.getX(), p2.getY());
-//
-//                    line.setStroke(Color.BLUE);
-//                    line.setStrokeWidth(1);
-//
-//                    pane.getChildren().add(line);
-//
-//                    edge = edge.getPrev();
-//
-//                } while (edge != null && !boundary.equals(edge));
-//            } else {
-//                System.out.println(cell.getCenter());
-//            }
-//        }));
-//
-//        timeline.play();
+        timeline.play();
 
         System.out.println("End drawing");
     }
