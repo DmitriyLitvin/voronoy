@@ -52,18 +52,18 @@ public class Main extends Application {
 
 //        for (int i = 0; i < count; i++) {
 //            // random.nextInt(max - min + 1) + min
-//            int x = random.nextInt(1000 - 20 + 1) + 20;
-//            int y = random.nextInt(1000- 20 + 1) + 20;
+//            int x = random.nextInt(1500 - 20 + 1) + 20;
+//            int y = random.nextInt(1500- 20 + 1) + 20;
 //
 //            points.add(new Point(x, y));
 //        }
 
-        points.forEach(p -> {
-            Circle circle = new Circle(p.getX(), p.getY(), 2, Color.RED);
-            Label label = new Label(+circle.getCenterX() + ", " + circle.getCenterY());
-            label.relocate(circle.getCenterX(), circle.getCenterY());
-            pane.getChildren().addAll(circle);
-        });
+//        points.forEach(p -> {
+//            Circle circle = new Circle(p.getX(), p.getY(), 2, Color.RED);
+//            Label label = new Label(+circle.getCenterX() + ", " + circle.getCenterY());
+//            label.relocate(circle.getCenterX(), circle.getCenterY());
+//            pane.getChildren().addAll(circle);
+//        });
 
         int width = 1500;
         int height = 1000;
@@ -94,17 +94,17 @@ public class Main extends Application {
     }
 
     public void drawVoronoyDiagram(List<Point> polygon) {
-//        for (int i = 0; i < polygon.size(); i++) {
-//            Point p = polygon.get(i);
-//
-//            long hash = Double.doubleToLongBits(p.getX() + p.getY() + i);
-//            double noiseX = Math.sin(hash) * 1e-10; // 0.00000001% від величини координати
-//            double noiseY = Math.cos(hash) * 1e-10;
-//
-//            // Зсув автоматично підлаштовується під масштаб числа
-//            p.setX(p.getX() + p.getX() * noiseX);
-//            p.setY(p.getY() + p.getY() * noiseY);
-//        }
+        for (int i = 0; i < polygon.size(); i++) {
+            Point p = polygon.get(i);
+
+            long hash = Double.doubleToLongBits(p.getX() + p.getY() + i);
+            double noiseX = Math.sin(hash) * 1e-4; // 0.00000001% від величини координати
+            double noiseY = Math.cos(hash) * 1e-4;
+
+            // Зсув автоматично підлаштовується під масштаб числа
+            p.setX(p.getX() + p.getX() * noiseX);
+            p.setY(p.getY() + p.getY() * noiseY);
+        }
 
 
         polygon.sort((p1, p2) -> p1.getX() != p2.getX() ? Double.compare(p1.getX(), p2.getX()) : Double.compare(p1.getY(), p2.getY()));
@@ -440,8 +440,6 @@ public class Main extends Application {
 
             if (rightEdge == null && leftEdge == null) {
                 throw new RuntimeException("edges are not intersected");
-            } else if (rightEdge != null && leftEdge != null && abs(leftDistance - rightDistance) <= 0.001) {
-                throw new RuntimeException("distances are equals");
             } else if (leftEdge != null && (rightEdge == null || leftDistance < rightDistance)) {
                 Edge leftTwinEdge = leftEdge.getTwin();
                 Edge nextLeftEdge;
