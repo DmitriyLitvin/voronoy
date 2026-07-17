@@ -48,16 +48,18 @@ public class Main extends Application {
 
         Random random = new Random();
 
-        int count = 7000; // Кількість точок, яку потрібно згенерувати
+        int count = 50; // Кількість точок, яку потрібно згенерувати
 
-//        for (int i = 0; i < count; i++) {
-//            // random.nextInt(max - min + 1) + min
-//            int x = random.nextInt(1500 - 20 + 1) + 20;
-//            int y = random.nextInt(1500 - 20 + 1) + 20;
-//
-//            points.add(new Point(x, y));
-//            System.out.println(x + " " + y);
-//        }
+        points.add(new Point(66, 29));
+        points.add(new Point(68, 47));
+        points.add(new Point(70, 62));
+        points.add(new Point(73, 57));
+        points.add(new Point(75, 47));
+        points.add(new Point(80, 54));
+        points.add(new Point(80, 91));
+        points.add(new Point(81, 49));
+        points.add(new Point(81, 95));  // видаліть цей рядок (дублікат)
+        points.add(new Point(84, 53));
 
         points.forEach(p -> {
             Circle circle = new Circle(p.getX(), p.getY(), 2, Color.RED);
@@ -65,6 +67,7 @@ public class Main extends Application {
             label.relocate(circle.getCenterX(), circle.getCenterY());
             pane.getChildren().addAll(circle);
         });
+
 
         int width = 1500;
         int height = 1000;
@@ -95,18 +98,6 @@ public class Main extends Application {
     }
 
     public void drawVoronoyDiagram(List<Point> polygon) {
-        //symbolic perturbations - temporary solution
-        for (int i = 0; i < polygon.size(); i++) {
-            Point p = polygon.get(i);
-
-            long hash = Double.doubleToLongBits(p.getX() + p.getY() + i);
-            double noiseX = Math.sin(hash) * 1e-3; // 0.00000001% від величини координати
-            double noiseY = Math.cos(hash) * 1e-3;
-
-            // Зсув автоматично підлаштовується під масштаб числа
-            p.setX(p.getX() + p.getX() * noiseX);
-            p.setY(p.getY() + p.getY() * noiseY);
-        }
 
 
         polygon.sort((p1, p2) -> p1.getX() != p2.getX() ? Double.compare(p1.getX(), p2.getX()) : Double.compare(p1.getY(), p2.getY()));
@@ -292,26 +283,6 @@ public class Main extends Application {
         return joinDiagrams(buildVoronoyDiagram(polygon.subList(0, polygon.size() / 2)), buildVoronoyDiagram(polygon.subList(polygon.size() / 2, polygon.size())));
     }
 
-    private Point getCommonVertex(Edge edge) {
-        Edge nextEdge = edge.getNext();
-        if (nextEdge != null) {
-            Point vertex = edge.getCommonVertex(nextEdge);
-            if (vertex != null) {
-                return vertex;
-            }
-        }
-
-        Edge prevEdge = edge.getPrev();
-        if (prevEdge != null) {
-            Point vertex = edge.getCommonVertex(prevEdge);
-            if (vertex != null) {
-                return vertex;
-            }
-        }
-
-        return null;
-    }
-
     private Map<Point, Cell> joinDiagrams(Map<Point, Cell> leftDiagram, Map<Point, Cell> rightDiagram) {
         Set<Point> leftPolygon = buildConvexHull(new ArrayList<>(leftDiagram.keySet()));
         Set<Point> rightPolygon = buildConvexHull(new ArrayList<>(rightDiagram.keySet()));
@@ -358,6 +329,7 @@ public class Main extends Application {
 
         Edge currentEdge = null;
         while (!Objects.equals(upperCommonSupport, lowerCommonSupport)) {
+            System.out.println("11111111111111111111111111111111111111111111111111111111111111111");
             Cell leftCell = leftDiagram.get(upperCommonSupport.getA());
             Cell rightCell = rightDiagram.get(upperCommonSupport.getB());
 
@@ -410,13 +382,11 @@ public class Main extends Application {
                 rightDistance = VectorUtils.getLength(rightPoint, chainPoint);
             }
 
-            if (Math.abs(leftDistance - rightDistance) < 0.01) {
-                System.out.println("111111111111111111111111111111111111111111");
-            }
-
 
             if (rightEdge == null && leftEdge == null) {
                 throw new RuntimeException("edges are not intersected");
+            } else if (leftDistance - rightDistance == 0) {
+                throw new RuntimeException("distances are equal:"  + rightDistance + " " + leftDistance);
             } else if (leftEdge != null && (rightEdge == null || leftDistance < rightDistance)) {
                 Edge leftTwinEdge = leftEdge.getTwin();
                 Edge nextLeftEdge;
@@ -762,10 +732,6 @@ public class Main extends Application {
         }
     }
 
-    private boolean isCorrectDirection(Point chainPoint, Point intersectPoint, Line perpendicular) {
-        return crossProduct(VectorUtils.geDirection(chainPoint, intersectPoint), VectorUtils.geDirection(perpendicular.getA(), perpendicular.getB())) > 0;
-    }
-
     private Edge getClosestEdge(List<Edge> edges, Line perpendicular, Edge currenEdge, Edge chainEdge, Point chainPoint) {
         if (edges == null || edges.isEmpty()) {
             return null;
@@ -778,9 +744,9 @@ public class Main extends Application {
             do {
                 if ((chainEdge == null || !chainEdge.equals(nextEdge)) && (currenEdge == null || !currenEdge.equals(nextEdge))) {
                     Point intersectPoint = getPointOfIntersection(perpendicular, new Line(nextEdge));
-                    if (isIntersected(intersectPoint, nextEdge) && isOutsideCell(currenEdge, chainEdge, intersectPoint)) {
+                    if (intersectPoint != null && isIntersected(intersectPoint, nextEdge) && isOutsideCell(currenEdge, chainEdge, intersectPoint)) {
                         double currentDistance = VectorUtils.getLength(intersectPoint, chainPoint);
-                        if (distance == 0 || currentDistance < distance && isCorrectDirection(chainPoint, intersectPoint, perpendicular)) {
+                        if (distance == 0 || currentDistance < distance) {  // ВИДАЛІТЬ isCorrectDirection
                             distance = currentDistance;
                             intersectedEdge = nextEdge;
                         }
@@ -793,9 +759,9 @@ public class Main extends Application {
             do {
                 if ((chainEdge == null || !chainEdge.equals(prevEdge)) && (currenEdge == null || !currenEdge.equals(prevEdge))) {
                     Point intersectPoint = getPointOfIntersection(perpendicular, new Line(prevEdge));
-                    if (isIntersected(intersectPoint, prevEdge) && isOutsideCell(currenEdge, chainEdge, intersectPoint)) {
+                    if (intersectPoint != null && isIntersected(intersectPoint, prevEdge) && isOutsideCell(currenEdge, chainEdge, intersectPoint)) {
                         double currentDistance = VectorUtils.getLength(intersectPoint, chainPoint);
-                        if (distance == 0 || currentDistance < distance && isCorrectDirection(chainPoint, intersectPoint, perpendicular)) {
+                        if (distance == 0 || currentDistance < distance) {  // ВИДАЛІТЬ isCorrectDirection
                             distance = currentDistance;
                             intersectedEdge = prevEdge;
                         }
@@ -807,6 +773,7 @@ public class Main extends Application {
 
         return intersectedEdge;
     }
+
 
     public static void main(String[] args) {
         launch(args);

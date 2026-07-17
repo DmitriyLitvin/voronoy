@@ -189,9 +189,6 @@ public class EdgeUtils {
     }
 
     public static boolean isPointInsideAngle(Point currentPoint, Point vertex, Point chainPoint, Point point) {
-        if (vertex == null) {
-            return false;
-        }
 
         if (crossProduct(VectorUtils.geDirection(vertex, currentPoint), VectorUtils.geDirection(vertex, chainPoint)) > 0) {
             return crossProduct(VectorUtils.geDirection(vertex, currentPoint), VectorUtils.geDirection(vertex, point)) >= 0 && crossProduct(VectorUtils.geDirection(vertex, point), VectorUtils.geDirection(vertex, chainPoint)) >= 0;
