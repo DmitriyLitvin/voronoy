@@ -29,30 +29,34 @@ public class LineUtils {
         double determinant = a1 * b2 - a2 * b1;
 
         // Если определитель равен 0, линии параллельны или совпадают
-        if (Math.abs(determinant) < 1e-9) {
+        if (Math.abs(determinant) < 1e-7) {
+            System.out.println(determinant);
             return null;
         }
-
-        // Находим координаты X и Y по правилу Крамера
-        double x = (b2 * c1 - b1 * c2) / determinant;
-        double y = (a1 * c2 - a2 * c1) / determinant;
-
-        return new Point(x, y);
+        return new Point((b2 * c1 - b1 * c2) / determinant, (a1 * c2 - a2 * c1) / determinant);
     }
+
 
     public static Line getPerpendicular(Line line) {
         Point middlePoint = line.getMidPoint();
-        double x = middlePoint.getX();
-        double y = middlePoint.getY();
-
         Point direction = VectorUtils.geDirection(line.getA(), line.getB());
-        if (VectorUtils.dotProduct(direction, new Point(1, 0)) == 0) {
-            return new Line(new Point(SCALE, y), new Point(-SCALE, y));
-        } else if (VectorUtils.dotProduct(direction, new Point(0, 1)) == 0) {
-            return new Line(new Point(x, -SCALE), new Point(x, SCALE));
-        } else {
-            return new Line(new Point(((y + SCALE) * direction.getY()) / direction.getX() + x, -SCALE), new Point((-(SCALE - y) * direction.getY()) / direction.getX() + x, SCALE));
+
+        double x = direction.getX();
+        double y = direction.getY();
+
+        double length = Math.sqrt(x * x + y * y);
+        if (length < 1.0) {
+            length = 1.0;
         }
+
+        double k = Math.floor(SCALE / length);
+        if (k == 0) {
+            k = 1;
+        }
+        x = x * k;
+        y = y * k;
+
+        return new Line(new Point( middlePoint.getX() + y,  middlePoint.getY() - x), new Point(middlePoint.getX() - y, middlePoint.getY() + x));
     }
 
     public static boolean is(Point point, Line line, boolean isUpper) {

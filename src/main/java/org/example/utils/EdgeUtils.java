@@ -119,24 +119,6 @@ public class EdgeUtils {
         return edge.getPrev() == null && edge.getNext() == null;
     }
 
-    public static boolean isIntersected(Point point, Edge edge) {
-        boolean isInfinite = edge.isInfinite();
-        boolean isTwinInfinite = edge.getTwin().isInfinite();
-        Point start = edge.getPoint();
-        Point end = edge.getTwin().getPoint();
-
-        if (point == null) {
-            return false;
-        } else if (isInfinite && isTwinInfinite) {
-            return true;
-        } else if (!isInfinite && !isTwinInfinite) {
-            return VectorUtils.dotProduct(VectorUtils.geDirection(point, start), VectorUtils.geDirection(point, end)) < 0;
-        } else if (isInfinite) {
-            return VectorUtils.dotProduct(VectorUtils.geDirection(point, end), VectorUtils.geDirection(start, end)) > 0 ;
-        }
-
-        return VectorUtils.dotProduct(VectorUtils.geDirection(point, start), VectorUtils.geDirection(end, start)) > 0;
-    }
 
     public static boolean isOnTheSameSide(Point center, Point edgePoint, Point middlePoint) {
         return VectorUtils.dotProduct(VectorUtils.geDirection(middlePoint, center), VectorUtils.geDirection(middlePoint, edgePoint)) >= 0;
