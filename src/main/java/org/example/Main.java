@@ -747,7 +747,7 @@ public class Main extends Application {
         return intersectedEdge;
     }
 
-    public static boolean isConnected(Cell cell, Edge edge) {
+    public  boolean isConnected(Cell cell, Edge edge) {
         Edge boundary = cell.getBoundary();
         Edge firstChainEdge = edge.getStart();
         Edge lastChainEdge = edge.getLast();
