@@ -14,10 +14,6 @@ public class VectorUtils {
         return a.getX() * b.getY() - a.getY() * b.getX();
     }
 
-    public static double dotProduct(Point a, Point b) {
-        return a.getX() * b.getX() + a.getY() * b.getY();
-    }
-
     public static Point geDirection(Point a, Point b) {
         return new Point(b.getX() - a.getX(), b.getY() - a.getY());
     }

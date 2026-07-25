@@ -1,5 +1,6 @@
 package org.example.utils;
 
+import org.example.entity.Edge;
 import org.example.entity.Line;
 import org.example.entity.Point;
 
@@ -9,33 +10,28 @@ public class LineUtils {
     private static final  double SCALE = 1000000;
 
 
-    public static Point getPointOfIntersection(Line line, Line other) {
-        Point p1 = line.getA();
-        Point p2 = line.getB();
-        Point p3 = other.getA();
-        Point p4 = other.getB();
+    public static Point getPointOfIntersection(Line commonSupport, Edge currentEdge) {
+        Point p1 = commonSupport.getA();
+        Point p2 = commonSupport.getB();
+        Point p3 = currentEdge.getCell().getCenter();
+        Point p4 = currentEdge.getTwin().getCell().getCenter();
 
-        // Коэффициенты первой линии: A1*x + B1*y = C1
-        double a1 = p2.getY() - p1.getY();
-        double b1 = p1.getX() - p2.getX();
-        double c1 = a1 * p1.getX() + b1 * p1.getY();
+        double a1 = p2.getX() - p1.getX();
+        double b1 = p2.getY() - p1.getY();
+        double a2 = p4.getX() - p3.getX();
+        double b2 = p4.getY() - p3.getY();
 
-        // Коэффициенты второй линии: A2*x + B2*y = C2
-        double a2 = p4.getY() - p3.getY();
-        double b2 = p3.getX() - p4.getX();
-        double c2 = a2 * p3.getX() + b2 * p3.getY();
+        double c1 = a1 * (p1.getX() + p2.getX()) + b1 * (p1.getY() + p2.getY());
+        double c2 = a2 * (p3.getX() + p4.getX()) + b2 * (p3.getY() + p4.getY());
 
-        // Главный определитель матрицы (determinant)
         double determinant = a1 * b2 - a2 * b1;
-
-        // Если определитель равен 0, линии параллельны или совпадают
-        if (Math.abs(determinant) < 1e-7) {
-            System.out.println(determinant);
+        if (Math.abs(determinant) == 0) {
+            System.out.println(55);
             return null;
         }
-        return new Point((b2 * c1 - b1 * c2) / determinant, (a1 * c2 - a2 * c1) / determinant);
-    }
 
+        return new Point((c1 * b2 - c2 * b1), (a1 * c2 - a2 * c1), 2.0 * determinant);
+    }
 
     public static Line getPerpendicular(Line line) {
         Point middlePoint = line.getMidPoint();

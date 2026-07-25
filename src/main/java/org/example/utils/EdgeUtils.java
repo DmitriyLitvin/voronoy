@@ -2,6 +2,7 @@ package org.example.utils;
 
 import org.example.entity.Cell;
 import org.example.entity.Edge;
+import org.example.entity.Line;
 import org.example.entity.Point;
 
 import java.util.List;
@@ -119,42 +120,25 @@ public class EdgeUtils {
         return edge.getPrev() == null && edge.getNext() == null;
     }
 
-
-    public static boolean isOnTheSameSide(Point center, Point edgePoint, Point middlePoint) {
-        return VectorUtils.dotProduct(VectorUtils.geDirection(middlePoint, center), VectorUtils.geDirection(middlePoint, edgePoint)) >= 0;
+    public static void connectIdleEdges(Edge edge, Edge other) {
+        if (Objects.equals(edge.getTwin().getPoint(), other.getPoint())) {
+            edge.setPrev(other);
+            other.setNext(edge);
+        } else if (Objects.equals(edge.getPoint(), other.getTwin().getPoint())) {
+            edge.setNext(other);
+            other.setPrev(edge);
+        }
     }
 
-    public static boolean isConnected(Cell cell, Edge edge) {
-        Edge boundary = cell.getBoundary();
-        Edge firstChainEdge = edge.getStart();
-        Edge lastChainEdge = edge.getLast();
+    public static boolean isOnTheSameSide(Point center, Point edgePoint, Line commonSupport) {
+        Point middlePoint = commonSupport.getMidPoint();
+        double x = commonSupport.getB().getX() - commonSupport.getA().getX();
+        double y = commonSupport.getB().getY() - commonSupport.getA().getY();
 
-        if (firstChainEdge != null && lastChainEdge != null) {
-            Point firstPoint;
-            Point lastPoint;
+        double evalCenter = x * (center.getX() - middlePoint.getX()) + y * (center.getY() - middlePoint.getY());
+        double evalEdge = x * (edgePoint.getX() - middlePoint.getX()) + y * (edgePoint.getY() - middlePoint.getY());
 
-            if (firstChainEdge.equals(lastChainEdge)) {
-                firstPoint = firstChainEdge.getPoint();
-                lastPoint = firstChainEdge.getTwin().getPoint();
-            } else {
-                firstPoint = getPoint(firstChainEdge);
-                lastPoint = getPoint(lastChainEdge);
-            }
-
-            Edge firstEdge = null;
-            if (firstPoint != null) {
-                firstEdge = getConnectedEdge(boundary, firstPoint);
-            }
-
-            Edge lastEdge = null;
-            if (lastPoint != null) {
-                lastEdge = getConnectedEdge(boundary, lastPoint);
-            }
-
-            return firstEdge != null && (firstEdge.isConnected(firstChainEdge) || firstEdge.isConnected(lastChainEdge)) || (lastEdge != null && (lastEdge.isConnected(lastChainEdge) || lastEdge.isConnected(firstChainEdge)));
-        }
-
-        return false;
+        return (evalCenter * evalEdge) > 0;
     }
 
     public static boolean isOutsideCell(Edge currentEdge, Edge chainEdge, Point chainPoint) {
