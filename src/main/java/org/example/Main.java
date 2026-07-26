@@ -58,7 +58,6 @@ public class Main extends Application {
             points.add(new Point(x, y));
         }
 
-
         points.forEach(p -> {
             Circle circle = new Circle(p.getX(), p.getY(), 2, Color.RED);
             Label label = new Label(+circle.getCenterX() + ", " + circle.getCenterY());
@@ -410,8 +409,7 @@ public class Main extends Application {
                 } else {
                     Edge lastEdge = edge.getLast();
                     if (lastEdge != null && nextLeftEdge.isConnected(lastEdge)) {
-                        nextLeftEdge.setPrev(lastEdge);
-                        lastEdge.setNext(nextLeftEdge);
+                        nextLeftEdge.connect(lastEdge);
                     } else {
                         excludedEdges.computeIfAbsent(leftCell, k -> new ArrayList<>()).add(nextLeftEdge);
                     }
@@ -429,8 +427,7 @@ public class Main extends Application {
                     } else {
                         Edge startEdge = edge.getStart();
                         if (startEdge != null && nextRightEdge.isConnected(startEdge)) {
-                            nextRightEdge.setNext(startEdge);
-                            startEdge.setPrev(nextRightEdge);
+                            nextRightEdge.connect(startEdge);
                         } else {
                             excludedEdges.computeIfAbsent(rightCell, k -> new ArrayList<>()).add(nextRightEdge);
                         }
@@ -464,8 +461,7 @@ public class Main extends Application {
                 } else {
                     Edge startEdge = edge.getStart();
                     if (startEdge != null && nextRightEdge.isConnected(startEdge)) {
-                        nextRightEdge.setNext(startEdge);
-                        startEdge.setPrev(nextRightEdge);
+                        nextRightEdge.connect(startEdge);
                     } else {
                         excludedEdges.computeIfAbsent(rightCell, k -> new ArrayList<>()).add(nextRightEdge);
                     }
@@ -483,8 +479,7 @@ public class Main extends Application {
                     } else {
                         Edge lastEdge = edge.getLast();
                         if (lastEdge != null && nextLeftEdge.isConnected(lastEdge)) {
-                            nextLeftEdge.setPrev(lastEdge);
-                            lastEdge.setNext(nextLeftEdge);
+                            nextLeftEdge.connect(lastEdge);
                         } else {
                             excludedEdges.computeIfAbsent(leftCell, k -> new ArrayList<>()).add(nextLeftEdge);
                         }
@@ -565,13 +560,11 @@ public class Main extends Application {
             Edge lastEdge = boundary.getLast();
 
             if (isIdle(boundary)) {
-                EdgeUtils.connectIdleEdges(leftEdge, startEdge);
+               leftEdge.connect(startEdge);
             } else if (lastEdge != null && lastEdge.isConnected(leftEdge)) {
-                lastEdge.setNext(leftEdge);
-                leftEdge.setPrev(lastEdge);
+                lastEdge.connect(leftEdge);
             } else if (startEdge != null && startEdge.isConnected(leftEdge)) {
-                startEdge.setPrev(leftEdge);
-                leftEdge.setNext(startEdge);
+                startEdge.connect(leftEdge);
             }
         }
 
@@ -581,13 +574,11 @@ public class Main extends Application {
             Edge lastEdge = boundary.getLast();
 
             if (isIdle(boundary)) {
-                EdgeUtils.connectIdleEdges(rightEdge, lastEdge);
+               rightEdge.connect(lastEdge);
             } else if (startEdge != null && startEdge.isConnected(rightEdge)) {
-                startEdge.setPrev(rightEdge);
-                rightEdge.setNext(startEdge);
+                startEdge.connect(rightEdge);
             } else if (lastEdge != null && lastEdge.isConnected(rightEdge)) {
-                lastEdge.setNext(rightEdge);
-                rightEdge.setPrev(lastEdge);
+                lastEdge.connect(rightEdge);
             }
         }
 
@@ -681,25 +672,22 @@ public class Main extends Application {
 
             if (firstEdge != null) {
                 if (isIdle(firstEdge) && isIdle(firstChainEdge)) {
-                    EdgeUtils.connectIdleEdges(firstChainEdge, firstEdge);
+                    firstChainEdge.connect(firstEdge);
                 } else if (firstEdge.getNext() == null && firstEdge.isConnected(firstChainEdge)) {
-                    firstEdge.setNext(firstChainEdge);
-                    firstChainEdge.setPrev(firstEdge);
+                    firstEdge.connect(firstChainEdge);
                 } else if (firstEdge.getPrev() == null && firstEdge.isConnected(lastChainEdge)) {
-                    firstEdge.setPrev(lastChainEdge);
-                    lastChainEdge.setNext(firstEdge);
+                    firstEdge.connect(lastChainEdge);
                 }
             }
 
             if (lastEdge != null) {
                 if (isIdle(lastEdge) && isIdle(lastChainEdge)) {
-                    EdgeUtils.connectIdleEdges(lastChainEdge, lastEdge);
+                    lastChainEdge.connect(lastEdge);
                 } else if (lastEdge.getPrev() == null && lastEdge.isConnected(lastChainEdge)) {
-                    lastEdge.setPrev(lastChainEdge);
-                    lastChainEdge.setNext(lastEdge);
+                    lastEdge.connect(lastChainEdge);
                 } else if (lastEdge.getNext() == null && lastEdge.isConnected(firstChainEdge)) {
-                    lastEdge.setNext(firstChainEdge);
-                    firstChainEdge.setPrev(lastEdge);
+                    lastEdge.connect(firstChainEdge);
+
                 }
             }
         }
@@ -747,7 +735,7 @@ public class Main extends Application {
         return intersectedEdge;
     }
 
-    public  boolean isConnected(Cell cell, Edge edge) {
+    public boolean isConnected(Cell cell, Edge edge) {
         Edge boundary = cell.getBoundary();
         Edge firstChainEdge = edge.getStart();
         Edge lastChainEdge = edge.getLast();

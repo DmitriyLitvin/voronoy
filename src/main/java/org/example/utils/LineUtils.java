@@ -4,6 +4,8 @@ import org.example.entity.Edge;
 import org.example.entity.Line;
 import org.example.entity.Point;
 
+import java.util.Objects;
+
 import static org.example.utils.VectorUtils.crossProduct;
 
 public class LineUtils {
@@ -32,6 +34,7 @@ public class LineUtils {
 
         return new Point((c1 * b2 - c2 * b1), (a1 * c2 - a2 * c1), 2.0 * determinant);
     }
+
 
     public static Line getPerpendicular(Line line) {
         Point middlePoint = line.getMidPoint();

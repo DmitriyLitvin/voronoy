@@ -56,6 +56,16 @@ public class Edge {
         return Objects.equals(edge.getPoint(), this.getTwin().getPoint()) || Objects.equals(edge.getTwin().getPoint(), this.getPoint());
     }
 
+    public  void connect(Edge edge) {
+        if (Objects.equals(edge.getTwin().getPoint(), this.getPoint())) {
+            edge.setPrev(this);
+            this.setNext(edge);
+        } else if (Objects.equals(edge.getPoint(), this.getTwin().getPoint())) {
+            edge.setNext(this);
+            this.setPrev(edge);
+        }
+    }
+
     public Point getCommonVertex(Edge edge) {
         if (edge == null) {
             return null;

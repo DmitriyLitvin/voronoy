@@ -120,16 +120,6 @@ public class EdgeUtils {
         return edge.getPrev() == null && edge.getNext() == null;
     }
 
-    public static void connectIdleEdges(Edge edge, Edge other) {
-        if (Objects.equals(edge.getTwin().getPoint(), other.getPoint())) {
-            edge.setPrev(other);
-            other.setNext(edge);
-        } else if (Objects.equals(edge.getPoint(), other.getTwin().getPoint())) {
-            edge.setNext(other);
-            other.setPrev(edge);
-        }
-    }
-
     public static boolean isOnTheSameSide(Point center, Point edgePoint, Line commonSupport) {
         Point middlePoint = commonSupport.getMidPoint();
         double x = commonSupport.getB().getX() - commonSupport.getA().getX();
