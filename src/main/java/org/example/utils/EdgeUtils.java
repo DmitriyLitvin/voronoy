@@ -120,10 +120,10 @@ public class EdgeUtils {
         return edge.getPrev() == null && edge.getNext() == null;
     }
 
-    public static boolean isOnTheSameSide(Point center, Point edgePoint, Line line) {
-        Point a = line.getA();
-        Point b = line.getB();
-        return ((b.getX() - a.getX()) * (center.getY() - a.getY()) - (b.getY() - a.getY()) * (center.getX() - a.getX())) * ((b.getX() - a.getX()) * (edgePoint.getY() - a.getY()) - (b.getY() - a.getY()) * (edgePoint.getX() - a.getX())) > 0;
+    public static boolean isOnTheSameSide(Point a, Point b, Line line) {
+        Point startPoint = line.getA();
+        Point endPoint = line.getB();
+        return ((endPoint.getX() - startPoint.getX()) * (a.getY() - startPoint.getY()) - (endPoint.getY() - startPoint.getY()) * (a.getX() - startPoint.getX())) * ((endPoint.getX() - startPoint.getX()) * (b.getY() - startPoint.getY()) - (endPoint.getY() - startPoint.getY()) * (b.getX() - startPoint.getX())) > 0;
     }
 
     public static boolean isOutsideCell(Edge currentEdge, Edge chainEdge, Point chainPoint) {

@@ -50,13 +50,13 @@ public class Main extends Application {
         int count = 500; // Кількість точок, яку потрібно згенерувати
 
 
-//        for (int i = 0; i < count; i++) {
-//            // random.nextInt(max - min + 1) + min
-//            int x = random.nextInt(1000 - 20 + 1) + 20;
-//            int y = random.nextInt(1000 - 20 + 1) + 20;
-//
-//            points.add(new Point(x, y));
-//        }
+        for (int i = 0; i < count; i++) {
+            // random.nextInt(max - min + 1) + min
+            int x = random.nextInt(1000 - 20 + 1) + 20;
+            int y = random.nextInt(1000 - 20 + 1) + 20;
+
+            points.add(new Point(x, y));
+        }
 
         points.forEach(p -> {
             Circle circle = new Circle(p.getX(), p.getY(), 2, Color.RED);
@@ -355,13 +355,12 @@ public class Main extends Application {
                 rightDistance = VectorUtils.getLength(rightPoint, chainPoint);
             }
 
+            if (rightEdge != null && leftEdge != null && Math.abs(leftDistance - rightDistance) <= 0.01) {
+                throw new RuntimeException("distances are equal");
+            }
 
             if (rightEdge == null && leftEdge == null) {
                 throw new RuntimeException();
-            }
-
-            if (rightEdge != null && leftEdge != null && Math.abs(leftDistance - rightDistance) == 0) {
-                throw new RuntimeException("distances are equal");
             }
 
             if (leftEdge != null && (rightEdge == null || leftDistance < rightDistance)) {
@@ -670,7 +669,7 @@ public class Main extends Application {
         }
     }
 
-    private Edge getClosestEdge(List<Edge> edges, Line upperCommonSupport, Edge currenEdge, Edge chainEdge, Point chainPoint) {
+    private Edge getClosestEdge(List<Edge> edges, Line upperCommonSupport, Edge currentEdge, Edge chainEdge, Point chainPoint) {
         if (edges == null || edges.isEmpty()) {
             return null;
         }
@@ -680,24 +679,26 @@ public class Main extends Application {
         for (Edge edge : edges) {
             Edge nextEdge = edge;
             do {
-                if ((chainEdge == null || !chainEdge.equals(nextEdge)) && (currenEdge == null || !currenEdge.equals(nextEdge))) {
+                if ((chainEdge == null || !chainEdge.equals(nextEdge)) && (currentEdge == null || !currentEdge.equals(nextEdge))) {
                     Point intersectPoint = getPointOfIntersection(upperCommonSupport, nextEdge);
-                    if (intersectPoint != null && isOutsideCell(currenEdge, chainEdge, intersectPoint)) {
+                    if (intersectPoint  != null && isOutsideCell(currentEdge, chainEdge, intersectPoint) && (currentEdge == null || !isOnTheSameSide(intersectPoint, currentEdge.getTwin().getCell().getCenter(), upperCommonSupport))) {
                         double currentDistance = VectorUtils.getLength(intersectPoint, chainPoint);
                         if (distance == 0 || currentDistance < distance) {
                             distance = currentDistance;
                             intersectedEdge = nextEdge;
                         }
                     }
+
                 }
                 nextEdge = nextEdge.getNext();
             } while (nextEdge != null && !edge.equals(nextEdge));
 
             Edge prevEdge = edge;
             do {
-                if ((chainEdge == null || !chainEdge.equals(prevEdge)) && (currenEdge == null || !currenEdge.equals(prevEdge))) {
+                if ((chainEdge == null || !chainEdge.equals(prevEdge)) && (currentEdge == null || !currentEdge.equals(prevEdge))) {
                     Point intersectPoint = getPointOfIntersection(upperCommonSupport, prevEdge);
-                    if (intersectPoint != null && isOutsideCell(currenEdge, chainEdge, intersectPoint)) {
+
+                    if (intersectPoint != null && isOutsideCell(currentEdge, chainEdge, intersectPoint) && (currentEdge == null || !isOnTheSameSide(intersectPoint, currentEdge.getTwin().getCell().getCenter(), upperCommonSupport))) {
                         double currentDistance = VectorUtils.getLength(intersectPoint, chainPoint);
                         if (distance == 0 || currentDistance < distance) {
                             distance = currentDistance;
