@@ -6,15 +6,15 @@ import static java.lang.Math.sqrt;
 
 public class VectorUtils {
 
-    public static double getLength(Point a, Point b) {
-        return sqrt(Math.pow(b.getX() - a.getX(), 2) + Math.pow(b.getY() - a.getY(), 2));
+    public static double getLength(Point point, Point other) {
+        return sqrt(Math.pow(other.getX() - point.getX(), 2) + Math.pow(other.getY() - point.getY(), 2));
     }
 
-    public static double crossProduct(Point a, Point b) {
-        return a.getX() * b.getY() - a.getY() * b.getX();
+    public static double crossProduct(Point point, Point other) {
+        return point.getX() * other.getY() - point.getY() * other.getX();
     }
 
-    public static Point geDirection(Point a, Point b) {
-        return new Point(b.getX() - a.getX(), b.getY() - a.getY());
+    public static Point geDirection(Point point, Point other) {
+        return new Point(other.getX() - point.getX(), other.getY() - point.getY());
     }
 }
