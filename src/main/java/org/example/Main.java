@@ -47,7 +47,7 @@ public class Main extends Application {
 
         Random random = new Random();
 
-        int count = 500; // Кількість точок, яку потрібно згенерувати
+        int count = 1000; // Кількість точок, яку потрібно згенерувати
 
 
         for (int i = 0; i < count; i++) {
@@ -354,16 +354,18 @@ public class Main extends Application {
                 assert rightPoint != null;
                 rightDistance = VectorUtils.getLength(rightPoint, chainPoint);
             }
-
-            if (rightEdge != null && leftEdge != null && Math.abs(leftDistance - rightDistance) <= 0.01) {
-                throw new RuntimeException("distances are equal");
-            }
+//
+//            if (rightEdge != null && leftEdge != null && Math.abs(leftDistance - rightDistance) <= 0.01) {
+//                throw new RuntimeException("distances are equal");
+//            }
 
             if (rightEdge == null && leftEdge == null) {
                 throw new RuntimeException();
             }
 
-            if (leftEdge != null && (rightEdge == null || leftDistance < rightDistance)) {
+            if (leftEdge != null && (rightEdge == null || leftDistance <= rightDistance)) {
+                System.out.println("1111111111111111111111111");
+                System.out.println((leftDistance - rightDistance) == 0);
                 Edge leftTwinEdge = leftEdge.getTwin();
                 Edge nextLeftEdge;
                 Edge nextRightEdge;
@@ -571,6 +573,7 @@ public class Main extends Application {
         Point center = cell.getCenter();
 
         if (isOnTheSameSide(center, edge.getPoint(), line) && isOnTheSameSide(center, edge.getTwin().getPoint(), line)) {
+            System.out.println("11111");
         } else if (isOnTheSameSide(center, edge.getPoint(), line)) {
             eraseLightEdges(edge, excludedEdges, point, twinEdge, cell);
         } else if (isOnTheSameSide(center, edge.getTwin().getPoint(), line)) {
