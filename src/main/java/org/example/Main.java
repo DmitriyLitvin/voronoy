@@ -679,31 +679,25 @@ public class Main extends Application {
         for (Edge edge : edges) {
             Edge nextEdge = edge;
             do {
-                if ((chainEdge == null || !chainEdge.equals(nextEdge)) && (currentEdge == null || !currentEdge.equals(nextEdge))) {
-                    Point intersectPoint = getPointOfIntersection(upperCommonSupport, nextEdge);
-                    if (intersectPoint  != null && isOutsideCell(currentEdge, chainEdge, intersectPoint) && (currentEdge == null || !isOnTheSameSide(intersectPoint, currentEdge.getTwin().getCell().getCenter(), upperCommonSupport))) {
-                        double currentDistance = VectorUtils.getLength(intersectPoint, chainPoint);
-                        if (distance == 0 || currentDistance < distance) {
-                            distance = currentDistance;
-                            intersectedEdge = nextEdge;
-                        }
+                Point intersectPoint = getPointOfIntersection(upperCommonSupport, nextEdge);
+                if (intersectPoint != null && isOutsideCell(currentEdge, chainEdge, intersectPoint) && (currentEdge == null || !isOnTheSameSide(intersectPoint, currentEdge.getTwin().getCell().getCenter(), upperCommonSupport))) {
+                    double currentDistance = VectorUtils.getLength(intersectPoint, chainPoint);
+                    if (distance == 0 || currentDistance < distance) {
+                        distance = currentDistance;
+                        intersectedEdge = nextEdge;
                     }
-
                 }
                 nextEdge = nextEdge.getNext();
             } while (nextEdge != null && !edge.equals(nextEdge));
 
             Edge prevEdge = edge;
             do {
-                if ((chainEdge == null || !chainEdge.equals(prevEdge)) && (currentEdge == null || !currentEdge.equals(prevEdge))) {
-                    Point intersectPoint = getPointOfIntersection(upperCommonSupport, prevEdge);
-
-                    if (intersectPoint != null && isOutsideCell(currentEdge, chainEdge, intersectPoint) && (currentEdge == null || !isOnTheSameSide(intersectPoint, currentEdge.getTwin().getCell().getCenter(), upperCommonSupport))) {
-                        double currentDistance = VectorUtils.getLength(intersectPoint, chainPoint);
-                        if (distance == 0 || currentDistance < distance) {
-                            distance = currentDistance;
-                            intersectedEdge = prevEdge;
-                        }
+                Point intersectPoint = getPointOfIntersection(upperCommonSupport, prevEdge);
+                if (intersectPoint != null && isOutsideCell(currentEdge, chainEdge, intersectPoint) && (currentEdge == null || !isOnTheSameSide(intersectPoint, currentEdge.getTwin().getCell().getCenter(), upperCommonSupport))) {
+                    double currentDistance = VectorUtils.getLength(intersectPoint, chainPoint);
+                    if (distance == 0 || currentDistance < distance) {
+                        distance = currentDistance;
+                        intersectedEdge = prevEdge;
                     }
                 }
                 prevEdge = prevEdge.getPrev();
