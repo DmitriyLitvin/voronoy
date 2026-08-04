@@ -1,7 +1,5 @@
 package org.example;
 
-import javafx.animation.KeyFrame;
-import javafx.animation.Timeline;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -12,7 +10,6 @@ import javafx.scene.layout.Pane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.stage.Stage;
-import javafx.util.Duration;
 import lombok.extern.slf4j.Slf4j;
 import org.example.entity.Cell;
 import org.example.entity.Edge;
@@ -50,13 +47,13 @@ public class Main extends Application {
         int count = 1000; // Кількість точок, яку потрібно згенерувати
 
 
-//        for (int i = 0; i < count; i++) {
-//            // random.nextInt(max - min + 1) + min
-//            int x = random.nextInt(1000 - 20 + 1) + 20;
-//            int y = random.nextInt(1000 - 20 + 1) + 20;
-//
-//            points.add(new Point(x, y));
-//        }
+        for (int i = 0; i < count; i++) {
+            // random.nextInt(max - min + 1) + min
+            int x = random.nextInt(1000 - 20 + 1) + 20;
+            int y = random.nextInt(1000 - 20 + 1) + 20;
+
+            points.add(new Point(x, y));
+        }
 
         points.forEach(p -> {
             Circle circle = new Circle(p.getX(), p.getY(), 2, Color.RED);
@@ -471,41 +468,7 @@ public class Main extends Application {
             }
         }
 
-        for (var entry : disjunctiveChain.entrySet()) {
-            Cell cell = entry.getKey();
-            Edge edge = entry.getValue();
-            addEdge(cell, edge);
-        }
-
-        for (var entry : excludedEdges.entrySet()) {
-            Cell cell = entry.getKey();
-            List<Edge> edges = entry.getValue();
-
-            List<Edge> remainingEdges = new ArrayList<>();
-            for (Edge edge : edges) {
-                if (isConnected(cell, edge)) {
-                    addEdge(cell, edge);
-                } else {
-                    remainingEdges.add(edge);
-                }
-            }
-            edges.clear();
-            edges.addAll(remainingEdges);
-        }
-
-        List<Edge> edgesToDelete = new ArrayList<>();
-        for (var entry : idleEdges.entrySet()) {
-            Cell cell = entry.getKey();
-            Edge edge = entry.getValue();
-            if (isConnected(cell, edge)) {
-                addEdge(cell, edge);
-                edgesToDelete.add(edge);
-            }
-        }
-
-        edgesToDelete.forEach(e -> idleEdges.remove(e.getCell()));
-
-
+        addEdges(disjunctiveChain, excludedEdges);
         perpendicular = getPerpendicular(lowerCommonSupport);
 
         Edge leftEdge;
@@ -564,13 +527,55 @@ public class Main extends Application {
         return diagram;
     }
 
+    private void addEdges(Map<Cell, Edge> disjunctiveChain, Map<Cell, List<Edge>> excludedEdges) {
+        for (var entry : disjunctiveChain.entrySet()) {
+            Cell cell = entry.getKey();
+            Edge edge = entry.getValue();
+            addEdge(cell, edge);
+        }
+
+        for (var entry : excludedEdges.entrySet()) {
+            Cell cell = entry.getKey();
+            List<Edge> edges = entry.getValue();
+
+            while (!edges.isEmpty()) {
+                List<Edge> connectedEdges = new ArrayList<>();
+
+                for (Edge edge : edges) {
+                    if (isConnected(cell, edge)) {
+                        addEdge(cell, edge);
+                        connectedEdges.add(edge);
+                    }
+                }
+                if (connectedEdges.isEmpty()) {
+                    break;
+                }
+                edges.removeAll(connectedEdges);
+            }
+        }
+
+        List<Edge> edgesToDelete = new ArrayList<>();
+        for (var entry : idleEdges.entrySet()) {
+            Cell cell = entry.getKey();
+            Edge edge = entry.getValue();
+            if (isConnected(cell, edge)) {
+                addEdge(cell, edge);
+                edgesToDelete.add(edge);
+            }
+        }
+
+        for (Edge edge : edgesToDelete) {
+            idleEdges.remove(edge.getCell());
+        }
+    }
+
     private void eraseEdges(Edge edge, Map<Cell, List<Edge>> excludedEdges, Point point, Line line) {
         Cell cell = edge.getCell();
         Edge twinEdge = edge.getTwin();
         Point center = cell.getCenter();
 
         if (isOnTheSameSide(center, edge.getPoint(), line) && isOnTheSameSide(center, edge.getTwin().getPoint(), line)) {
-            System.out.println("11111");
+
         } else if (isOnTheSameSide(center, edge.getPoint(), line)) {
             eraseLightEdges(edge, excludedEdges, point, twinEdge, cell);
         } else if (isOnTheSameSide(center, edge.getTwin().getPoint(), line)) {
