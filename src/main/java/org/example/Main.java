@@ -50,13 +50,13 @@ public class Main extends Application {
         int count = 1000; // Кількість точок, яку потрібно згенерувати
 
 
-        for (int i = 0; i < count; i++) {
-            // random.nextInt(max - min + 1) + min
-            int x = random.nextInt(1000 - 20 + 1) + 20;
-            int y = random.nextInt(1000 - 20 + 1) + 20;
-
-            points.add(new Point(x, y));
-        }
+//        for (int i = 0; i < count; i++) {
+//            // random.nextInt(max - min + 1) + min
+//            int x = random.nextInt(1000 - 20 + 1) + 20;
+//            int y = random.nextInt(1000 - 20 + 1) + 20;
+//
+//            points.add(new Point(x, y));
+//        }
 
         points.forEach(p -> {
             Circle circle = new Circle(p.getX(), p.getY(), 2, Color.RED);
@@ -481,19 +481,16 @@ public class Main extends Application {
             Cell cell = entry.getKey();
             List<Edge> edges = entry.getValue();
 
-            while (!edges.isEmpty()) {
-                List<Edge> connectedEdges = new ArrayList<>();
-                for (Edge edge : edges) {
-                    if (isConnected(cell, edge)) {
-                        addEdge(cell, edge);
-                        connectedEdges.add(edge);
-                    }
+            List<Edge> remainingEdges = new ArrayList<>();
+            for (Edge edge : edges) {
+                if (isConnected(cell, edge)) {
+                    addEdge(cell, edge);
+                } else {
+                    remainingEdges.add(edge);
                 }
-                if (connectedEdges.isEmpty()) {
-                    break;
-                }
-                edges.removeAll(connectedEdges);
             }
+            edges.clear();
+            edges.addAll(remainingEdges);
         }
 
         List<Edge> edgesToDelete = new ArrayList<>();
