@@ -94,7 +94,7 @@ public class Edge {
             return false;
         }
 
-        return Objects.equals(getPoint(), other.getPoint()) && Objects.equals(getTwin().getPoint(), other.getTwin().getPoint());
+        return (Objects.equals(getPoint(), other.getPoint()) && Objects.equals(getTwin().getPoint(), other.getTwin().getPoint()));
     }
 
     @Override
