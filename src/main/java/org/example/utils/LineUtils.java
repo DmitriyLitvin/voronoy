@@ -9,7 +9,7 @@ import java.util.Objects;
 import static org.example.utils.VectorUtils.crossProduct;
 
 public class LineUtils {
-    private static final double SCALE = 10000000;
+    private static final double SCALE = 100000000;
 
 
     public static Point getPointOfIntersection(Line commonSupport, Edge currentEdge) {
@@ -47,7 +47,7 @@ public class LineUtils {
             length = 1.0;
         }
 
-        double k = SCALE / length;
+        double k = Math.floor(SCALE / length);
         if (k == 0) {
             k = 1;
         }
@@ -59,10 +59,10 @@ public class LineUtils {
 
     public static boolean is(Point point, Line line, boolean isUpper) {
         Point direction = VectorUtils.geDirection(line.getA(), line.getB());
-        double cp = crossProduct(direction, VectorUtils.geDirection(line.getA(), point));
+        double crossProduct = crossProduct(direction, VectorUtils.geDirection(line.getA(), point));
         if (isUpper) {
-            return cp > 0;
+            return crossProduct > 0;
         }
-        return cp < 0;
+        return crossProduct < 0;
     }
 }

@@ -120,6 +120,27 @@ public class EdgeUtils {
         return edge.getPrev() == null && edge.getNext() == null;
     }
 
+    public static boolean isIntersected(Point point, Edge edge) {
+        if (point == null) {
+            return false;
+        }
+
+        boolean isInfinite = edge.isInfinite();
+        boolean isTwinInfinite = edge.getTwin().isInfinite();
+        Point startPoint = edge.getPoint();
+        Point endPoint = edge.getTwin().getPoint();
+
+        if (isInfinite && isTwinInfinite) {
+            return true; // Раз точка на прямой, она автоматически принадлежит бесконечной прямой
+        } else if (!isInfinite && !isTwinInfinite) {
+            return VectorUtils.dotProduct(VectorUtils.geDirection(point, startPoint), VectorUtils.geDirection(point, endPoint)) <= 0;
+        } else if (isInfinite) {
+            return VectorUtils.dotProduct(VectorUtils.geDirection(endPoint, point), VectorUtils.geDirection(endPoint, startPoint)) >= 0;
+        }
+
+        return VectorUtils.dotProduct(VectorUtils.geDirection(startPoint, point), VectorUtils.geDirection(startPoint, endPoint)) >= 0;
+    }
+
     public static boolean isOnTheSameSide(Point point, Point other, Line line) {
         Point startPoint = line.getA();
         Point endPoint = line.getB();

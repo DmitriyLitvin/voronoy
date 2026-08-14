@@ -254,6 +254,10 @@ public class Main extends Application {
         return joinDiagrams(buildVoronoyDiagram(polygon.subList(0, polygon.size() / 2)), buildVoronoyDiagram(polygon.subList(polygon.size() / 2, polygon.size())));
     }
 
+    private boolean isPointsEqual(Point point, Point other) {
+        return (point.getNumX() * other.getDeterminant() == point.getDeterminant() * other.getNumX() && point.getNumY() * other.getDeterminant() == point.getDeterminant() * other.getNumY());
+    }
+
     private Map<Point, Cell> joinDiagrams(Map<Point, Cell> leftDiagram, Map<Point, Cell> rightDiagram) {
         Set<Point> leftPolygon = buildConvexHull(new ArrayList<>(leftDiagram.keySet()));
         Set<Point> rightPolygon = buildConvexHull(new ArrayList<>(rightDiagram.keySet()));
@@ -298,13 +302,13 @@ public class Main extends Application {
             return diagram;
         }
 
+
         Edge currentEdge = null;
         while (!Objects.equals(upperCommonSupport, lowerCommonSupport)) {
             Cell leftCell = leftDiagram.get(upperCommonSupport.getA());
             Cell rightCell = rightDiagram.get(upperCommonSupport.getB());
 
             perpendicular = getPerpendicular(upperCommonSupport);
-            Point middlePoint = upperCommonSupport.getMidPoint();
 
             boolean isInfinite = false;
             if (chainPoint == null) {
@@ -352,15 +356,40 @@ public class Main extends Application {
                 rightDistance = VectorUtils.getLength(rightPoint, chainPoint);
             }
 
-            if (rightEdge != null && leftEdge != null &&  leftDistance == rightDistance) {
-                throw new RuntimeException("distances are equal");
-            }
-
             if (rightEdge == null && leftEdge == null) {
-                throw new RuntimeException();
-            }
 
-            if (leftEdge != null && (rightEdge == null || leftDistance < rightDistance)) {
+
+                throw new RuntimeException();
+            } else if (rightEdge != null && leftEdge != null && leftDistance == rightDistance) {
+                Point startPoint = leftEdge.getPoint();
+                Point endPoint = leftEdge.getTwin().getPoint();
+                if (isPointsEqual(startPoint, leftPoint)) {
+                    throw new RuntimeException("edge point");
+                } else if (isPointsEqual(endPoint, leftPoint)) {
+                    throw new RuntimeException("edge point");
+                }
+
+                startPoint = rightEdge.getPoint();
+                endPoint = rightEdge.getTwin().getPoint();
+                if (isPointsEqual(startPoint, rightPoint)) {
+                    throw new RuntimeException("edge point");
+                } else if (isPointsEqual(endPoint, rightPoint)) {
+                    throw new RuntimeException("edge point");
+                } else {
+                    throw new RuntimeException("distances are equal");
+                }
+            } else if (leftEdge != null && (rightEdge == null || leftDistance < rightDistance)) {
+                Point startPOint = leftEdge.getPoint();
+                Point endPoint = leftEdge.getTwin().getPoint();
+
+
+                if (isPointsEqual(startPOint, leftPoint)) {
+                    throw new RuntimeException("edge point");
+                } else if (isPointsEqual(endPoint, leftPoint)) {
+                    throw new RuntimeException("edge point");
+                }
+
+
                 Edge leftTwinEdge = leftEdge.getTwin();
                 Edge nextLeftEdge;
                 Edge nextRightEdge;
@@ -412,6 +441,15 @@ public class Main extends Application {
                 chainEdge = nextLeftEdge;
                 currentEdge = leftEdge;
             } else if (leftEdge == null || leftDistance > rightDistance) {
+                Point startPOint = rightEdge.getPoint();
+                Point endPoint = rightEdge.getTwin().getPoint();
+
+                if (isPointsEqual(startPOint, rightPoint)) {
+                    throw new RuntimeException("edge point");
+                } else if (isPointsEqual(endPoint, rightPoint)) {
+                    throw new RuntimeException("edge point");
+                }
+
                 Edge rightTwinEdge = rightEdge.getTwin();
                 Edge nextLeftEdge;
                 Edge nextRightEdge;
@@ -684,7 +722,7 @@ public class Main extends Application {
             do {
                 if ((chainEdge == null || (!chainEdge.equals(nextEdge) && !chainEdge.getTwin().equals(nextEdge))) && (currentEdge == null || (!currentEdge.equals(nextEdge) && !currentEdge.getTwin().equals(nextEdge)))) {
                     Point intersectPoint = getPointOfIntersection(upperCommonSupport, nextEdge);
-                    if (intersectPoint != null && isOutsideCell(currentEdge, chainEdge, intersectPoint) && (currentEdge == null || !isOnTheSameSide(intersectPoint, currentEdge.getTwin().getCell().getCenter(), upperCommonSupport))) {
+                    if (intersectPoint != null && isOutsideCell(currentEdge, chainEdge, intersectPoint) && isIntersected(intersectPoint, nextEdge)) {
                         double currentDistance = VectorUtils.getLength(intersectPoint, chainPoint);
                         if (distance == 0 || currentDistance < distance) {
                             distance = currentDistance;
@@ -699,7 +737,7 @@ public class Main extends Application {
             do {
                 if ((chainEdge == null || (!chainEdge.equals(prevEdge) && !chainEdge.getTwin().equals(prevEdge))) && (currentEdge == null || (!currentEdge.equals(prevEdge) && !currentEdge.getTwin().equals(prevEdge)))) {
                     Point intersectPoint = getPointOfIntersection(upperCommonSupport, prevEdge);
-                    if (intersectPoint != null && isOutsideCell(currentEdge, chainEdge, intersectPoint) && (currentEdge == null || !isOnTheSameSide(intersectPoint, currentEdge.getTwin().getCell().getCenter(), upperCommonSupport))) {
+                    if (intersectPoint != null && isOutsideCell(currentEdge, chainEdge, intersectPoint) && isIntersected(intersectPoint, prevEdge)) {
                         double currentDistance = VectorUtils.getLength(intersectPoint, chainPoint);
                         if (distance == 0 || currentDistance < distance) {
                             distance = currentDistance;

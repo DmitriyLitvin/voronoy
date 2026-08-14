@@ -23,6 +23,15 @@ public class Point {
         this.y = y;
     }
 
+    public double getNumX() {
+        return x;
+    }
+
+    public double getNumY() {
+        return y;
+    }
+
+
     public double getX() {
         return x / determinant;
     }
