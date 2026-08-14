@@ -379,11 +379,11 @@ public class Main extends Application {
                     throw new RuntimeException("distances are equal");
                 }
             } else if (leftEdge != null && (rightEdge == null || leftDistance < rightDistance)) {
-                Point startPOint = leftEdge.getPoint();
+                Point startPoint = leftEdge.getPoint();
                 Point endPoint = leftEdge.getTwin().getPoint();
 
 
-                if (isPointsEqual(startPOint, leftPoint)) {
+                if (isPointsEqual(startPoint, leftPoint)) {
                     throw new RuntimeException("edge point");
                 } else if (isPointsEqual(endPoint, leftPoint)) {
                     throw new RuntimeException("edge point");
@@ -441,10 +441,10 @@ public class Main extends Application {
                 chainEdge = nextLeftEdge;
                 currentEdge = leftEdge;
             } else if (leftEdge == null || leftDistance > rightDistance) {
-                Point startPOint = rightEdge.getPoint();
+                Point startPoint = rightEdge.getPoint();
                 Point endPoint = rightEdge.getTwin().getPoint();
 
-                if (isPointsEqual(startPOint, rightPoint)) {
+                if (isPointsEqual(startPoint, rightPoint)) {
                     throw new RuntimeException("edge point");
                 } else if (isPointsEqual(endPoint, rightPoint)) {
                     throw new RuntimeException("edge point");
