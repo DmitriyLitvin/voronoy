@@ -9,29 +9,32 @@ import java.util.Objects;
 import static org.example.utils.VectorUtils.crossProduct;
 
 public class LineUtils {
-    private static final double SCALE = 100000000;
+    private static final double SCALE = 10000000;
 
 
     public static Point getPointOfIntersection(Line commonSupport, Edge currentEdge) {
-        Point p1 = commonSupport.getA();
-        Point p2 = commonSupport.getB();
-        Point p3 = currentEdge.getCell().getCenter();
-        Point p4 = currentEdge.getTwin().getCell().getCenter();
+        Point lineStart = commonSupport.getA(), lineEnd = commonSupport.getB();
+        Point cellCenter = currentEdge.getCell().getCenter(), twinCenter = currentEdge.getTwin().getCell().getCenter();
 
-        double a1 = p2.getX() - p1.getX();
-        double b1 = p2.getY() - p1.getY();
-        double a2 = p4.getX() - p3.getX();
-        double b2 = p4.getY() - p3.getY();
+        double lineWidth  = lineEnd.getX() - lineStart.getX();
+        double lineHeight = lineEnd.getY() - lineStart.getY();
+        double edgeWidth  = twinCenter.getX() - cellCenter.getX();
+        double edgeHeight = twinCenter.getY() - cellCenter.getY();
 
-        double c1 = a1 * (p1.getX() + p2.getX()) + b1 * (p1.getY() + p2.getY());
-        double c2 = a2 * (p3.getX() + p4.getX()) + b2 * (p3.getY() + p4.getY());
-
-        double determinant = a1 * b2 - a2 * b1;
-        if (Math.abs(determinant) == 0) {
+        double determinant = lineWidth * edgeHeight - edgeWidth * lineHeight;
+        if (Math.abs(determinant) < 1e-9) {
             return null;
         }
 
-        return new Point((c1 * b2 - c2 * b1), (a1 * c2 - a2 * c1), 2.0 * determinant);
+        return new Point(
+                (lineWidth * (lineStart.getX() + lineEnd.getX()) + lineHeight * (lineStart.getY() + lineEnd.getY())) * edgeHeight -
+                        (edgeWidth * (cellCenter.getX() + twinCenter.getX()) + edgeHeight * (cellCenter.getY() + twinCenter.getY())) * lineHeight,
+
+                lineWidth * (edgeWidth * (cellCenter.getX() + twinCenter.getX()) + edgeHeight * (cellCenter.getY() + twinCenter.getY())) -
+                        edgeWidth * (lineWidth * (lineStart.getX() + lineEnd.getX()) + lineHeight * (lineStart.getY() + lineEnd.getY())),
+
+                2.0 * determinant
+        );
     }
 
 
