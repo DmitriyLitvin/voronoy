@@ -574,7 +574,7 @@ public class Main extends Application {
             Cell cell = entry.getKey();
             List<Edge> edges = entry.getValue();
 
-            while (!edges.isEmpty()) {
+            do {
                 List<Edge> connectedEdges = new ArrayList<>();
 
                 for (Edge edge : edges) {
@@ -587,7 +587,7 @@ public class Main extends Application {
                     break;
                 }
                 edges.removeAll(connectedEdges);
-            }
+            } while (!edges.isEmpty());
         }
 
         List<Edge> edgesToDelete = new ArrayList<>();
