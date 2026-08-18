@@ -564,13 +564,13 @@ public class Main extends Application {
     }
 
     private void addEdges(Map<Cell, Edge> disjunctiveChain, Map<Cell, List<Edge>> excludedEdges) {
-        for (var entry : disjunctiveChain.entrySet()) {
+        for (Map.Entry<Cell, Edge> entry : disjunctiveChain.entrySet()) {
             Cell cell = entry.getKey();
             Edge edge = entry.getValue();
             addEdge(cell, edge);
         }
 
-        for (var entry : excludedEdges.entrySet()) {
+        for (Map.Entry<Cell, List<Edge>> entry : excludedEdges.entrySet()) {
             Cell cell = entry.getKey();
             List<Edge> edges = entry.getValue();
 
@@ -591,7 +591,7 @@ public class Main extends Application {
         }
 
         List<Edge> edgesToDelete = new ArrayList<>();
-        for (var entry : idleEdges.entrySet()) {
+        for (Map.Entry<Cell, Edge> entry : idleEdges.entrySet()) {
             Cell cell = entry.getKey();
             Edge edge = entry.getValue();
             if (isConnected(cell, edge)) {
