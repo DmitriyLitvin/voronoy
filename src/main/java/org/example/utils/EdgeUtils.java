@@ -5,9 +5,7 @@ import org.example.entity.Edge;
 import org.example.entity.Line;
 import org.example.entity.Point;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 import static org.example.utils.VectorUtils.crossProduct;
 
@@ -35,24 +33,25 @@ public class EdgeUtils {
     public static Edge eraseEdges(Map<Cell, List<Edge>> excludedEdges, Edge edge, Point point) {
         List<Edge> edges = excludedEdges.get(edge.getCell());
         if (edges != null) {
-            for (int i = 0; i < edges.size(); i++) {
-                Edge currentEdge = edges.get(i);
-                do {
-                    if (Objects.equals(currentEdge, edge)) {
-                        edges.set(i, edge);
-                        break;
-                    }
-                    currentEdge = currentEdge.getNext();
-                } while (currentEdge != null);
+            Set<Edge> connectedEdges = new HashSet<>();
 
-                currentEdge = edges.get(i);
-                do {
-                    if (Objects.equals(currentEdge, edge)) {
-                        edges.set(i, edge);
-                        break;
-                    }
-                    currentEdge = currentEdge.getPrev();
-                } while (currentEdge != null);
+            Edge curentEdge = edge;
+            while (curentEdge != null) {
+                connectedEdges.add(curentEdge);
+                curentEdge = curentEdge.getNext();
+            }
+
+            curentEdge = edge.getPrev();
+            while (curentEdge != null) {
+                connectedEdges.add(curentEdge);
+                curentEdge = curentEdge.getPrev();
+            }
+
+            ListIterator<Edge> iterator = edges.listIterator();
+            while (iterator.hasNext()) {
+                if (connectedEdges.contains(iterator.next())) {
+                    iterator.set(edge);
+                }
             }
         }
 
