@@ -47,10 +47,10 @@ public class EdgeUtils {
                 curentEdge = curentEdge.getPrev();
             }
 
-            ListIterator<Edge> iterator = edges.listIterator();
-            while (iterator.hasNext()) {
-                if (connectedEdges.contains(iterator.next())) {
-                    iterator.set(edge);
+            ListIterator<Edge> edgeIterator = edges.listIterator();
+            while (edgeIterator.hasNext()) {
+                if (connectedEdges.contains(edgeIterator.next())) {
+                    edgeIterator.set(edge);
                 }
             }
         }
