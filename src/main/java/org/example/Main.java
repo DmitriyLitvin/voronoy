@@ -47,13 +47,12 @@ public class Main extends Application {
         int count = 1000; // Кількість точок, яку потрібно згенерувати
 
 
-        for (int i = 0; i < count; i++) {
-            // random.nextInt(max - min + 1) + min
-            int x = random.nextInt(1000 - 20 + 1) + 20;
-            int y = random.nextInt(1000 - 20 + 1) + 20;
+        // Ліва піддіаграма (L) — сортування за координатою X
+        points.add(new Point(100, 200));   // P1 (Левое крыло первого ядра)
+        points.add(new Point(200, 350));   // P2 (Общая точка: низ первого ядра / верх второго)
+        points.add(new Point(300, 100));   // P3 (Верхнее левое крыло)
+        points.add(new Point(300, 500));   // P4 (Нижнее левое крыло)
 
-            points.add(new Point(x, y));
-        }
 
         points.forEach(p -> {
             Circle circle = new Circle(p.getX(), p.getY(), 2, Color.RED);
@@ -94,41 +93,57 @@ public class Main extends Application {
     public void drawVoronoyDiagram(List<Point> polygon) {
         polygon.sort((p1, p2) -> p1.getX() != p2.getX() ? Double.compare(p1.getX(), p2.getX()) : Double.compare(p1.getY(), p2.getY()));
 
-
         Set<Edge> visitedEdges = new HashSet<>();
+
         buildVoronoyDiagram(polygon.stream().toList()).values().forEach(cell -> {
             Edge boundary = cell.getBoundary();
+            if (boundary == null) return;
+
+            // 1. Обход вперед (по часовой / против часовой стрелке)
             Edge nextEdge = boundary;
+            do {
+                checkAndDrawEdge(nextEdge, visitedEdges);
+                nextEdge = nextEdge.getNext();
+            } while (nextEdge != null && !Objects.equals(boundary, nextEdge));
 
-            if (nextEdge != null) {
-                do {
-                    // Проверяем, не было ли это ребро (или его близнец) уже отрисовано
-                    if (!visitedEdges.contains(nextEdge)) {
-                        Point startPoint = nextEdge.getPoint();
-                        // Безопасная проверка на null для Twin, если диаграмма имеет открытые ребра
-                        Edge twin = nextEdge.getTwin();
-                        if (twin != null && startPoint != null && twin.getPoint() != null) {
-                            Point endPoint = twin.getPoint();
-
-                            javafx.scene.shape.Line line = new javafx.scene.shape.Line(
-                                    startPoint.getX(), startPoint.getY(),
-                                    endPoint.getX(), endPoint.getY()
-                            );
-                            line.setStroke(Color.BLUE);
-                            line.setStrokeWidth(1);
-                            pane.getChildren().add(line);
-                        }
-
-                        // Маркируем оба ребра как посещенные
-                        visitedEdges.add(nextEdge);
-                        if (twin != null) {
-                            visitedEdges.add(twin);
-                        }
-                    }
-                    nextEdge = nextEdge.getNext();
-                } while (nextEdge != null && !Objects.equals(boundary, nextEdge));
-            }
+            // 2. Обход назад (в противоположную сторону)
+            Edge prevEdge = boundary;
+            do {
+                checkAndDrawEdge(prevEdge, visitedEdges);
+                prevEdge = prevEdge.getPrev();
+            } while (prevEdge != null && !Objects.equals(boundary, prevEdge));
         });
+    }
+
+    /**
+     * Метод проверяет ребро на уникальность и рисует его ровно один раз.
+     */
+    private void checkAndDrawEdge(Edge edge, Set<Edge> visitedEdges) {
+        // Если это полуребро (или его близнец) уже обрабатывалось — выходим
+        if (visitedEdges.contains(edge)) {
+            return;
+        }
+
+        Point startPoint = edge.getPoint();
+        Edge twin = edge.getTwin();
+
+        if (twin != null && startPoint != null && twin.getPoint() != null) {
+            Point endPoint = twin.getPoint();
+
+            javafx.scene.shape.Line line = new javafx.scene.shape.Line(
+                    startPoint.getX(), startPoint.getY(),
+                    endPoint.getX(), endPoint.getY()
+            );
+            line.setStroke(Color.BLUE);
+            line.setStrokeWidth(1);
+            pane.getChildren().add(line);
+        }
+
+        // Маркируем обе стороны ребра как посещенные, чтобы избежать повторной отрисовки
+        visitedEdges.add(edge);
+        if (twin != null) {
+            visitedEdges.add(twin);
+        }
     }
 
     private Set<Point> buildConvexHull(List<Point> points) {
