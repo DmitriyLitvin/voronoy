@@ -47,15 +47,22 @@ public class Main extends Application {
         int count = 1000; // Кількість точок, яку потрібно згенерувати
 
 
-        // Ліва піддіаграма (L) — сортування за координатою X
-        points.add(new Point(100, 200));   // P1 (Левое крыло первого ядра)
-        points.add(new Point(200, 350));   // P2 (Общая точка: низ первого ядра / верх второго)
-        points.add(new Point(300, 100));   // P3 (Верхнее левое крыло)
-        points.add(new Point(300, 500));   // P4 (Нижнее левое крыло)
+        points.add(new Point(24.0, 51.0));
+        points.add(new Point(31.0, 70.0));
+        points.add(new Point(32.0, 41.0));
+        points.add(new Point(33.0, 50.0));
+        points.add(new Point(33.0, 95.0));
+        points.add(new Point(37.0, 46.0));
+        points.add(new Point(20.0, 51.0));
+        points.add(new Point(20.0, 59.0));
+        points.add(new Point(20.0, 81.0));
+        points.add(new Point(21.0, 33.0));
+        points.add(new Point(21.0, 81.0));
+        points.add(new Point(24.0, 33.0));
 
 
         points.forEach(p -> {
-            Circle circle = new Circle(p.getX(), p.getY(), 2, Color.RED);
+            Circle circle = new Circle(p.getX(), p.getY(), 1.5, Color.RED);
             Label label = new Label(+circle.getCenterX() + ", " + circle.getCenterY());
             label.relocate(circle.getCenterX(), circle.getCenterY());
             pane.getChildren().addAll(circle);
@@ -70,7 +77,7 @@ public class Main extends Application {
             double y = event.getY();
 
             // Додаємо точку на екран
-            Circle circle = new Circle(x, y, 2, Color.RED);
+            Circle circle = new Circle(x, y, 1.5, Color.RED);
             borderPane.getChildren().add(circle);
 
             // Зберігаємо координати
