@@ -19,6 +19,7 @@ import org.example.utils.EdgeUtils;
 import org.example.utils.VectorUtils;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static java.lang.Math.*;
 import static org.example.utils.EdgeUtils.*;
@@ -47,18 +48,18 @@ public class Main extends Application {
         int count = 1000; // Кількість точок, яку потрібно згенерувати
 
 
-        points.add(new Point(24.0, 51.0));
-        points.add(new Point(31.0, 70.0));
-        points.add(new Point(32.0, 41.0));
-        points.add(new Point(33.0, 50.0));
-        points.add(new Point(33.0, 95.0));
-        points.add(new Point(37.0, 46.0));
-        points.add(new Point(20.0, 51.0));
-        points.add(new Point(20.0, 59.0));
-        points.add(new Point(20.0, 81.0));
-        points.add(new Point(21.0, 33.0));
-        points.add(new Point(21.0, 81.0));
-        points.add(new Point(24.0, 33.0));
+//        points.add(new Point(24.0, 51.0));
+//        points.add(new Point(31.0, 70.0));
+//        points.add(new Point(32.0, 41.0));
+//        points.add(new Point(33.0, 50.0));
+//        points.add(new Point(33.0, 95.0));
+//        points.add(new Point(37.0, 46.0));
+//        points.add(new Point(20.0, 51.0));
+//        points.add(new Point(20.0, 59.0));
+//        points.add(new Point(20.0, 81.0));
+//        points.add(new Point(21.0, 33.0));
+//        points.add(new Point(21.0, 81.0));
+//        points.add(new Point(24.0, 33.0));
 
 
         points.forEach(p -> {
@@ -142,7 +143,7 @@ public class Main extends Application {
                     endPoint.getX(), endPoint.getY()
             );
             line.setStroke(Color.BLUE);
-            line.setStrokeWidth(1);
+            line.setStrokeWidth(0.5);
             pane.getChildren().add(line);
         }
 
@@ -586,45 +587,46 @@ public class Main extends Application {
     }
 
     private void addEdges(Map<Cell, Edge> disjunctiveChain, Map<Cell, List<Edge>> excludedEdges) {
-        for (Map.Entry<Cell, Edge> entry : disjunctiveChain.entrySet()) {
-            Cell cell = entry.getKey();
-            Edge edge = entry.getValue();
-            addEdge(cell, edge);
-        }
+        disjunctiveChain.values().forEach(this::addEdge);
 
-        for (Map.Entry<Cell, List<Edge>> entry : excludedEdges.entrySet()) {
-            Cell cell = entry.getKey();
-            List<Edge> edges = entry.getValue();
+        List<Edge> tasks = excludedEdges.values().stream().flatMap(Collection::stream).collect(Collectors.toList());
 
-            do {
-                List<Edge> connectedEdges = new ArrayList<>();
 
-                for (Edge edge : edges) {
-                    if (isConnected(cell, edge)) {
-                        addEdge(cell, edge);
-                        connectedEdges.add(edge);
-                    }
-                }
-                if (connectedEdges.isEmpty()) {
-                    break;
-                }
-                edges.removeAll(connectedEdges);
-            } while (!edges.isEmpty());
-        }
+        int sizeAtRoundStart = tasks.size();
+        int elementsProcessedInRound = 0;
 
-        List<Edge> edgesToDelete = new ArrayList<>();
-        for (Map.Entry<Cell, Edge> entry : idleEdges.entrySet()) {
-            Cell cell = entry.getKey();
-            Edge edge = entry.getValue();
-            if (isConnected(cell, edge)) {
-                addEdge(cell, edge);
-                edgesToDelete.add(edge);
+        while (!tasks.isEmpty()) {
+            Edge edge = tasks.remove(0); // Беремо перший елемент
+
+            if (isConnected(edge)) {
+                addEdge(edge);
+
+                // Є прогрес! Списку стало менше, поточне коло скидається
+                sizeAtRoundStart = tasks.size();
+                elementsProcessedInRound = 0;
+            } else {
+                tasks.add(edge);
+                elementsProcessedInRound++;
+            }
+
+            if (elementsProcessedInRound == sizeAtRoundStart) {
+                break;
             }
         }
 
-        for (Edge edge : edgesToDelete) {
-            idleEdges.remove(edge.getCell());
-        }
+        List<Edge> edgesToDelete = new ArrayList<>();
+        idleEdges.values().forEach(e -> {
+            if (isConnected(e)) {
+                addEdge(e);
+                edgesToDelete.add(e);
+            }
+        });
+
+
+        edgesToDelete.forEach(e -> {
+            idleEdges.remove(e.getCell());
+        });
+
     }
 
     private void eraseEdges(Edge edge, Map<Cell, List<Edge>> excludedEdges, Point point, Line line) {
@@ -682,8 +684,8 @@ public class Main extends Application {
         }
     }
 
-    private void addEdge(Cell cell, Edge edge) {
-        Edge boundary = cell.getBoundary();
+    private void addEdge(Edge edge) {
+        Edge boundary = edge.getCell().getBoundary();
         Edge firstChainEdge = edge.getStart();
         Edge lastChainEdge = edge.getLast();
 
@@ -774,8 +776,8 @@ public class Main extends Application {
         return intersectedEdge;
     }
 
-    public boolean isConnected(Cell cell, Edge edge) {
-        Edge boundary = cell.getBoundary();
+    public boolean isConnected(Edge edge) {
+        Edge boundary = edge.getCell().getBoundary();
         Edge firstChainEdge = edge.getStart();
         Edge lastChainEdge = edge.getLast();
 
