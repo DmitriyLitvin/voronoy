@@ -133,10 +133,10 @@ public class Main extends Application {
         }
 
         Point startPoint = edge.getPoint();
-        Edge twin = edge.getTwin();
+        Edge twinEdge = edge.getTwin();
 
-        if (twin != null && startPoint != null && twin.getPoint() != null) {
-            Point endPoint = twin.getPoint();
+        if (twinEdge != null && startPoint != null && twinEdge.getPoint() != null) {
+            Point endPoint = twinEdge.getPoint();
 
             javafx.scene.shape.Line line = new javafx.scene.shape.Line(
                     startPoint.getX(), startPoint.getY(),
@@ -149,8 +149,8 @@ public class Main extends Application {
 
         // Маркируем обе стороны ребра как посещенные, чтобы избежать повторной отрисовки
         visitedEdges.add(edge);
-        if (twin != null) {
-            visitedEdges.add(twin);
+        if (twinEdge != null) {
+            visitedEdges.add(twinEdge);
         }
     }
 
