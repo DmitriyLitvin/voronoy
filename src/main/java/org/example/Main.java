@@ -589,7 +589,7 @@ public class Main extends Application {
     private void addEdges(Map<Cell, Edge> disjunctiveChain, Map<Cell, List<Edge>> excludedEdges) {
         disjunctiveChain.values().forEach(this::addEdge);
 
-        List<Edge> tasks = excludedEdges.values().stream().flatMap(Collection::stream).collect(Collectors.toList());
+        List<Edge> tasks = new ArrayList<>(excludedEdges.values().stream().flatMap(Collection::stream).toList());
 
 
         int sizeAtRoundStart = tasks.size();
