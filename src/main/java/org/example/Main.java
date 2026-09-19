@@ -47,18 +47,18 @@ public class Main extends Application {
         int count = 1000; // Кількість точок, яку потрібно згенерувати
 
 
-//        points.add(new Point(24.0, 51.0));
-//        points.add(new Point(31.0, 70.0));
-//        points.add(new Point(32.0, 41.0));
-//        points.add(new Point(33.0, 50.0));
-//        points.add(new Point(33.0, 95.0));
-//        points.add(new Point(37.0, 46.0));
-//        points.add(new Point(20.0, 51.0));
-//        points.add(new Point(20.0, 59.0));
-//        points.add(new Point(20.0, 81.0));
-//        points.add(new Point(21.0, 33.0));
-//        points.add(new Point(21.0, 81.0));
-//        points.add(new Point(24.0, 33.0));
+        points.add(new Point(24.0, 51.0));
+        points.add(new Point(31.0, 70.0));
+        points.add(new Point(32.0, 41.0));
+        points.add(new Point(33.0, 50.0));
+        points.add(new Point(33.0, 95.0));
+        points.add(new Point(37.0, 46.0));
+        points.add(new Point(20.0, 51.0));
+        points.add(new Point(20.0, 59.0));
+        points.add(new Point(20.0, 81.0));
+        points.add(new Point(21.0, 33.0));
+        points.add(new Point(21.0, 81.0));
+        points.add(new Point(24.0, 33.0));
 
 
         points.forEach(p -> {
@@ -215,21 +215,33 @@ public class Main extends Application {
         Line prevSupportLine;
         do {
             prevSupportLine = new Line(supportLine.getStart(), supportLine.getEnd());
+            double prevLength = VectorUtils.getLength(prevSupportLine.getStart(), prevSupportLine.getEnd());
+            Point prevDirection = VectorUtils.geDirection(prevSupportLine.getStart(), prevSupportLine.getEnd());
 
             for (Point leftPoint : leftPolygon) {
-                if (is(leftPoint, supportLine, isUpper)) {
+                boolean isCollinear = isColLinear(prevDirection, VectorUtils.geDirection(leftPoint, supportLine.getEnd()));
+                boolean isShorter = VectorUtils.getLength(leftPoint, supportLine.getEnd()) < prevLength;
+
+                if (is(leftPoint, supportLine, isUpper) || (isCollinear && isShorter)) {
                     supportLine.setStart(leftPoint);
                 }
             }
 
             for (Point rightPoint : rightPolygon) {
-                if (is(rightPoint, supportLine, isUpper)) {
+                boolean isCollinear = isColLinear(prevDirection, VectorUtils.geDirection(supportLine.getStart(), rightPoint));
+                boolean isShorter = VectorUtils.getLength(supportLine.getStart(), rightPoint) < prevLength;
+
+                if (is(rightPoint, supportLine, isUpper) ||  (isCollinear && isShorter)) {
                     supportLine.setEnd(rightPoint);
                 }
             }
         } while (!Objects.equals(supportLine, prevSupportLine));
 
         return supportLine;
+    }
+
+    private boolean isColLinear(Point point, Point other) {
+        return point.getNumX() * other.getNumY() == point.getNumY() * other.getNumX();
     }
 
 
