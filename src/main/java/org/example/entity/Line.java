@@ -8,15 +8,15 @@ import lombok.*;
 @EqualsAndHashCode
 @ToString
 public class Line {
-    private Point a;
-    private Point b;
+    private Point start;
+    private Point end;
 
-    public Line(Point a, Point b) {
-        this.a = a;
-        this.b = b;
+    public Line(Point start, Point end) {
+        this.start = start;
+        this.end = end;
     }
 
     public Point getMidPoint() {
-        return new Point((a.getX() + b.getX()) / 2, (a.getY() + b.getY()) / 2);
+        return new Point((start.getX() + end.getX()) / 2, (start.getY() + end.getY()) / 2);
     }
 }

@@ -4,8 +4,6 @@ import org.example.entity.Edge;
 import org.example.entity.Line;
 import org.example.entity.Point;
 
-import java.util.Objects;
-
 import static org.example.utils.VectorUtils.crossProduct;
 
 public class LineUtils {
@@ -13,7 +11,7 @@ public class LineUtils {
 
 
     public static Point getPointOfIntersection(Line commonSupport, Edge currentEdge) {
-        Point lineStart = commonSupport.getA(), lineEnd = commonSupport.getB();
+        Point lineStart = commonSupport.getStart(), lineEnd = commonSupport.getEnd();
         Point cellCenter = currentEdge.getCell().getCenter(), twinCenter = currentEdge.getTwin().getCell().getCenter();
 
         double lineWidth  = lineEnd.getX() - lineStart.getX();
@@ -40,7 +38,7 @@ public class LineUtils {
 
     public static Line getPerpendicular(Line line) {
         Point middlePoint = line.getMidPoint();
-        Point direction = VectorUtils.geDirection(line.getA(), line.getB());
+        Point direction = VectorUtils.geDirection(line.getStart(), line.getEnd());
 
         double x = direction.getX();
         double y = direction.getY();
@@ -61,8 +59,8 @@ public class LineUtils {
     }
 
     public static boolean is(Point point, Line line, boolean isUpper) {
-        Point direction = VectorUtils.geDirection(line.getA(), line.getB());
-        double crossProduct = crossProduct(direction, VectorUtils.geDirection(line.getA(), point));
+        Point direction = VectorUtils.geDirection(line.getStart(), line.getEnd());
+        double crossProduct = crossProduct(direction, VectorUtils.geDirection(line.getStart(), point));
         if (isUpper) {
             return crossProduct > 0;
         }

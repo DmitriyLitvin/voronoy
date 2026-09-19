@@ -19,7 +19,6 @@ import org.example.utils.EdgeUtils;
 import org.example.utils.VectorUtils;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 import static java.lang.Math.*;
 import static org.example.utils.EdgeUtils.*;
@@ -211,37 +210,26 @@ public class Main extends Application {
     private Line getCommonSupport(Set<Point> leftPolygon, Set<Point> rightPolygon, boolean isUpper) {
         Point maxPoint = leftPolygon.stream().max(Comparator.comparingDouble(Point::getX).thenComparing(Point::getY)).orElse(null);
         Point minPoint = rightPolygon.stream().min(Comparator.comparingDouble(Point::getX).thenComparing(Point::getY)).orElse(null);
-        Line line = new Line(maxPoint, minPoint);
+        Line supportLine = new Line(maxPoint, minPoint);
 
-        for (int i = 0; i < 2; i++) {
-            Point leftPoint = maxPoint;
-            Point rightPoint = minPoint;
+        Line prevSupportLine;
+        do {
+            prevSupportLine = new Line(supportLine.getStart(), supportLine.getEnd());
 
-            Iterator<Point> leftConvexPolygonIterator = leftPolygon.stream().filter(p -> !p.equals(maxPoint)).iterator();
-            Iterator<Point> rightConvexPolygonIterator = rightPolygon.stream().filter(p -> !p.equals(minPoint)).iterator();
-            while (leftConvexPolygonIterator.hasNext() || rightConvexPolygonIterator.hasNext()) {
-                if (leftConvexPolygonIterator.hasNext()) {
-                    leftPoint = leftConvexPolygonIterator.next();
-                }
-                if (rightConvexPolygonIterator.hasNext()) {
-                    rightPoint = rightConvexPolygonIterator.next();
-                }
-                if (is(leftPoint, line, isUpper)) {
-                    line.setA(leftPoint);
-                    if (is(rightPoint, line, isUpper)) {
-                        line.setB(rightPoint);
-                    }
-
-                } else if (is(rightPoint, line, isUpper)) {
-                    line.setB(rightPoint);
-                    if (is(leftPoint, line, isUpper)) {
-                        line.setA(leftPoint);
-                    }
+            for (Point leftPoint : leftPolygon) {
+                if (is(leftPoint, supportLine, isUpper)) {
+                    supportLine.setStart(leftPoint);
                 }
             }
-        }
 
-        return line;
+            for (Point rightPoint : rightPolygon) {
+                if (is(rightPoint, supportLine, isUpper)) {
+                    supportLine.setEnd(rightPoint);
+                }
+            }
+        } while (!Objects.equals(supportLine, prevSupportLine));
+
+        return supportLine;
     }
 
 
@@ -257,8 +245,8 @@ public class Main extends Application {
             Point rightCenter = polygon.get(1);
 
             Line perpendicular = getPerpendicular(new Line(leftCenter, rightCenter));
-            Edge leftEdge = new Edge(perpendicular.getA());
-            Edge rightEdge = new Edge(perpendicular.getB());
+            Edge leftEdge = new Edge(perpendicular.getStart());
+            Edge rightEdge = new Edge(perpendicular.getEnd());
 
             leftEdge.setTwin(rightEdge);
             rightEdge.setTwin(leftEdge);
@@ -296,18 +284,18 @@ public class Main extends Application {
 
 
         if (Objects.equals(upperCommonSupport, lowerCommonSupport)) {
-            Cell leftCell = leftDiagram.get(upperCommonSupport.getA());
-            Cell rightCell = rightDiagram.get(upperCommonSupport.getB());
+            Cell leftCell = leftDiagram.get(upperCommonSupport.getStart());
+            Cell rightCell = rightDiagram.get(upperCommonSupport.getEnd());
 
             perpendicular = getPerpendicular(new Line(leftCell.getCenter(), rightCell.getCenter()));
-            Edge leftEdge = new Edge(perpendicular.getA(), leftCell);
+            Edge leftEdge = new Edge(perpendicular.getStart(), leftCell);
             if (leftCell.getBoundary() == null) {
                 leftCell.setBoundary(leftEdge);
             } else {
                 idleEdges.put(leftCell, leftEdge);
             }
 
-            Edge rightEdge = new Edge(perpendicular.getB(), rightCell);
+            Edge rightEdge = new Edge(perpendicular.getEnd(), rightCell);
             if (rightCell.getBoundary() == null) {
                 rightCell.setBoundary(rightEdge);
             } else {
@@ -328,19 +316,19 @@ public class Main extends Application {
 
         Edge currentEdge = null;
         while (!Objects.equals(upperCommonSupport, lowerCommonSupport)) {
-            Cell leftCell = leftDiagram.get(upperCommonSupport.getA());
-            Cell rightCell = rightDiagram.get(upperCommonSupport.getB());
+            Cell leftCell = leftDiagram.get(upperCommonSupport.getStart());
+            Cell rightCell = rightDiagram.get(upperCommonSupport.getEnd());
 
             perpendicular = getPerpendicular(upperCommonSupport);
 
             boolean isInfinite = false;
             if (chainPoint == null) {
                 isInfinite = true;
-                Point point = perpendicular.getA();
-                if (crossProduct(VectorUtils.geDirection(upperCommonSupport.getA(), upperCommonSupport.getB()), VectorUtils.geDirection(upperCommonSupport.getA(), point)) > 0) {
+                Point point = perpendicular.getStart();
+                if (crossProduct(VectorUtils.geDirection(upperCommonSupport.getStart(), upperCommonSupport.getEnd()), VectorUtils.geDirection(upperCommonSupport.getStart(), point)) > 0) {
                     chainPoint = point;
                 } else {
-                    chainPoint = perpendicular.getB();
+                    chainPoint = perpendicular.getEnd();
                 }
             }
 
@@ -459,7 +447,7 @@ public class Main extends Application {
                     }
                 }
 
-                upperCommonSupport.setA(leftTwinEdge.getCell().getCenter());
+                upperCommonSupport.setStart(leftTwinEdge.getCell().getCenter());
                 chainPoint = leftPoint;
                 chainEdge = nextLeftEdge;
                 currentEdge = leftEdge;
@@ -520,7 +508,7 @@ public class Main extends Application {
                     }
                 }
 
-                upperCommonSupport.setB(rightTwinEdge.getCell().getCenter());
+                upperCommonSupport.setEnd(rightTwinEdge.getCell().getCenter());
                 chainPoint = rightPoint;
                 chainEdge = nextRightEdge;
                 currentEdge = rightEdge;
@@ -532,15 +520,15 @@ public class Main extends Application {
 
         Edge leftEdge;
         Edge rightEdge;
-        Cell leftCell = leftDiagram.get(lowerCommonSupport.getA());
-        Cell rightCell = rightDiagram.get(lowerCommonSupport.getB());
-        Point leftPoint = perpendicular.getA();
+        Cell leftCell = leftDiagram.get(lowerCommonSupport.getStart());
+        Cell rightCell = rightDiagram.get(lowerCommonSupport.getEnd());
+        Point leftPoint = perpendicular.getStart();
         assert chainPoint != null;
-        if (crossProduct(VectorUtils.geDirection(lowerCommonSupport.getA(), lowerCommonSupport.getB()), VectorUtils.geDirection(lowerCommonSupport.getA(), leftPoint)) < 0) {
+        if (crossProduct(VectorUtils.geDirection(lowerCommonSupport.getStart(), lowerCommonSupport.getEnd()), VectorUtils.geDirection(lowerCommonSupport.getStart(), leftPoint)) < 0) {
             leftEdge = new Edge(leftPoint, leftCell);
             rightEdge = new Edge(chainPoint, rightCell);
         } else {
-            Point rightPoint = perpendicular.getB();
+            Point rightPoint = perpendicular.getEnd();
             leftEdge = new Edge(rightPoint, leftCell);
             rightEdge = new Edge(chainPoint, rightCell);
         }

@@ -141,8 +141,8 @@ public class EdgeUtils {
     }
 
     public static boolean isOnTheSameSide(Point point, Point other, Line line) {
-        Point startPoint = line.getA();
-        Point endPoint = line.getB();
+        Point startPoint = line.getStart();
+        Point endPoint = line.getEnd();
         return ((endPoint.getX() - startPoint.getX()) * (point.getY() - startPoint.getY()) - (endPoint.getY() - startPoint.getY()) * (point.getX() - startPoint.getX())) * ((endPoint.getX() - startPoint.getX()) * (other.getY() - startPoint.getY()) - (endPoint.getY() - startPoint.getY()) * (other.getX() - startPoint.getX())) > 0;
     }
 
